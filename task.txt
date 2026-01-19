@@ -1,0 +1,14 @@
+请帮我进行品牌重塑 (Rebranding)，将项目正式更名为 "**PolyDelta**"。
+
+请修改以下前端文件：
+
+1. **`web/app/layout.tsx` (元数据设置)**
+   - 修改 `title` 为 `"PolyDelta | Crypto Prediction Arbitrage"`。
+   - 修改 `description` 为 `"Track real-time odds discrepancies between Polymarket and Web2 bookmakers."`。
+
+2. **`web/components/Dashboard.tsx` (主界面)**
+   - 将左上角的 Logo 文字从 "WorldCup Alpha" 改为 "**PolyDelta**"。
+   - 副标题（如果有）请更新为 `"Real-time Web2 vs Web3 Arbitrage"`。
+   - 保持现有的深色 Bloomberg 终端风格不变。
+
+请执行修改。

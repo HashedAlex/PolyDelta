@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MarketOdds {
+  id               Int       @id @default(autoincrement())
+  sport_type       String    @db.VarChar(20)
+  team_name        String    @db.VarChar(100)
+  web2_odds        Float?
+  source_bookmaker String?   @db.VarChar(50)
+  source_url       String?
+  polymarket_price Float?
+  polymarket_url   String?
+  kalshi_price     Float?
+  kalshi_url       String?
+  last_updated     DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([sport_type, team_name], map: "idx_sport_team")
+  @@index([sport_type], map: "idx_sport_type")
+  @@index([team_name], map: "idx_team_name")
+  @@map("market_odds")
+}
