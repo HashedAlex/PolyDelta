@@ -19,6 +19,7 @@ export interface MarketItem {
 // 每日比赛类型
 export interface DailyMatchItem {
   id: number
+  match_id: string
   home_team: string
   away_team: string
   commence_time: Date
@@ -97,6 +98,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   const [activeSport, setActiveSport] = useState<SportType>('nba')
   const [nbaSubTab, setNbaSubTab] = useState<NbaSubTab>('daily')
   const [hideLowOdds, setHideLowOdds] = useState(true)
+  const [showBanner, setShowBanner] = useState(true)
 
   // 冠军盘口数据过滤
   const filterChampionMarkets = (markets: MarketItem[]) => {
@@ -119,6 +121,25 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
   return (
     <main className="min-h-screen p-6">
+      {/* Warning Banner */}
+      {showBanner && (
+        <div className="mb-4 -mt-2 bg-[#d29922]/20 border border-[#d29922]/40 rounded-lg px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-[#d29922]">
+            <span>⚠️</span>
+            <span>Beta Version. Odds may be delayed. Always verify on official platforms.</span>
+          </div>
+          <button
+            onClick={() => setShowBanner(false)}
+            className="text-[#d29922] hover:text-[#f0b429] p-1 transition-colors"
+            aria-label="Dismiss banner"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <header className="mb-6">
         <div className="flex items-center justify-between">
@@ -285,6 +306,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                 <ArbitrageCard
                   key={item.id}
                   teamName={item.team_name}
+                  sportType="world_cup"
                   web2Odds={item.web2_odds}
                   sourceBookmaker={item.source_bookmaker}
                   sourceUrl={item.source_url}
@@ -318,6 +340,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
               {sortedDailyMatches.map((match) => (
                 <MatchCard
                   key={match.id}
+                  matchId={match.match_id}
                   homeTeam={match.home_team}
                   awayTeam={match.away_team}
                   commenceTime={new Date(match.commence_time)}
@@ -359,6 +382,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                 <ArbitrageCard
                   key={item.id}
                   teamName={item.team_name}
+                  sportType="nba"
                   web2Odds={item.web2_odds}
                   sourceBookmaker={item.source_bookmaker}
                   sourceUrl={item.source_url}
@@ -376,10 +400,23 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="mt-12 pt-6 border-t border-[#30363d] text-center text-xs text-[#8b949e]">
-        <p>Data sources: TheOddsAPI (Web2) | Polymarket (Prediction Market)</p>
-        <p className="mt-1">Built for educational purposes only. Not financial advice.</p>
+      {/* Footer - Disclaimer */}
+      <footer className="mt-12 pt-8 pb-6 bg-[#0d1117] border-t border-[#30363d]">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-sm text-[#8b949e] mb-3">
+            PolyDelta provides data for informational purposes only. No financial advice provided. Betting involves risk.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-[#6e7681]">
+            <span>Data sources: TheOddsAPI | Polymarket</span>
+            <span>•</span>
+            <span>Built for educational purposes</span>
+            <span>•</span>
+            <span>Always verify on official platforms</span>
+          </div>
+          <p className="mt-4 text-xs text-[#484f58]">
+            © {new Date().getFullYear()} PolyDelta. Not affiliated with any betting platform.
+          </p>
+        </div>
       </footer>
     </main>
   )
