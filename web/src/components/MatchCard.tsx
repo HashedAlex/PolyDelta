@@ -1,6 +1,11 @@
 "use client"
 
+import { useState } from 'react'
+import { CalculatorModal, CalculatorData } from './CalculatorModal'
+import { OddsChart } from './OddsChart'
+
 interface MatchCardProps {
+  matchId?: string
   homeTeam: string
   awayTeam: string
   commenceTime: Date
@@ -48,6 +53,7 @@ function calculateEV(web2Odds: number | null, polyPrice: number | null): number 
 }
 
 export function MatchCard({
+  matchId,
   homeTeam,
   awayTeam,
   commenceTime,
@@ -59,8 +65,21 @@ export function MatchCard({
   sourceUrl,
   polymarketUrl,
 }: MatchCardProps) {
+  const [showCalculator, setShowCalculator] = useState(false)
+
   const homeEV = calculateEV(web2HomeOdds, polyHomePrice)
   const awayEV = calculateEV(web2AwayOdds, polyAwayPrice)
+
+  // Calculator data
+  const calculatorData: CalculatorData = {
+    homeTeam,
+    awayTeam,
+    web2HomeOdds,
+    web2AwayOdds,
+    polyHomePrice,
+    polyAwayPrice,
+    sourceBookmaker,
+  }
 
   // 找到最大的 EV 值
   const maxEV = Math.max(
@@ -170,17 +189,26 @@ export function MatchCard({
         </div>
       </div>
 
-      {/* Bet on Polymarket Button */}
+      {/* Action Buttons */}
       {hasPoly && polymarketUrl && (
-        <a
-          href={polymarketUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-[#238636] hover:bg-[#2ea043] text-white text-sm font-medium rounded-md transition-colors"
-        >
-          <span>Bet on Polymarket</span>
-          <span>↗</span>
-        </a>
+        <div className="mt-3 flex gap-2">
+          <a
+            href={polymarketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-[#238636] hover:bg-[#2ea043] text-white text-sm font-medium rounded-md transition-colors"
+          >
+            <span>Bet on Polymarket</span>
+            <span>↗</span>
+          </a>
+          <button
+            onClick={() => setShowCalculator(true)}
+            className="px-3 py-2 bg-[#21262d] hover:bg-[#30363d] text-[#e6edf3] rounded-md transition-colors border border-[#30363d]"
+            title="Open Calculator"
+          >
+            🧮
+          </button>
+        </div>
       )}
 
       {/* Fallback: No Polymarket data */}
@@ -189,6 +217,24 @@ export function MatchCard({
           Polymarket not available yet
         </div>
       )}
+
+      {/* History Chart (Home Team) */}
+      {matchId && (
+        <OddsChart
+          eventId={`${matchId}_home`}
+          eventType="daily"
+          sportType="nba"
+          teamName={`${homeTeam} (Home)`}
+        />
+      )}
+
+      {/* Calculator Modal */}
+      <CalculatorModal
+        isOpen={showCalculator}
+        onClose={() => setShowCalculator(false)}
+        data={calculatorData}
+        type="match"
+      />
     </div>
   )
 }
