@@ -25,3 +25,31 @@ model MarketOdds {
   @@index([team_name], map: "idx_team_name")
   @@map("market_odds")
 }
+
+// Daily Matches - 每日比赛盘口 (H2H)
+model DailyMatch {
+  id               Int       @id @default(autoincrement())
+  sport_type       String    @db.VarChar(20)   // "nba", "nfl", etc.
+  match_id         String    @db.VarChar(100)  // 唯一比赛 ID (来自 Web2)
+  home_team        String    @db.VarChar(100)
+  away_team        String    @db.VarChar(100)
+  commence_time    DateTime  @db.Timestamp(6)  // 比赛开始时间
+
+  // Web2 赔率 (TheOddsAPI)
+  web2_home_odds   Float?    // 主队隐含胜率
+  web2_away_odds   Float?    // 客队隐含胜率
+  source_bookmaker String?   @db.VarChar(50)
+  source_url       String?
+
+  // Polymarket 价格
+  poly_home_price  Float?    // 主队价格
+  poly_away_price  Float?    // 客队价格
+  polymarket_url   String?
+
+  last_updated     DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([sport_type, match_id])
+  @@index([sport_type], map: "idx_daily_sport")
+  @@index([commence_time], map: "idx_daily_time")
+  @@map("daily_matches")
+}

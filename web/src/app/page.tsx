@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Dashboard, MarketItem } from '@/components/Dashboard'
+import { Dashboard, MarketItem, DailyMatchItem } from '@/components/Dashboard'
 
 // 配置页面为动态渲染，每次请求都重新获取数据
 export const dynamic = 'force-dynamic'
@@ -12,7 +12,7 @@ function calculateEV(web2Odds: number | null, polyPrice: number | null): number 
 }
 
 export default async function Page() {
-  // 从数据库获取所有数据
+  // 从数据库获取冠军盘口数据
   const allData = await prisma.marketOdds.findMany({
     orderBy: [
       { sport_type: 'asc' },
@@ -20,7 +20,17 @@ export default async function Page() {
     ],
   })
 
-  // 按赛事类型分组并处理数据
+  // 从数据库获取每日比赛数据
+  const dailyMatchesRaw = await prisma.dailyMatch.findMany({
+    where: {
+      sport_type: 'nba',
+    },
+    orderBy: {
+      commence_time: 'asc',
+    },
+  })
+
+  // 按赛事类型分组并处理冠军盘口数据
   const worldCupMarkets: MarketItem[] = []
   const nbaMarkets: MarketItem[] = []
 
@@ -43,6 +53,21 @@ export default async function Page() {
     }
   })
 
+  // 处理每日比赛数据
+  const dailyMatches: DailyMatchItem[] = dailyMatchesRaw.map((match) => ({
+    id: match.id,
+    home_team: match.home_team,
+    away_team: match.away_team,
+    commence_time: match.commence_time,
+    web2_home_odds: match.web2_home_odds,
+    web2_away_odds: match.web2_away_odds,
+    poly_home_price: match.poly_home_price,
+    poly_away_price: match.poly_away_price,
+    source_bookmaker: match.source_bookmaker,
+    source_url: match.source_url,
+    polymarket_url: match.polymarket_url,
+  }))
+
   // 按 Polymarket 价格（胜率）排序，热门球队在前
   const sortByPolymarketPrice = (a: MarketItem, b: MarketItem) => {
     const priceA = a.polymarket_price || 0
@@ -60,6 +85,7 @@ export default async function Page() {
       const ev = calculateEV(item.web2_odds, item.polymarket_price)
       return ev !== null && Math.abs(ev) >= 5
     }).length,
+    dailyMatchCount: dailyMatches.length,
     lastUpdate: allData[0]?.last_updated
       ? new Date(allData[0].last_updated).toLocaleString()
       : 'N/A',
@@ -69,6 +95,7 @@ export default async function Page() {
     <Dashboard
       worldCupMarkets={worldCupMarkets}
       nbaMarkets={nbaMarkets}
+      dailyMatches={dailyMatches}
       stats={stats}
     />
   )
