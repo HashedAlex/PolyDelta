@@ -131,7 +131,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
           <div className="flex gap-6 text-sm">
             <div className="text-center">
               <div className="text-2xl font-bold text-[#58a6ff]">{stats.dailyMatchCount}</div>
-              <div className="text-[#8b949e]">Today's Games</div>
+              <div className="text-[#8b949e]">Today&apos;s Games</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
