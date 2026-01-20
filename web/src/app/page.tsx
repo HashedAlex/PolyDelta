@@ -56,6 +56,7 @@ export default async function Page() {
   // 处理每日比赛数据
   const dailyMatches: DailyMatchItem[] = dailyMatchesRaw.map((match) => ({
     id: match.id,
+    match_id: match.match_id,
     home_team: match.home_team,
     away_team: match.away_team,
     commence_time: match.commence_time,
