@@ -1,5 +1,12 @@
+"use client"
+
+import { useState } from 'react'
+import { CalculatorModal, CalculatorData } from './CalculatorModal'
+import { OddsChart } from './OddsChart'
+
 interface ArbitrageCardProps {
   teamName: string
+  sportType?: string
   web2Odds: number | null
   sourceBookmaker: string | null
   sourceUrl: string | null
@@ -10,6 +17,7 @@ interface ArbitrageCardProps {
 
 export function ArbitrageCard({
   teamName,
+  sportType = 'nba',
   web2Odds,
   sourceBookmaker,
   sourceUrl,
@@ -17,15 +25,33 @@ export function ArbitrageCard({
   polymarketUrl,
   ev,
 }: ArbitrageCardProps) {
-  // 判断是否为套利机会 (|EV| >= 5%)
+  const [showCalculator, setShowCalculator] = useState(false)
+
+  // Normalize probability helper (defined early for calculatorData)
+  const normalizeProb = (value: number | null): number | null => {
+    if (value === null) return null
+    return value > 1 ? value / 100 : value
+  }
+
+  // Calculator data - normalize values to ensure 0-1 probability format
+  const calculatorData: CalculatorData = {
+    teamName,
+    web2Odds: normalizeProb(web2Odds),
+    polymarketPrice: normalizeProb(polymarketPrice),
+    sourceBookmaker,
+  }
+
+  // 判断是否为价值投注机会 (|EV| >= 5%)
   const isArbitrage = ev !== null && Math.abs(ev) >= 5
   // 判断方向：正EV表示Web2低估（应该买Polymarket），负EV表示Web2高估（应该卖Polymarket）
   const isPositiveEV = ev !== null && ev > 0
 
-  // 格式化百分比显示
+  // 格式化百分比显示 (handles both percentage and probability formats)
   const formatPercent = (value: number | null) => {
     if (value === null) return 'N/A'
-    return `${(value * 100).toFixed(1)}%`
+    // Normalize: if > 1, it's percentage, else it's probability
+    const normalized = value > 1 ? value / 100 : value
+    return `${(normalized * 100).toFixed(1)}%`
   }
 
   const formatEV = (value: number | null) => {
@@ -47,10 +73,10 @@ export function ArbitrageCard({
         }
       `}
     >
-      {/* Arbitrage Badge */}
+      {/* Value Bet Badge - Show when EV >= 5% */}
       {isArbitrage && (
-        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#3fb950] text-black text-xs font-bold rounded-full">
-          Arbitrage
+        <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#58a6ff] text-white text-xs font-bold rounded-full">
+          Value Bet
         </div>
       )}
 
@@ -112,28 +138,53 @@ export function ArbitrageCard({
         </div>
       </div>
 
-      {/* Action Button */}
+      {/* Action Buttons */}
       {polymarketUrl ? (
-        <a
-          href={polymarketUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`
-            block w-full py-2 px-4 rounded text-center text-sm font-medium
-            transition-colors duration-200
-            ${isArbitrage
-              ? 'bg-[#3fb950] hover:bg-[#2ea043] text-black'
-              : 'bg-[#21262d] hover:bg-[#30363d] text-[#e6edf3] border border-[#30363d]'
-            }
-          `}
-        >
-          {isArbitrage ? 'Bet on Polymarket' : 'View on Polymarket'}
-        </a>
+        <div className="flex gap-2">
+          <a
+            href={polymarketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`
+              flex-1 py-2 px-4 rounded text-center text-sm font-medium
+              transition-colors duration-200
+              ${isArbitrage
+                ? 'bg-[#3fb950] hover:bg-[#2ea043] text-black'
+                : 'bg-[#21262d] hover:bg-[#30363d] text-[#e6edf3] border border-[#30363d]'
+              }
+            `}
+          >
+            {isArbitrage ? 'Bet on Polymarket' : 'View on Polymarket'}
+          </a>
+          <button
+            onClick={() => setShowCalculator(true)}
+            className="px-3 py-2 bg-[#21262d] hover:bg-[#30363d] text-[#e6edf3] rounded transition-colors border border-[#30363d]"
+            title="Open Calculator"
+          >
+            🧮
+          </button>
+        </div>
       ) : (
         <div className="w-full py-2 px-4 rounded text-center text-sm text-[#8b949e] bg-[#21262d] border border-[#30363d]">
           No Polymarket Data
         </div>
       )}
+
+      {/* History Chart */}
+      <OddsChart
+        eventId={teamName}
+        eventType="championship"
+        sportType={sportType}
+        teamName={teamName}
+      />
+
+      {/* Calculator Modal */}
+      <CalculatorModal
+        isOpen={showCalculator}
+        onClose={() => setShowCalculator(false)}
+        data={calculatorData}
+        type="championship"
+      />
     </div>
   )
 }
