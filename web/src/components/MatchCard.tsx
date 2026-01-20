@@ -22,6 +22,7 @@ function formatMatchTime(date: Date): string {
   tomorrow.setDate(tomorrow.getDate() + 1)
   const isTomorrow = matchDate.toDateString() === tomorrow.toDateString()
 
+  // 使用固定 locale 避免 hydration mismatch
   const timeStr = matchDate.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
@@ -71,12 +72,15 @@ export function MatchCard({
   const hasArbitrage = maxEV >= 5
   const borderColor = hasArbitrage ? 'border-[#3fb950]' : 'border-[#30363d]'
 
+  const hasPoly = polyHomePrice != null || polyAwayPrice != null
+
   return (
     <div className={`bg-[#161b22] rounded-lg p-4 border ${borderColor} hover:border-[#58a6ff] transition-colors`}>
       {/* Header - 比赛时间 */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-[#8b949e] bg-[#21262d] px-2 py-1 rounded">
-          {formatMatchTime(commenceTime)}
+        <span className="text-xs text-[#8b949e] bg-[#21262d] px-2 py-1 rounded flex items-center gap-1">
+          <span>🌍</span>
+          <span>{formatMatchTime(commenceTime)}</span>
         </span>
         {hasArbitrage && (
           <span className="text-xs text-[#3fb950] bg-[#3fb950]/10 px-2 py-1 rounded font-medium">
@@ -165,6 +169,26 @@ export function MatchCard({
           </div>
         </div>
       </div>
+
+      {/* Bet on Polymarket Button */}
+      {hasPoly && polymarketUrl && (
+        <a
+          href={polymarketUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 px-3 bg-[#238636] hover:bg-[#2ea043] text-white text-sm font-medium rounded-md transition-colors"
+        >
+          <span>Bet on Polymarket</span>
+          <span>↗</span>
+        </a>
+      )}
+
+      {/* Fallback: No Polymarket data */}
+      {!hasPoly && (
+        <div className="mt-3 text-center text-xs text-[#8b949e] py-2">
+          Polymarket not available yet
+        </div>
+      )}
     </div>
   )
 }
