@@ -53,3 +53,19 @@ model DailyMatch {
   @@index([commence_time], map: "idx_daily_time")
   @@map("daily_matches")
 }
+
+// Odds History - 历史赔率快照 (用于趋势图)
+model OddsHistory {
+  id               Int       @id @default(autoincrement())
+  event_type       String    @db.VarChar(20)   // "championship" or "daily"
+  event_id         String    @db.VarChar(100)  // team_name for championship, match_id for daily
+  sport_type       String    @db.VarChar(20)
+  web2_odds        Float?    // 隐含胜率 (0-1)
+  polymarket_price Float?    // Polymarket 价格 (0-1)
+  recorded_at      DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([event_type, event_id], map: "idx_history_event")
+  @@index([sport_type], map: "idx_history_sport")
+  @@index([recorded_at], map: "idx_history_time")
+  @@map("odds_history")
+}
