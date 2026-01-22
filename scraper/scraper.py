@@ -21,9 +21,191 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 ODDS_API_KEY = os.getenv('ODDS_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+# 导入 OpenRouter AI 分析模块 (用于冠军盘口)
+from ai_analyst import generate_ai_report as generate_championship_ai_report
 
 # 缓存文件目录
 CACHE_DIR = os.path.dirname(__file__)
+
+# ============================================
+# AI 分析报告生成
+# ============================================
+
+def calculate_match_ev(home_odds, away_odds, poly_home, poly_away):
+    """计算比赛的最大 EV"""
+    evs = []
+    if home_odds and poly_home:
+        ev_home = (home_odds - poly_home) / poly_home if poly_home > 0 else 0
+        evs.append(ev_home)
+    if away_odds and poly_away:
+        ev_away = (away_odds - poly_away) / poly_away if poly_away > 0 else 0
+        evs.append(ev_away)
+    return max(evs) if evs else 0
+
+
+def generate_ai_report(match_data, existing_analysis=None, existing_timestamp=None):
+    """
+    生成 AI 分析报告 (每日比赛用)
+    优先使用 OpenRouter，然后 OpenAI，最后 Mock
+
+    Args:
+        match_data: 比赛数据字典
+        existing_analysis: 现有的分析报告
+        existing_timestamp: 现有报告的时间戳
+
+    Returns:
+        tuple: (analysis_text, timestamp) 或 (None, None) 如果跳过
+    """
+    home_team = match_data.get("home_team", "Home")
+    away_team = match_data.get("away_team", "Away")
+    home_odds = match_data.get("home_odds")
+    away_odds = match_data.get("away_odds")
+    poly_home = match_data.get("poly_home_price")
+    poly_away = match_data.get("poly_away_price")
+    bookmaker = match_data.get("bookmaker", "Web2")
+
+    # 计算 EV
+    max_ev = calculate_match_ev(home_odds, away_odds, poly_home, poly_away)
+
+    # 触发条件: EV > 2%
+    if max_ev < 0.02:
+        return "No significant arbitrage opportunity detected yet.", datetime.utcnow().isoformat()
+
+    # 频次控制: 4小时内的报告直接复用 (但跳过占位文本)
+    if existing_timestamp and existing_analysis:
+        # 跳过旧的占位文本，重新生成
+        if "No significant" not in existing_analysis:
+            try:
+                last_gen = datetime.fromisoformat(existing_timestamp.replace('Z', '+00:00').replace('+00:00', ''))
+                if datetime.utcnow() - last_gen < timedelta(hours=4):
+                    print(f"  [AI] 复用现有报告 (生成于 {existing_timestamp})")
+                    return existing_analysis, existing_timestamp
+            except:
+                pass
+
+    # 尝试使用 OpenRouter API (新增)
+    try:
+        match_data_for_openrouter = {
+            'title': f"{home_team} vs {away_team}",
+            'web2_odds': (home_odds or 0) * 100,
+            'polymarket_price': (poly_home or 0) * 100,
+            'ev': max_ev,
+        }
+        report = generate_championship_ai_report(match_data_for_openrouter, is_championship=False)
+        if report:
+            print(f"  [AI] OpenRouter 报告生成成功")
+            return report, datetime.utcnow().isoformat()
+    except Exception as e:
+        print(f"  [AI] OpenRouter 错误: {e}")
+
+    # 尝试使用 OpenAI API
+    if OPENAI_API_KEY:
+        try:
+            return _generate_openai_report(
+                home_team, away_team, home_odds, away_odds,
+                poly_home, poly_away, bookmaker, max_ev
+            )
+        except Exception as e:
+            print(f"  [AI] OpenAI API 错误: {e}, 使用 Mock 报告")
+
+    # Fallback: Mock 报告
+    return _generate_mock_report(
+        home_team, away_team, home_odds, away_odds,
+        poly_home, poly_away, bookmaker, max_ev
+    )
+
+
+def _generate_openai_report(home_team, away_team, home_odds, away_odds, poly_home, poly_away, bookmaker, max_ev):
+    """使用 OpenAI API 生成报告"""
+    import openai
+
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+    prompt = f"""You are a Professional Sports Arbitrage Trader. Analyze this NBA match:
+
+**Match:** {home_team} vs {away_team}
+
+**Web2 Odds ({bookmaker}):**
+- {home_team}: {home_odds*100:.1f}% implied probability
+- {away_team}: {away_odds*100:.1f}% implied probability
+
+**Polymarket Prices:**
+- {home_team}: {poly_home*100:.1f}%
+- {away_team}: {poly_away*100:.1f}%
+
+**Max EV:** {max_ev*100:.1f}%
+
+Provide a brief, sharp analysis in Markdown format:
+1. Identify which side has value (Web2 vs Polymarket discrepancy)
+2. Possible reasons for the market divergence (2-3 bullet points)
+3. Risk factors to consider
+4. Clear recommendation
+
+Keep it concise - under 200 words. Use bullet points."""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=500,
+        temperature=0.7
+    )
+
+    analysis = response.choices[0].message.content
+    timestamp = datetime.utcnow().isoformat()
+
+    print(f"  [AI] OpenAI 报告生成成功")
+    return analysis, timestamp
+
+
+def _generate_mock_report(home_team, away_team, home_odds, away_odds, poly_home, poly_away, bookmaker, max_ev):
+    """生成 Mock 报告 (无 API Key 时使用)"""
+    timestamp = datetime.utcnow().isoformat()
+
+    # 判断哪边有价值
+    home_ev = (home_odds - poly_home) / poly_home if poly_home and home_odds else 0
+    away_ev = (away_odds - poly_away) / poly_away if poly_away and away_odds else 0
+
+    if home_ev > away_ev:
+        value_team = home_team
+        value_side = "home"
+        web2_prob = home_odds * 100 if home_odds else 0
+        poly_prob = poly_home * 100 if poly_home else 0
+    else:
+        value_team = away_team
+        value_side = "away"
+        web2_prob = away_odds * 100 if away_odds else 0
+        poly_prob = poly_away * 100 if poly_away else 0
+
+    analysis = f"""## Market Analysis
+
+**Value Identified:** {value_team} ({value_side.upper()})
+
+The {bookmaker} sportsbook implies a **{web2_prob:.1f}%** win probability for {value_team}, while Polymarket prices it at **{poly_prob:.1f}%**. This {web2_prob - poly_prob:.1f}% discrepancy suggests potential value.
+
+## Possible Reasons for Divergence
+
+- **Information asymmetry:** Web2 books may have access to injury/lineup data not yet reflected in crypto markets
+- **Market efficiency:** Polymarket's liquidity is lower, leading to slower price discovery
+- **Demographic bias:** Different bettor populations with varying risk preferences
+
+## Risk Factors
+
+- Odds can shift rapidly before game time
+- Web2 implied probabilities include vig/margin
+- Polymarket fees and slippage on execution
+
+## Recommendation
+
+⚠️ **Proceed with caution.** The +{max_ev*100:.1f}% EV is notable but not guaranteed. Consider position sizing using Kelly Criterion.
+
+---
+*This is an AI-generated analysis for informational purposes only. Not financial advice.*
+"""
+
+    print(f"  [AI] Mock 报告生成成功")
+    return analysis, timestamp
 
 # ============================================
 # Bookmaker URL 映射表
@@ -769,19 +951,20 @@ def fetch_nba_matches_web2():
 def fetch_nba_matches_polymarket():
     """
     从 Polymarket Gamma API 获取 NBA 每日比赛数据
-    使用 Events API (tag_slug=nba) 而不是 Markets API
+    使用 Events API (tag_slug=nba)
     格式: "Team1 vs. Team2" (例如 "Grizzlies vs. Lakers")
 
     过滤条件:
-    - 排除已结束的比赛 (价格接近 100%/0%)
+    - 排除已结束的比赛 (价格接近 100%/0% 或结束时间已过)
     - 排除冠军、MVP 等非每日比赛盘口
+    - 去重：同一场比赛可能有多个市场
     """
     print("\n[Polymarket] 正在获取 NBA 每日比赛数据...")
 
     # 使用 Events API 获取 NBA 比赛
     url = "https://gamma-api.polymarket.com/events"
     params = {
-        "limit": 50,
+        "limit": 100,
         "active": "true",
         "closed": "false",
         "tag_slug": "nba",
@@ -792,11 +975,13 @@ def fetch_nba_matches_polymarket():
         response.raise_for_status()
         events = response.json()
 
-        matches = []
-        all_events = []  # 用于调试
+        # 用于去重的字典: {(team1, team2): match_data}
+        unique_matches = {}
+        all_events = []
 
         # 匹配模式: "Team1 vs. Team2" 或 "Team1 vs Team2"
         vs_pattern = re.compile(r"^(.+?)\s+vs\.?\s+(.+?)$", re.IGNORECASE)
+        now = datetime.utcnow()
 
         for event in events:
             title = event.get("title", "")
@@ -824,11 +1009,19 @@ def fetch_nba_matches_polymarket():
             std_team2, score2 = fuzzy_match_team(team2_raw)
 
             if not std_team1 or not std_team2:
-                print(f"[Polymarket] 无法识别队伍: {team1_raw} vs {team2_raw}")
                 continue
 
-            # 获取市场详情（价格）
-            # 需要从 event 中获取 markets 数据
+            # 解析结束时间，跳过已过期的比赛
+            end_time = None
+            if end_date_str:
+                try:
+                    end_time = datetime.fromisoformat(end_date_str.replace("Z", "+00:00").replace("+00:00", ""))
+                    if end_time < now:
+                        continue  # 跳过已过期
+                except:
+                    pass
+
+            # 获取市场详情（价格）- 只找 H2H 市场（两队名作为选项）
             event_markets = event.get("markets", [])
 
             team1_price = None
@@ -849,53 +1042,73 @@ def fetch_nba_matches_polymarket():
                     except:
                         outcome_prices = []
 
-                for i, outcome in enumerate(outcomes):
-                    if i < len(outcome_prices):
-                        try:
-                            price = float(outcome_prices[i])
-                        except:
-                            continue
-
-                        # 匹配队伍
-                        outcome_team, _ = fuzzy_match_team(outcome)
-                        if outcome_team == std_team1:
-                            team1_price = price
-                        elif outcome_team == std_team2:
-                            team2_price = price
-
-            # 过滤已结束的比赛 (价格接近 100%/0% 或 0%/100%)
-            if team1_price is not None and team2_price is not None:
-                # 如果任一价格 > 0.95 或 < 0.05，说明比赛已结束或接近结束
-                if team1_price > 0.95 or team1_price < 0.05 or team2_price > 0.95 or team2_price < 0.05:
-                    print(f"[Polymarket] 跳过已结束比赛: {std_team1} vs {std_team2} ({team1_price:.1%} / {team2_price:.1%})")
+                # 只处理两个选项的市场，且选项不是 Yes/No/Over/Under
+                if len(outcomes) != 2:
+                    continue
+                if any(o in ["Yes", "No", "Over", "Under"] for o in outcomes):
                     continue
 
-            # 解析结束时间
-            end_time = None
-            if end_date_str:
-                try:
-                    end_time = datetime.fromisoformat(end_date_str.replace("Z", "+00:00"))
-                except:
-                    pass
+                # 尝试匹配两个选项为两支队伍
+                matched_team1 = None
+                matched_team2 = None
+
+                for i, outcome in enumerate(outcomes):
+                    if i >= len(outcome_prices):
+                        continue
+                    try:
+                        price = float(outcome_prices[i])
+                    except:
+                        continue
+
+                    outcome_team, _ = fuzzy_match_team(outcome)
+                    if outcome_team == std_team1:
+                        team1_price = price
+                        matched_team1 = True
+                    elif outcome_team == std_team2:
+                        team2_price = price
+                        matched_team2 = True
+
+                # 如果成功匹配到两队价格，跳出循环
+                if matched_team1 and matched_team2:
+                    break
+
+            # 过滤已结束的比赛 (价格接近 100%/0%)
+            if team1_price is not None and team2_price is not None:
+                if team1_price > 0.95 or team1_price < 0.05 or team2_price > 0.95 or team2_price < 0.05:
+                    continue
+
+            # 没有价格的跳过
+            if team1_price is None or team2_price is None:
+                continue
 
             # 构造市场 URL
             market_url = f"https://polymarket.com/event/{slug}" if slug else f"https://polymarket.com/event/{event_id}"
 
-            matches.append({
+            # 去重：用排序后的队伍名作为 key
+            match_key = tuple(sorted([std_team1, std_team2]))
+
+            # 如果已存在，保留结束时间更近的（更新的比赛）
+            if match_key in unique_matches:
+                existing = unique_matches[match_key]
+                if existing.get("end_time") and end_time:
+                    if end_time <= existing["end_time"]:
+                        continue  # 现有的更新，跳过
+
+            unique_matches[match_key] = {
                 "team1": std_team1,
                 "team2": std_team2,
-                "team1_price": round(team1_price, 4) if team1_price else None,
-                "team2_price": round(team2_price, 4) if team2_price else None,
+                "team1_price": round(team1_price, 4),
+                "team2_price": round(team2_price, 4),
                 "url": market_url,
                 "raw_question": title,
                 "end_time": end_time,
                 "event_id": str(event_id),
-            })
+            }
 
-            if team1_price and team2_price:
-                print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} ({team1_price:.2%} / {team2_price:.2%})")
-            else:
-                print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} (无价格)")
+        matches = list(unique_matches.values())
+
+        for m in matches:
+            print(f"[Polymarket] 找到比赛: {m['team1']} vs {m['team2']} ({m['team1_price']:.1%} / {m['team2_price']:.1%})")
 
         print(f"[Polymarket] 获取到 {len(matches)} 场 NBA 比赛市场")
 
@@ -1066,7 +1279,7 @@ def match_daily_games(web2_matches, poly_data):
 
 def save_daily_matches(matches):
     """
-    将每日比赛数据保存到数据库
+    将每日比赛数据保存到数据库，并生成 AI 分析报告
     """
     print("\n[入库] 正在保存每日比赛数据...")
 
@@ -1082,17 +1295,27 @@ def save_daily_matches(matches):
         conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
 
+        # 获取现有的 AI 分析报告 (用于 4 小时复用逻辑)
+        cursor.execute("""
+            SELECT match_id, ai_analysis, analysis_timestamp
+            FROM daily_matches
+            WHERE sport_type = 'nba' AND ai_analysis IS NOT NULL
+        """)
+        existing_reports = {row[0]: {"analysis": row[1], "timestamp": row[2]} for row in cursor.fetchall()}
+        print(f"[入库] 获取到 {len(existing_reports)} 条现有 AI 报告")
+
         # 清空现有 NBA 每日比赛数据
         cursor.execute("DELETE FROM daily_matches WHERE sport_type = 'nba';")
 
-        # 插入新数据
+        # 插入新数据 (包含 AI 分析字段)
         insert_sql = """
         INSERT INTO daily_matches
             (sport_type, match_id, home_team, away_team, commence_time,
              web2_home_odds, web2_away_odds, source_bookmaker, source_url,
-             poly_home_price, poly_away_price, polymarket_url, last_updated)
+             poly_home_price, poly_away_price, polymarket_url,
+             ai_analysis, analysis_timestamp, last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         ON CONFLICT (sport_type, match_id) DO UPDATE SET
             home_team = EXCLUDED.home_team,
             away_team = EXCLUDED.away_team,
@@ -1104,13 +1327,51 @@ def save_daily_matches(matches):
             poly_home_price = EXCLUDED.poly_home_price,
             poly_away_price = EXCLUDED.poly_away_price,
             polymarket_url = EXCLUDED.polymarket_url,
+            ai_analysis = EXCLUDED.ai_analysis,
+            analysis_timestamp = EXCLUDED.analysis_timestamp,
             last_updated = CURRENT_TIMESTAMP
         """
 
+        ai_generated_count = 0
+        ai_reused_count = 0
+
         for m in matches:
+            match_id = m["match_id"]
+
+            # 获取现有的 AI 报告 (用于 4 小时复用)
+            existing = existing_reports.get(match_id, {})
+            existing_analysis = existing.get("analysis")
+            existing_timestamp = existing.get("timestamp")
+            if existing_timestamp and hasattr(existing_timestamp, 'isoformat'):
+                existing_timestamp = existing_timestamp.isoformat()
+
+            # 准备 match_data 给 AI 报告生成器
+            match_data = {
+                "home_team": m["home_team"],
+                "away_team": m["away_team"],
+                "home_odds": m["home_odds"],
+                "away_odds": m["away_odds"],
+                "poly_home_price": m.get("poly_home_price"),
+                "poly_away_price": m.get("poly_away_price"),
+                "bookmaker": m.get("bookmaker", "Web2"),
+            }
+
+            # 生成 AI 报告
+            ai_analysis, analysis_timestamp = generate_ai_report(
+                match_data,
+                existing_analysis=existing_analysis,
+                existing_timestamp=existing_timestamp
+            )
+
+            # 统计 AI 报告生成情况
+            if existing_analysis and ai_analysis == existing_analysis:
+                ai_reused_count += 1
+            elif ai_analysis and "No significant" not in ai_analysis:
+                ai_generated_count += 1
+
             cursor.execute(insert_sql, (
                 "nba",
-                m["match_id"],
+                match_id,
                 m["home_team"],
                 m["away_team"],
                 m["commence_time"],
@@ -1121,10 +1382,32 @@ def save_daily_matches(matches):
                 m.get("poly_home_price"),
                 m.get("poly_away_price"),
                 m.get("polymarket_url"),
+                ai_analysis,
+                analysis_timestamp,
             ))
+            # 保存历史记录 (主队)
+            save_odds_history(
+                cursor,
+                event_type="daily",
+                event_id=f"{match_id}_home",
+                sport_type="nba",
+                web2_odds=m["home_odds"],
+                polymarket_price=m.get("poly_home_price")
+            )
+            # 保存历史记录 (客队)
+            save_odds_history(
+                cursor,
+                event_type="daily",
+                event_id=f"{match_id}_away",
+                sport_type="nba",
+                web2_odds=m["away_odds"],
+                polymarket_price=m.get("poly_away_price")
+            )
 
         conn.commit()
         print(f"[入库] 成功保存 {len(matches)} 场比赛")
+        print(f"[入库] AI 报告: 新生成 {ai_generated_count} 个, 复用 {ai_reused_count} 个")
+        print(f"[入库] 每日比赛历史记录已追加")
 
         cursor.close()
         conn.close()
@@ -1201,9 +1484,23 @@ def merge_and_save_data(sport_type, web2_data, poly_data, kalshi_data):
     return merged_data
 
 
+def save_odds_history(cursor, event_type, event_id, sport_type, web2_odds, polymarket_price):
+    """
+    保存赔率历史记录（追加模式）
+    """
+    insert_sql = """
+    INSERT INTO odds_history
+        (event_type, event_id, sport_type, web2_odds, polymarket_price, recorded_at)
+    VALUES
+        (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+    """
+    cursor.execute(insert_sql, (event_type, event_id, sport_type, web2_odds, polymarket_price))
+
+
 def save_to_database(all_data):
     """
     将所有赛事数据写入 PostgreSQL 数据库
+    包含 AI 分析报告生成 (使用 OpenRouter DeepSeek R1 + Gemini Flash)
     """
     print("\n" + "=" * 60)
     print("[入库] 正在写入数据库...")
@@ -1216,19 +1513,100 @@ def save_to_database(all_data):
         conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
 
+        # ============================================
+        # 步骤 1: 获取现有的 AI 分析报告 (用于频次控制)
+        # ============================================
+        cursor.execute("""
+            SELECT team_name, ai_analysis, analysis_timestamp
+            FROM market_odds
+            WHERE ai_analysis IS NOT NULL
+        """)
+        existing_reports = {}
+        for row in cursor.fetchall():
+            existing_reports[row[0]] = {
+                "analysis": row[1],
+                "timestamp": row[2]
+            }
+        print(f"[入库] 获取到 {len(existing_reports)} 条现有 AI 报告")
+
         # 清空现有数据
         cursor.execute("TRUNCATE TABLE market_odds RESTART IDENTITY;")
 
-        # 插入新数据（包含 bookmaker 信息）
+        # 插入新数据（包含 AI 分析字段）
         insert_sql = """
         INSERT INTO market_odds
             (sport_type, team_name, web2_odds, source_bookmaker, source_url,
-             polymarket_price, polymarket_url, kalshi_price, kalshi_url, last_updated)
+             polymarket_price, polymarket_url, kalshi_price, kalshi_url,
+             ai_analysis, analysis_timestamp, last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
+        ai_generated_count = 0
+        ai_reused_count = 0
+        ai_skipped_count = 0
+
         for record in all_data:
+            team_name = record["team_name"]
+            web2_odds = record["web2_odds"]
+            poly_price = record["polymarket_price"]
+
+            # ============================================
+            # 步骤 2: 计算 EV 并准备 AI 数据
+            # ============================================
+            ev = 0
+            if web2_odds and poly_price and poly_price > 0:
+                ev = (web2_odds - poly_price) / poly_price
+
+            ai_analysis = None
+            analysis_timestamp = None
+
+            # ============================================
+            # 步骤 3: 频次控制 (6小时内复用现有报告)
+            # ============================================
+            existing = existing_reports.get(team_name, {})
+            existing_analysis = existing.get("analysis")
+            existing_timestamp = existing.get("timestamp")
+
+            skip_ai = False
+            if existing_timestamp:
+                try:
+                    if hasattr(existing_timestamp, 'replace'):
+                        # datetime object
+                        last_gen = existing_timestamp
+                    else:
+                        # string
+                        last_gen = datetime.fromisoformat(str(existing_timestamp).replace('Z', '+00:00').replace('+00:00', ''))
+
+                    if datetime.utcnow() - last_gen.replace(tzinfo=None) < timedelta(hours=6):
+                        skip_ai = True
+                        ai_analysis = existing_analysis
+                        analysis_timestamp = existing_timestamp
+                        ai_reused_count += 1
+                except Exception as e:
+                    pass
+
+            # ============================================
+            # 步骤 4: 调用 AI 生成报告 (高 EV 且未复用)
+            # ============================================
+            if not skip_ai and ev >= 0.05:  # 冠军盘口 EV >= 5% 才生成
+                try:
+                    match_data_for_ai = {
+                        'title': f"{team_name} ({record['sport_type']})",
+                        'web2_odds': web2_odds * 100 if web2_odds else 0,
+                        'polymarket_price': poly_price * 100 if poly_price else 0,
+                        'ev': ev,
+                    }
+                    new_report = generate_championship_ai_report(match_data_for_ai, is_championship=True)
+                    if new_report:
+                        ai_analysis = new_report
+                        analysis_timestamp = datetime.utcnow()
+                        ai_generated_count += 1
+                except Exception as e:
+                    print(f"  [AI] 生成失败 ({team_name}): {e}")
+            elif not skip_ai:
+                ai_skipped_count += 1
+
             cursor.execute(insert_sql, (
                 record["sport_type"],
                 record["team_name"],
@@ -1238,11 +1616,24 @@ def save_to_database(all_data):
                 record["polymarket_price"],
                 record["polymarket_url"],
                 record["kalshi_price"],
-                record["kalshi_url"]
+                record["kalshi_url"],
+                ai_analysis,
+                analysis_timestamp
             ))
+            # 保存历史记录
+            save_odds_history(
+                cursor,
+                event_type="championship",
+                event_id=record["team_name"],
+                sport_type=record["sport_type"],
+                web2_odds=record["web2_odds"],
+                polymarket_price=record["polymarket_price"]
+            )
 
         conn.commit()
+        print(f"[入库] 历史记录已追加")
         print(f"[入库] 成功写入 {len(all_data)} 条记录")
+        print(f"[入库] AI 报告: 新生成 {ai_generated_count} 个, 复用 {ai_reused_count} 个, 跳过 {ai_skipped_count} 个")
 
         # 显示各赛事统计
         cursor.execute("""

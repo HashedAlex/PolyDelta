@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { CalculatorModal, CalculatorData } from './CalculatorModal'
 import { OddsChart } from './OddsChart'
 
@@ -209,6 +210,17 @@ export function MatchCard({
             🧮
           </button>
         </div>
+      )}
+
+      {/* AI Analysis Link */}
+      {matchId && (
+        <Link
+          href={`/match/${matchId}`}
+          className="mt-2 flex items-center justify-center gap-2 py-2 px-3 bg-[#1f6feb]/20 hover:bg-[#1f6feb]/30 text-[#58a6ff] text-sm font-medium rounded-md transition-colors border border-[#1f6feb]/40"
+        >
+          <span>🤖</span>
+          <span>Analysis & Chat</span>
+        </Link>
       )}
 
       {/* Fallback: No Polymarket data */}

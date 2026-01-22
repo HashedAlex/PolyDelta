@@ -20,6 +20,10 @@ model MarketOdds {
   kalshi_url       String?
   last_updated     DateTime? @default(now()) @db.Timestamp(6)
 
+  // AI 分析报告
+  ai_analysis        String?   @db.Text    // Markdown 格式的 AI 分析
+  analysis_timestamp DateTime? @db.Timestamp(6)  // 报告生成时间
+
   @@index([sport_type, team_name], map: "idx_sport_team")
   @@index([sport_type], map: "idx_sport_type")
   @@index([team_name], map: "idx_team_name")
@@ -45,6 +49,10 @@ model DailyMatch {
   poly_home_price  Float?    // 主队价格
   poly_away_price  Float?    // 客队价格
   polymarket_url   String?
+
+  // AI 分析报告
+  ai_analysis        String?   @db.Text    // Markdown 格式的 AI 分析
+  analysis_timestamp DateTime? @db.Timestamp(6)  // 报告生成时间
 
   last_updated     DateTime? @default(now()) @db.Timestamp(6)
 
