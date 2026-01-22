@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
 
 interface MatchData {
@@ -297,48 +298,25 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
           {/* Report Content */}
           <div className="px-6 py-6">
             {match.aiAnalysis ? (
-              <div className="prose prose-invert max-w-none">
-                {match.aiAnalysis.split('\n\n').map((paragraph, index) => {
-                  if (paragraph.startsWith('## ')) {
-                    return (
-                      <h3 key={index} className="text-[#e6edf3] font-semibold text-base mt-4 mb-2">
-                        {paragraph.replace('## ', '')}
-                      </h3>
-                    )
-                  } else if (paragraph.startsWith('**')) {
-                    return (
-                      <p key={index} className="text-[#e6edf3] mb-3 font-medium">
-                        {paragraph.replace(/\*\*/g, '')}
-                      </p>
-                    )
-                  } else if (paragraph.startsWith('- ')) {
-                    return (
-                      <ul key={index} className="list-disc list-inside text-[#8b949e] mb-3 space-y-1">
-                        {paragraph.split('\n').map((item, i) => (
-                          <li key={i}>{item.replace('- ', '')}</li>
-                        ))}
-                      </ul>
-                    )
-                  } else if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
-                    return (
-                      <p key={index} className="text-[#6e7681] text-sm italic mt-4">
-                        {paragraph.replace(/\*/g, '')}
-                      </p>
-                    )
-                  } else {
-                    return (
-                      <p key={index} className="text-[#8b949e] mb-3 leading-relaxed">
-                        {paragraph}
-                      </p>
-                    )
-                  }
-                })}
+              <div className="prose prose-invert prose-sm max-w-none
+                prose-headings:text-[#e6edf3] prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
+                prose-p:text-[#8b949e] prose-p:mb-3 prose-p:leading-relaxed
+                prose-strong:text-[#e6edf3] prose-strong:font-medium
+                prose-ul:text-[#8b949e] prose-ul:mb-3 prose-ul:space-y-1
+                prose-li:text-[#8b949e]
+                prose-em:text-[#6e7681] prose-em:text-sm
+                prose-hr:border-[#30363d] prose-hr:my-4
+              ">
+                <ReactMarkdown>{match.aiAnalysis}</ReactMarkdown>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-[#8b949e]">No AI analysis available yet.</p>
-                <p className="text-[#6e7681] text-sm mt-2">
-                  AI analysis is generated when EV exceeds 2% threshold.
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#21262d] rounded-lg mb-3">
+                  <span className="animate-pulse">⏳</span>
+                  <span className="text-[#8b949e]">AI analysis is generating...</span>
+                </div>
+                <p className="text-[#6e7681] text-sm">
+                  Check back later. Analysis is generated when EV exceeds threshold.
                 </p>
               </div>
             )}

@@ -13,6 +13,40 @@ function generateTeamSlug(teamName: string): string {
     .replace(/^-|-$/g, '')
 }
 
+// Liquidity indicator component
+function LiquidityBadge({ liquidity }: { liquidity: number | null | undefined }) {
+  if (liquidity === null || liquidity === undefined) {
+    return null
+  }
+
+  // Format liquidity value
+  const formatLiq = (val: number) => {
+    if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`
+    if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`
+    return `$${val.toFixed(0)}`
+  }
+
+  if (liquidity >= 10000) {
+    return (
+      <span className="text-[10px] text-[#3fb950] bg-[#3fb950]/15 px-1.5 py-0.5 rounded whitespace-nowrap">
+        🟢 {formatLiq(liquidity)}
+      </span>
+    )
+  } else if (liquidity >= 1000) {
+    return (
+      <span className="text-[10px] text-[#d29922] bg-[#d29922]/15 px-1.5 py-0.5 rounded whitespace-nowrap">
+        🟡 {formatLiq(liquidity)}
+      </span>
+    )
+  } else {
+    return (
+      <span className="text-[10px] text-[#f85149] bg-[#f85149]/15 px-1.5 py-0.5 rounded whitespace-nowrap">
+        🔴 {formatLiq(liquidity)}
+      </span>
+    )
+  }
+}
+
 interface ArbitrageCardProps {
   teamName: string
   sportType?: string
@@ -22,6 +56,7 @@ interface ArbitrageCardProps {
   polymarketPrice: number | null
   polymarketUrl: string | null
   ev: number | null
+  liquidity?: number | null
 }
 
 export function ArbitrageCard({
@@ -33,6 +68,7 @@ export function ArbitrageCard({
   polymarketPrice,
   polymarketUrl,
   ev,
+  liquidity,
 }: ArbitrageCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
 
@@ -48,6 +84,7 @@ export function ArbitrageCard({
     web2Odds: normalizeProb(web2Odds),
     polymarketPrice: normalizeProb(polymarketPrice),
     sourceBookmaker,
+    liquidityUsdc: liquidity,
   }
 
   // 判断是否为价值投注机会 (|EV| >= 5%)
@@ -97,28 +134,32 @@ export function ArbitrageCard({
       {/* Odds Comparison */}
       <div className="space-y-2 mb-4">
         {/* Bookmaker Odds */}
-        <div className="flex justify-between items-center text-sm">
-          {sourceUrl ? (
-            <a
-              href={sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#d29922] hover:text-[#f0b429] hover:underline"
-            >
-              {bookmakerDisplay}
-            </a>
-          ) : (
-            <span className="text-[#8b949e]">{bookmakerDisplay}</span>
-          )}
-          <span className="text-[#e6edf3] font-mono">
+        <div className="flex items-center text-sm">
+          <div className="flex-1">
+            {sourceUrl ? (
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#d29922] hover:text-[#f0b429] hover:underline"
+              >
+                {bookmakerDisplay}
+              </a>
+            ) : (
+              <span className="text-[#8b949e]">{bookmakerDisplay}</span>
+            )}
+          </div>
+          <span className="text-[#e6edf3] font-mono w-16 text-right">
             {formatPercent(web2Odds)}
           </span>
         </div>
 
         {/* Polymarket Price */}
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-[#58a6ff]">Polymarket</span>
-          <span className="text-[#58a6ff] font-mono">
+        <div className="flex items-center text-sm">
+          <div className="flex-1">
+            <span className="text-[#58a6ff]">Polymarket</span>
+          </div>
+          <span className="text-[#58a6ff] font-mono w-16 text-right">
             {formatPercent(polymarketPrice)}
           </span>
         </div>
@@ -127,11 +168,11 @@ export function ArbitrageCard({
         <div className="border-t border-[#30363d] my-2"></div>
 
         {/* EV Display */}
-        <div className="flex justify-between items-center">
-          <span className="text-[#8b949e] text-sm">EV Diff</span>
+        <div className="flex items-center">
+          <span className="text-[#8b949e] text-sm flex-1">EV Diff</span>
           <span
             className={`
-              font-mono font-bold text-lg
+              font-mono font-bold text-lg w-16 text-right
               ${ev === null
                 ? 'text-[#8b949e]'
                 : isArbitrage
@@ -145,6 +186,14 @@ export function ArbitrageCard({
             {formatEV(ev)}
           </span>
         </div>
+
+        {/* Liquidity Display */}
+        {liquidity !== null && liquidity !== undefined && (
+          <div className="flex items-center">
+            <span className="text-[#8b949e] text-sm flex-1">Liquidity</span>
+            <LiquidityBadge liquidity={liquidity} />
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}

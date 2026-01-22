@@ -72,6 +72,50 @@ export async function GET(
       const sportType = parts[0] // 'nba' or 'world_cup'
       const teamSlug = parts.slice(1).join('-') // rest is team slug
 
+      // Convert slug back to team name for search
+      const teamNameSearch = teamSlug
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+
+      // Try to fetch real data from MarketOdds
+      const championship = await prisma.marketOdds.findFirst({
+        where: {
+          sport_type: sportType === 'world_cup' ? 'world_cup' : sportType,
+          team_name: {
+            contains: teamNameSearch,
+            mode: 'insensitive',
+          },
+        },
+      })
+
+      if (championship) {
+        // Return real championship data
+        return NextResponse.json({
+          success: true,
+          data: {
+            id: championship.id,
+            matchId: `championship-${sportType}-${teamSlug}`,
+            sportType: championship.sport_type,
+            homeTeam: championship.team_name,
+            awayTeam: 'Championship',
+            commenceTime: new Date().toISOString(),
+            web2HomeOdds: championship.web2_odds,
+            web2AwayOdds: null,
+            polyHomePrice: championship.polymarket_price,
+            polyAwayPrice: null,
+            sourceBookmaker: championship.source_bookmaker,
+            sourceUrl: championship.source_url,
+            polymarketUrl: championship.polymarket_url,
+            aiAnalysis: championship.ai_analysis,
+            analysisTimestamp: championship.analysis_timestamp?.toISOString() || null,
+            lastUpdated: championship.last_updated?.toISOString() || null,
+            isChampionship: true,
+          },
+        })
+      }
+
+      // Fallback to mock data if not found
       const mockData = getChampionshipMockData(sportType, teamSlug)
       return NextResponse.json({
         success: true,

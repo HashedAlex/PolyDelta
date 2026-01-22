@@ -582,6 +582,123 @@ def load_web2_cache(cache_file):
 
 
 # ============================================
+# Polymarket 流动性深度 (CLOB Order Book API)
+# ============================================
+
+def fetch_polymarket_liquidity(token_id, current_price, side="buy", depth_percent=0.02):
+    """
+    从 Polymarket CLOB API 获取订单簿深度
+    计算在价格上涨 depth_percent (默认 2%) 范围内可买入的 USDC 数量
+
+    Args:
+        token_id: Polymarket 市场的 Token ID
+        current_price: 当前价格 (0-1)
+        side: "buy" 买入深度, "sell" 卖出深度
+        depth_percent: 价格变动范围 (默认 2%)
+
+    Returns:
+        float: 可交易的 USDC 数量
+    """
+    if not token_id or not current_price:
+        return None
+
+    try:
+        # Polymarket CLOB API endpoint
+        url = f"https://clob.polymarket.com/book"
+        params = {"token_id": token_id}
+
+        response = requests.get(url, params=params, timeout=10)
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+
+        # 订单簿格式: {"bids": [[price, size], ...], "asks": [[price, size], ...]}
+        # bids 是买单 (从高到低), asks 是卖单 (从低到高)
+        # 买入 YES Token: 消耗 asks (卖单)
+        # 卖出 YES Token: 消耗 bids (买单)
+
+        if side == "buy":
+            orders = data.get("asks", [])
+            # 计算价格上限 (当前价格 + 2%)
+            price_limit = current_price + depth_percent
+        else:
+            orders = data.get("bids", [])
+            # 计算价格下限 (当前价格 - 2%)
+            price_limit = current_price - depth_percent
+
+        # 解析订单并按价格排序
+        parsed_orders = []
+        for order in orders:
+            if isinstance(order, dict):
+                price = float(order.get("price", 0))
+                size = float(order.get("size", 0))
+            elif isinstance(order, (list, tuple)) and len(order) >= 2:
+                price = float(order[0])
+                size = float(order[1])
+            else:
+                continue
+            parsed_orders.append((price, size))
+
+        # 排序: asks 按价格升序 (最低价优先), bids 按价格降序 (最高价优先)
+        if side == "buy":
+            parsed_orders.sort(key=lambda x: x[0])  # 升序
+        else:
+            parsed_orders.sort(key=lambda x: x[0], reverse=True)  # 降序
+
+        total_usdc = 0.0
+
+        for price, size in parsed_orders:
+            # 检查是否在价格范围内
+            if side == "buy" and price > price_limit:
+                break
+            if side == "sell" and price < price_limit:
+                break
+
+            # 计算 USDC 价值 (price * size)
+            usdc_value = price * size
+            total_usdc += usdc_value
+
+        return round(total_usdc, 2)
+
+    except Exception as e:
+        # 静默失败，不影响主流程
+        return None
+
+
+def get_market_token_ids(market):
+    """
+    从 Polymarket 市场数据中提取 Token IDs
+    返回: {"yes": token_id, "no": token_id} 或 {outcome_name: token_id, ...}
+    """
+    clob_token_ids = market.get("clobTokenIds")
+    outcomes = market.get("outcomes", [])
+
+    if isinstance(clob_token_ids, str):
+        try:
+            clob_token_ids = json.loads(clob_token_ids)
+        except:
+            return {}
+
+    if isinstance(outcomes, str):
+        try:
+            outcomes = json.loads(outcomes)
+        except:
+            return {}
+
+    if not clob_token_ids or not outcomes:
+        return {}
+
+    # 将 outcome 名称与 token ID 配对
+    token_map = {}
+    for i, outcome in enumerate(outcomes):
+        if i < len(clob_token_ids):
+            token_map[outcome.lower()] = clob_token_ids[i]
+
+    return token_map
+
+
+# ============================================
 # Polymarket 数据抓取 (Gamma API) - 多赛事支持
 # ============================================
 
@@ -709,9 +826,17 @@ def fetch_polymarket_data(sport_type):
                         if standard_name:
                             # 如果已存在，保留价格更高的
                             if standard_name not in result or yes_price > result[standard_name]["price"]:
+                                # 获取流动性数据
+                                liquidity = None
+                                token_map = get_market_token_ids(market)
+                                yes_token_id = token_map.get("yes")
+                                if yes_token_id:
+                                    liquidity = fetch_polymarket_liquidity(yes_token_id, yes_price, side="buy")
+
                                 result[standard_name] = {
                                     "price": round(yes_price, 4),
-                                    "url": market_url
+                                    "url": market_url,
+                                    "liquidity": liquidity
                                 }
 
         print(f"[Polymarket] 获取到 {len(result)} 支队伍的数据")
@@ -1094,6 +1219,14 @@ def fetch_nba_matches_polymarket():
                     if end_time <= existing["end_time"]:
                         continue  # 现有的更新，跳过
 
+            # 获取 Token IDs 用于流动性查询
+            token_ids = {}
+            for market in event_markets:
+                token_map = get_market_token_ids(market)
+                if token_map:
+                    token_ids = token_map
+                    break
+
             unique_matches[match_key] = {
                 "team1": std_team1,
                 "team2": std_team2,
@@ -1103,12 +1236,42 @@ def fetch_nba_matches_polymarket():
                 "raw_question": title,
                 "end_time": end_time,
                 "event_id": str(event_id),
+                "token_ids": token_ids,  # 添加 Token IDs
             }
 
         matches = list(unique_matches.values())
 
+        # 获取流动性数据 (批量处理，限制请求数量)
+        print(f"[Polymarket] 正在获取流动性数据...")
+        for m in matches[:20]:  # 限制前 20 场以避免过多 API 请求
+            token_ids = m.get("token_ids", {})
+            team1_price = m.get("team1_price")
+            team2_price = m.get("team2_price")
+
+            # 尝试获取每个队伍的流动性
+            team1_liq = None
+            team2_liq = None
+
+            # Token IDs 可能是 {team_name: token_id} 或 {"yes": token_id, "no": token_id}
+            for outcome_name, token_id in token_ids.items():
+                outcome_lower = outcome_name.lower()
+                # 匹配 team1
+                if m["team1"].lower() in outcome_lower or outcome_lower in m["team1"].lower():
+                    team1_liq = fetch_polymarket_liquidity(token_id, team1_price, "buy")
+                # 匹配 team2 (使用 if 而非 elif，确保两个队伍都获取流动性)
+                if m["team2"].lower() in outcome_lower or outcome_lower in m["team2"].lower():
+                    team2_liq = fetch_polymarket_liquidity(token_id, team2_price, "buy")
+
+            m["team1_liquidity"] = team1_liq
+            m["team2_liquidity"] = team2_liq
+
         for m in matches:
-            print(f"[Polymarket] 找到比赛: {m['team1']} vs {m['team2']} ({m['team1_price']:.1%} / {m['team2_price']:.1%})")
+            liq1 = m.get("team1_liquidity")
+            liq2 = m.get("team2_liquidity")
+            liq_str = ""
+            if liq1 or liq2:
+                liq_str = f" [Liq: ${liq1 or 0:.0f} / ${liq2 or 0:.0f}]"
+            print(f"[Polymarket] 找到比赛: {m['team1']} vs {m['team2']} ({m['team1_price']:.1%} / {m['team2_price']:.1%}){liq_str}")
 
         print(f"[Polymarket] 获取到 {len(matches)} 场 NBA 比赛市场")
 
@@ -1192,6 +1355,8 @@ def match_daily_games(web2_matches, poly_data):
                     "home_price": poly["team1_price"],
                     "away_price": poly["team2_price"],
                     "url": poly["url"],
+                    "home_liquidity": poly.get("team1_liquidity"),
+                    "away_liquidity": poly.get("team2_liquidity"),
                 }
                 best_poly_idx = idx
                 print(f"[匹配] 成功匹配: {poly['raw_question'][:60]}...")
@@ -1202,6 +1367,8 @@ def match_daily_games(web2_matches, poly_data):
                     "home_price": poly["team2_price"],
                     "away_price": poly["team1_price"],
                     "url": poly["url"],
+                    "home_liquidity": poly.get("team2_liquidity"),
+                    "away_liquidity": poly.get("team1_liquidity"),
                 }
                 best_poly_idx = idx
                 print(f"[匹配] 成功匹配 (反向): {poly['raw_question'][:60]}...")
@@ -1216,6 +1383,8 @@ def match_daily_games(web2_matches, poly_data):
                 "poly_home_price": best_poly["home_price"],
                 "poly_away_price": best_poly["away_price"],
                 "polymarket_url": best_poly["url"],
+                "liquidity_home": best_poly.get("home_liquidity"),
+                "liquidity_away": best_poly.get("away_liquidity"),
             })
         else:
             # 匹配失败，打印调试信息
@@ -1231,6 +1400,8 @@ def match_daily_games(web2_matches, poly_data):
                 "poly_home_price": None,
                 "poly_away_price": None,
                 "polymarket_url": None,
+                "liquidity_home": None,
+                "liquidity_away": None,
             })
 
     print(f"\n[匹配] Web2 比赛匹配完成: {len(merged)} 场")
@@ -1267,6 +1438,8 @@ def match_daily_games(web2_matches, poly_data):
             "poly_home_price": poly["team1_price"],
             "poly_away_price": poly["team2_price"],
             "polymarket_url": poly["url"],
+            "liquidity_home": poly.get("team1_liquidity"),
+            "liquidity_away": poly.get("team2_liquidity"),
         })
         poly_only_count += 1
         print(f"[Polymarket 独有] 添加: {poly['team1']} vs {poly['team2']} ({poly['team1_price']:.1%} / {poly['team2_price']:.1%})")
@@ -1307,15 +1480,16 @@ def save_daily_matches(matches):
         # 清空现有 NBA 每日比赛数据
         cursor.execute("DELETE FROM daily_matches WHERE sport_type = 'nba';")
 
-        # 插入新数据 (包含 AI 分析字段)
+        # 插入新数据 (包含 AI 分析字段和流动性)
         insert_sql = """
         INSERT INTO daily_matches
             (sport_type, match_id, home_team, away_team, commence_time,
              web2_home_odds, web2_away_odds, source_bookmaker, source_url,
              poly_home_price, poly_away_price, polymarket_url,
+             liquidity_home, liquidity_away,
              ai_analysis, analysis_timestamp, last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         ON CONFLICT (sport_type, match_id) DO UPDATE SET
             home_team = EXCLUDED.home_team,
             away_team = EXCLUDED.away_team,
@@ -1327,6 +1501,8 @@ def save_daily_matches(matches):
             poly_home_price = EXCLUDED.poly_home_price,
             poly_away_price = EXCLUDED.poly_away_price,
             polymarket_url = EXCLUDED.polymarket_url,
+            liquidity_home = EXCLUDED.liquidity_home,
+            liquidity_away = EXCLUDED.liquidity_away,
             ai_analysis = EXCLUDED.ai_analysis,
             analysis_timestamp = EXCLUDED.analysis_timestamp,
             last_updated = CURRENT_TIMESTAMP
@@ -1382,6 +1558,8 @@ def save_daily_matches(matches):
                 m.get("poly_home_price"),
                 m.get("poly_away_price"),
                 m.get("polymarket_url"),
+                m.get("liquidity_home"),
+                m.get("liquidity_away"),
                 ai_analysis,
                 analysis_timestamp,
             ))
@@ -1474,6 +1652,7 @@ def merge_and_save_data(sport_type, web2_data, poly_data, kalshi_data):
             # Polymarket 数据
             "polymarket_price": poly_info.get("price") if isinstance(poly_info, dict) else None,
             "polymarket_url": poly_info.get("url") if isinstance(poly_info, dict) else None,
+            "liquidity_usdc": poly_info.get("liquidity") if isinstance(poly_info, dict) else None,
             # Kalshi 数据
             "kalshi_price": kalshi_info.get("price") if isinstance(kalshi_info, dict) else None,
             "kalshi_url": kalshi_info.get("url") if isinstance(kalshi_info, dict) else None,
@@ -1532,14 +1711,14 @@ def save_to_database(all_data):
         # 清空现有数据
         cursor.execute("TRUNCATE TABLE market_odds RESTART IDENTITY;")
 
-        # 插入新数据（包含 AI 分析字段）
+        # 插入新数据（包含 AI 分析字段和流动性）
         insert_sql = """
         INSERT INTO market_odds
             (sport_type, team_name, web2_odds, source_bookmaker, source_url,
              polymarket_price, polymarket_url, kalshi_price, kalshi_url,
-             ai_analysis, analysis_timestamp, last_updated)
+             liquidity_usdc, ai_analysis, analysis_timestamp, last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
         ai_generated_count = 0
@@ -1617,6 +1796,7 @@ def save_to_database(all_data):
                 record["polymarket_url"],
                 record["kalshi_price"],
                 record["kalshi_url"],
+                record.get("liquidity_usdc"),
                 ai_analysis,
                 analysis_timestamp
             ))

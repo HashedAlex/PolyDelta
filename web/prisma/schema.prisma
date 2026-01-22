@@ -8,21 +8,20 @@ datasource db {
 }
 
 model MarketOdds {
-  id               Int       @id @default(autoincrement())
-  sport_type       String    @db.VarChar(20)
-  team_name        String    @db.VarChar(100)
-  web2_odds        Float?
-  source_bookmaker String?   @db.VarChar(50)
-  source_url       String?
-  polymarket_price Float?
-  polymarket_url   String?
-  kalshi_price     Float?
-  kalshi_url       String?
-  last_updated     DateTime? @default(now()) @db.Timestamp(6)
-
-  // AI 分析报告
-  ai_analysis        String?   @db.Text    // Markdown 格式的 AI 分析
-  analysis_timestamp DateTime? @db.Timestamp(6)  // 报告生成时间
+  id                 Int       @id @default(autoincrement())
+  sport_type         String    @db.VarChar(20)
+  team_name          String    @db.VarChar(100)
+  web2_odds          Float?
+  polymarket_price   Float?
+  polymarket_url     String?
+  kalshi_price       Float?
+  kalshi_url         String?
+  last_updated       DateTime? @default(now()) @db.Timestamp(6)
+  source_bookmaker   String?   @db.VarChar(50)
+  source_url         String?
+  ai_analysis        String?
+  analysis_timestamp DateTime? @db.Timestamp(6)
+  liquidity_usdc     Float?
 
   @@index([sport_type, team_name], map: "idx_sport_team")
   @@index([sport_type], map: "idx_sport_type")
@@ -30,31 +29,25 @@ model MarketOdds {
   @@map("market_odds")
 }
 
-// Daily Matches - 每日比赛盘口 (H2H)
 model DailyMatch {
-  id               Int       @id @default(autoincrement())
-  sport_type       String    @db.VarChar(20)   // "nba", "nfl", etc.
-  match_id         String    @db.VarChar(100)  // 唯一比赛 ID (来自 Web2)
-  home_team        String    @db.VarChar(100)
-  away_team        String    @db.VarChar(100)
-  commence_time    DateTime  @db.Timestamp(6)  // 比赛开始时间
-
-  // Web2 赔率 (TheOddsAPI)
-  web2_home_odds   Float?    // 主队隐含胜率
-  web2_away_odds   Float?    // 客队隐含胜率
-  source_bookmaker String?   @db.VarChar(50)
-  source_url       String?
-
-  // Polymarket 价格
-  poly_home_price  Float?    // 主队价格
-  poly_away_price  Float?    // 客队价格
-  polymarket_url   String?
-
-  // AI 分析报告
-  ai_analysis        String?   @db.Text    // Markdown 格式的 AI 分析
-  analysis_timestamp DateTime? @db.Timestamp(6)  // 报告生成时间
-
-  last_updated     DateTime? @default(now()) @db.Timestamp(6)
+  id                 Int       @id @default(autoincrement())
+  sport_type         String    @db.VarChar(20)
+  match_id           String    @db.VarChar(100)
+  home_team          String    @db.VarChar(100)
+  away_team          String    @db.VarChar(100)
+  commence_time      DateTime  @db.Timestamp(6)
+  web2_home_odds     Float?
+  web2_away_odds     Float?
+  source_bookmaker   String?   @db.VarChar(50)
+  source_url         String?
+  poly_home_price    Float?
+  poly_away_price    Float?
+  polymarket_url     String?
+  last_updated       DateTime? @default(now()) @db.Timestamp(6)
+  ai_analysis        String?
+  analysis_timestamp DateTime? @db.Timestamp(6)
+  liquidity_away     Float?
+  liquidity_home     Float?
 
   @@unique([sport_type, match_id])
   @@index([sport_type], map: "idx_daily_sport")
@@ -62,15 +55,14 @@ model DailyMatch {
   @@map("daily_matches")
 }
 
-// Odds History - 历史赔率快照 (用于趋势图)
 model OddsHistory {
-  id               Int       @id @default(autoincrement())
-  event_type       String    @db.VarChar(20)   // "championship" or "daily"
-  event_id         String    @db.VarChar(100)  // team_name for championship, match_id for daily
-  sport_type       String    @db.VarChar(20)
-  web2_odds        Float?    // 隐含胜率 (0-1)
-  polymarket_price Float?    // Polymarket 价格 (0-1)
-  recorded_at      DateTime  @default(now()) @db.Timestamp(6)
+  id               Int      @id @default(autoincrement())
+  event_type       String   @db.VarChar(20)
+  event_id         String   @db.VarChar(100)
+  sport_type       String   @db.VarChar(20)
+  web2_odds        Float?
+  polymarket_price Float?
+  recorded_at      DateTime @default(now()) @db.Timestamp(6)
 
   @@index([event_type, event_id], map: "idx_history_event")
   @@index([sport_type], map: "idx_history_sport")

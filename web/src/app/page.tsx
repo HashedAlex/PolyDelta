@@ -44,6 +44,7 @@ export default async function Page() {
       polymarket_price: item.polymarket_price,
       polymarket_url: item.polymarket_url,
       ev: calculateEV(item.web2_odds, item.polymarket_price),
+      liquidity_usdc: item.liquidity_usdc,
     }
 
     if (item.sport_type === 'world_cup') {
@@ -67,6 +68,10 @@ export default async function Page() {
     source_bookmaker: match.source_bookmaker,
     source_url: match.source_url,
     polymarket_url: match.polymarket_url,
+    ai_analysis: match.ai_analysis,
+    analysis_timestamp: match.analysis_timestamp,
+    liquidity_home: match.liquidity_home,
+    liquidity_away: match.liquidity_away,
   }))
 
   // 按 Polymarket 价格（胜率）排序，热门球队在前

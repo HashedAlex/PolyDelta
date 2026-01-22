@@ -17,6 +17,10 @@ export interface CalculatorData {
   polymarketPrice?: number | null
   // Common
   sourceBookmaker?: string | null
+  // Liquidity depth (USDC)
+  liquidityHome?: number | null
+  liquidityAway?: number | null
+  liquidityUsdc?: number | null  // For championship
 }
 
 interface CalculatorModalProps {
@@ -310,7 +314,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-base font-bold flex items-center gap-1.5">
                 <span>🎯</span>
-                <span>Kelly</span>
+                <span>Kelly Criterion</span>
               </span>
               <span className="text-xs opacity-80 font-normal">Value Bet</span>
             </button>
@@ -320,7 +324,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             <div className="flex-1 flex flex-col items-center justify-center h-14 py-3 px-3 rounded-lg bg-[#58a6ff] text-white">
               <span className="text-base font-bold flex items-center gap-1.5">
                 <span>🎯</span>
-                <span>Kelly</span>
+                <span>Kelly Criterion</span>
               </span>
               <span className="text-xs opacity-80 font-normal">Value Bet</span>
             </div>
@@ -332,7 +336,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
           {/* Team Selector for Match type - Only show in Kelly mode */}
           {type === 'match' && mode === 'kelly' && (
             <div>
-              <label className="block text-xs text-[#8b949e] mb-2">Select Team (for Kelly calculation)</label>
+              <label className="block text-xs text-[#8b949e] mb-2">Select Team (for Kelly Criterion)</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setSelectedTeam('home')}
@@ -440,6 +444,23 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                   className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#58a6ff] focus:outline-none"
                   min={0}
                 />
+                {/* Liquidity Warning for Arbitrage */}
+                {(() => {
+                  const minLiq = Math.min(
+                    data.liquidityHome ?? Infinity,
+                    data.liquidityAway ?? Infinity,
+                    data.liquidityUsdc ?? Infinity
+                  )
+                  if (minLiq !== Infinity && totalInvestment > minLiq) {
+                    return (
+                      <div className="mt-2 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
+                        <span>⚠️</span>
+                        <span>Order book thin. Expected slippage applies. Available liquidity: ${minLiq.toLocaleString()}</span>
+                      </div>
+                    )
+                  }
+                  return null
+                })()}
               </div>
 
               {/* Arbitrage Results */}
@@ -492,10 +513,28 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                   className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#58a6ff] focus:outline-none"
                   min={0}
                 />
+                {/* Liquidity Warning for Kelly */}
+                {(() => {
+                  // Get liquidity for the selected team
+                  const relevantLiq = type === 'championship'
+                    ? data.liquidityUsdc
+                    : (selectedTeam === 'home' ? data.liquidityHome : data.liquidityAway)
+
+                  // Warning if recommended stake would exceed liquidity
+                  if (relevantLiq && kellyResult && kellyResult.recommendedStake > relevantLiq) {
+                    return (
+                      <div className="mt-2 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
+                        <span>⚠️</span>
+                        <span>Order book thin. Expected slippage applies. Available liquidity: ${relevantLiq.toLocaleString()}</span>
+                      </div>
+                    )
+                  }
+                  return null
+                })()}
               </div>
 
               <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Kelly Fraction (Risk Level)</label>
+                <label className="block text-xs text-[#8b949e] mb-2">Kelly Criterion Fraction (Risk Level)</label>
                 <div className="flex gap-2">
                   {(['quarter', 'half', 'full'] as KellyFraction[]).map((fraction) => (
                     <button
@@ -521,7 +560,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               {/* Kelly Results */}
               {kellyResult ? (
                 <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  <div className="text-sm font-medium text-[#e6edf3] mb-2">Kelly Recommendation</div>
+                  <div className="text-sm font-medium text-[#e6edf3] mb-2">Kelly Criterion Recommendation</div>
                   <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
                     <span className="text-sm text-[#8b949e]">Win Probability (Web2):</span>
                     <span className="font-mono text-[#d29922]">{(web2Odds * 100).toFixed(1)}%</span>
@@ -545,7 +584,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 </div>
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  Insufficient data to calculate Kelly
+                  Insufficient data for Kelly Criterion
                 </div>
               )}
             </>

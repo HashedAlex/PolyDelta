@@ -14,6 +14,7 @@ export interface MarketItem {
   polymarket_price: number | null
   polymarket_url: string | null
   ev: number | null
+  liquidity_usdc: number | null
 }
 
 // 每日比赛类型
@@ -30,6 +31,10 @@ export interface DailyMatchItem {
   source_bookmaker: string | null
   source_url: string | null
   polymarket_url: string | null
+  ai_analysis: string | null
+  analysis_timestamp: Date | null
+  liquidity_home: number | null
+  liquidity_away: number | null
 }
 
 interface DashboardProps {
@@ -313,6 +318,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                   polymarketPrice={item.polymarket_price}
                   polymarketUrl={item.polymarket_url}
                   ev={item.ev}
+                  liquidity={item.liquidity_usdc}
                 />
               ))}
             </div>
@@ -351,6 +357,8 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                   sourceBookmaker={match.source_bookmaker}
                   sourceUrl={match.source_url}
                   polymarketUrl={match.polymarket_url}
+                  liquidityHome={match.liquidity_home}
+                  liquidityAway={match.liquidity_away}
                 />
               ))}
             </div>
@@ -389,6 +397,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                   polymarketPrice={item.polymarket_price}
                   polymarketUrl={item.polymarket_url}
                   ev={item.ev}
+                  liquidity={item.liquidity_usdc}
                 />
               ))}
             </div>

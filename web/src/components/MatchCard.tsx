@@ -17,6 +17,41 @@ interface MatchCardProps {
   sourceBookmaker: string | null
   sourceUrl: string | null
   polymarketUrl: string | null
+  liquidityHome?: number | null
+  liquidityAway?: number | null
+}
+
+// Liquidity indicator component
+function LiquidityBadge({ liquidity }: { liquidity: number | null | undefined }) {
+  if (liquidity === null || liquidity === undefined) {
+    return null
+  }
+
+  // Format liquidity value
+  const formatLiq = (val: number) => {
+    if (val >= 1000) return `$${(val / 1000).toFixed(0)}k`
+    return `$${val.toFixed(0)}`
+  }
+
+  if (liquidity >= 1000) {
+    return (
+      <span className="text-[10px] text-[#3fb950] bg-[#3fb950]/15 px-1 py-0.5 rounded whitespace-nowrap">
+        🟢 {formatLiq(liquidity)}
+      </span>
+    )
+  } else if (liquidity >= 200) {
+    return (
+      <span className="text-[10px] text-[#d29922] bg-[#d29922]/15 px-1 py-0.5 rounded whitespace-nowrap">
+        🟡 {formatLiq(liquidity)}
+      </span>
+    )
+  } else {
+    return (
+      <span className="text-[10px] text-[#f85149] bg-[#f85149]/15 px-1 py-0.5 rounded whitespace-nowrap">
+        🔴 {formatLiq(liquidity)}
+      </span>
+    )
+  }
 }
 
 function formatMatchTime(date: Date): string {
@@ -65,11 +100,20 @@ export function MatchCard({
   sourceBookmaker,
   sourceUrl,
   polymarketUrl,
+  liquidityHome,
+  liquidityAway,
 }: MatchCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
 
   const homeEV = calculateEV(web2HomeOdds, polyHomePrice)
   const awayEV = calculateEV(web2AwayOdds, polyAwayPrice)
+
+  // Calculate min liquidity for card dimming
+  const minLiquidity = Math.min(
+    liquidityHome ?? Infinity,
+    liquidityAway ?? Infinity
+  )
+  const isIlliquid = minLiquidity < 200 && minLiquidity !== Infinity
 
   // Calculator data
   const calculatorData: CalculatorData = {
@@ -80,6 +124,8 @@ export function MatchCard({
     polyHomePrice,
     polyAwayPrice,
     sourceBookmaker,
+    liquidityHome,
+    liquidityAway,
   }
 
   // 找到最大的 EV 值
@@ -95,7 +141,7 @@ export function MatchCard({
   const hasPoly = polyHomePrice != null || polyAwayPrice != null
 
   return (
-    <div className={`bg-[#161b22] rounded-lg p-4 border ${borderColor} hover:border-[#58a6ff] transition-colors`}>
+    <div className={`bg-[#161b22] rounded-lg p-4 border ${borderColor} hover:border-[#58a6ff] transition-colors ${isIlliquid ? 'opacity-60' : ''}`}>
       {/* Header - 比赛时间 */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-[#8b949e] bg-[#21262d] px-2 py-1 rounded flex items-center gap-1">
@@ -122,7 +168,7 @@ export function MatchCard({
 
       {/* Odds Comparison Table */}
       <div className="bg-[#0d1117] rounded-lg p-3">
-        <div className="grid grid-cols-4 gap-2 text-xs mb-2">
+        <div className="grid grid-cols-5 gap-2 text-xs mb-2">
           <div className="text-[#8b949e]">Team</div>
           <div className="text-[#8b949e] text-center">
             {sourceBookmaker ? (
@@ -147,10 +193,11 @@ export function MatchCard({
             )}
           </div>
           <div className="text-[#8b949e] text-center">EV</div>
+          <div className="text-[#8b949e] text-center">Liquidity</div>
         </div>
 
         {/* Home Team Row */}
-        <div className="grid grid-cols-4 gap-2 text-sm py-1.5 border-t border-[#30363d]">
+        <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={homeTeam}>
             {homeTeam.split(' ').pop()}
           </div>
@@ -167,10 +214,13 @@ export function MatchCard({
           }`}>
             {homeEV ? `${homeEV > 0 ? '+' : ''}${homeEV.toFixed(1)}%` : '-'}
           </div>
+          <div className="flex justify-center">
+            <LiquidityBadge liquidity={liquidityHome} />
+          </div>
         </div>
 
         {/* Away Team Row */}
-        <div className="grid grid-cols-4 gap-2 text-sm py-1.5 border-t border-[#30363d]">
+        <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={awayTeam}>
             {awayTeam.split(' ').pop()}
           </div>
@@ -186,6 +236,9 @@ export function MatchCard({
             'text-[#8b949e]'
           }`}>
             {awayEV ? `${awayEV > 0 ? '+' : ''}${awayEV.toFixed(1)}%` : '-'}
+          </div>
+          <div className="flex justify-center">
+            <LiquidityBadge liquidity={liquidityAway} />
           </div>
         </div>
       </div>
