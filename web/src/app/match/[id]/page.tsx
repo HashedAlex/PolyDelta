@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+// Link removed - using router.push for navigation
 import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
 
@@ -75,7 +75,6 @@ function generateChampionshipAnalysis(
 ): AIAnalysisDataExtended {
   const team = teamName || 'Team'
   const isNBA = sportType === 'nba'
-  const isFIFA = sportType === 'world_cup'
 
   const odds = web2Odds ?? 0
   const price = polyPrice ?? 0
@@ -534,19 +533,6 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
     router.push(backUrl)
   }
 
-  // Get back URL based on where user came from
-  const getBackUrl = () => {
-    switch (fromParam) {
-      case 'worldcup':
-        return '/?tab=worldcup'
-      case 'nba-championship':
-        return '/?tab=nba&sub=championship'
-      case 'nba-daily':
-        return '/?tab=nba&sub=daily'
-      default:
-        return '/'
-    }
-  }
   const getBackLabel = () => {
     switch (fromParam) {
       case 'worldcup':

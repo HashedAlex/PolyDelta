@@ -333,7 +333,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     // === 5. 应用分数凯利 (Fractional Kelly) ===
     // Conservative: 1/4 Kelly, Aggressive: 1/2 Kelly
     const fractionMultiplier = kellyRiskMode === 'conservative' ? 0.25 : 0.50
-    let adjustedKelly = rawKelly * fractionMultiplier
+    const adjustedKelly = rawKelly * fractionMultiplier
 
     // === 6. 安全上限 (Hard Cap at 20%) ===
     const MAX_CAP = 0.20
