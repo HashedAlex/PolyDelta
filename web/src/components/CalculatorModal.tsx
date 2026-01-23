@@ -30,8 +30,9 @@ interface CalculatorModalProps {
   type: 'match' | 'championship'
 }
 
-type CalculatorMode = 'arbitrage' | 'kelly'
+type CalculatorMode = 'arbitrage' | 'kelly' | 'roi'
 type KellyFraction = 'full' | 'half' | 'quarter'
+type FeeType = 'taker' | 'maker'
 
 // 套利计算器结果
 interface ArbitrageResult {
@@ -53,11 +54,39 @@ interface KellyResult {
   expectedValue: number
 }
 
+// Net ROI 对比结果
+interface NetROIResult {
+  trad: {
+    netROI: number
+    netProfit: number
+  }
+  poly: {
+    status: 'ok' | 'error'
+    netROI: number
+    netProfit: number
+    shares: number
+    details: {
+      gasDeducted: number
+      feeRateApplied: string
+      exchangeFeeAmt: number
+      effectivePrice: number
+    }
+  }
+  verdict: {
+    betterPlatform: 'Polymarket' | 'Traditional'
+    roiAdvantage: number
+  }
+}
+
 export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModalProps) {
   const [mode, setMode] = useState<CalculatorMode>('arbitrage')
   const [totalInvestment, setTotalInvestment] = useState(1000)
   const [bankroll, setBankroll] = useState(1000)
   const [kellyFraction, setKellyFraction] = useState<KellyFraction>('half')
+  // Net ROI 模式状态
+  const [roiInvestment, setRoiInvestment] = useState(1000)
+  const [gasCost, setGasCost] = useState(0.05)
+  const [feeType, setFeeType] = useState<FeeType>('taker')
 
   // For match type, which team to calculate
   const [selectedTeam, setSelectedTeam] = useState<'home' | 'away'>('home')
@@ -69,9 +98,12 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
       setBankroll(1000)
       setKellyFraction('half')
       setSelectedTeam('home')
-      // Force Kelly mode for championship (can't do arbitrage on same outcome)
+      setRoiInvestment(1000)
+      setGasCost(0.05)
+      setFeeType('taker')
+      // Force ROI mode for championship (can't do arbitrage on same outcome)
       if (type === 'championship') {
-        setMode('kelly')
+        setMode('roi')
       }
     }
   }, [isOpen, type])
@@ -258,8 +290,92 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     }
   }
 
+  // === Net ROI 对比计算 ===
+  // 对比传统庄家 vs Polymarket 的净回报率（含 Gas 和手续费）
+  const calculateNetROI = (): NetROIResult | null => {
+    if (!web2Odds || !polyPrice || polyPrice === 0 || web2Odds === 0) return null
+
+    const investment = roiInvestment
+
+    // 传统庄家赔率 (decimal odds) = 1 / probability
+    const tradDecimalOdds = 1 / web2Odds
+
+    // 费率: Taker 2%, Maker 0%
+    const feeRate = feeType === 'taker' ? 0.02 : 0.00
+
+    // --- A. 传统庄家计算 ---
+    const tradProfit = investment * (tradDecimalOdds - 1)
+    const tradNetROI = (tradProfit / investment) * 100
+
+    // --- B. Polymarket 计算 ---
+    // B1. 扣除 Gas
+    const capitalAfterGas = investment - gasCost
+
+    if (capitalAfterGas <= 0) {
+      return {
+        trad: { netROI: tradNetROI, netProfit: tradProfit },
+        poly: {
+          status: 'error',
+          netROI: -100,
+          netProfit: -investment,
+          shares: 0,
+          details: {
+            gasDeducted: gasCost,
+            feeRateApplied: `${feeRate * 100}%`,
+            exchangeFeeAmt: 0,
+            effectivePrice: 0
+          }
+        },
+        verdict: {
+          betterPlatform: 'Traditional',
+          roiAdvantage: Math.abs(tradNetROI + 100)
+        }
+      }
+    }
+
+    // B2. 计算实际获得份额 (扣除百分比手续费)
+    const effectiveCostPerShare = polyPrice * (1 + feeRate)
+    const sharesBought = capitalAfterGas / effectiveCostPerShare
+
+    // B3. 结算 (假设胜出 payout = 1.0)
+    const grossPayout = sharesBought * 1.0
+    const polyProfit = grossPayout - investment
+    const polyNetROI = (polyProfit / investment) * 100
+
+    // 隐性成本明细
+    const actualMoneyInShares = sharesBought * polyPrice
+    const exchangeFeeAmt = capitalAfterGas - actualMoneyInShares
+
+    // --- C. 生成对比结论 ---
+    const roiDiff = polyNetROI - tradNetROI
+
+    return {
+      trad: {
+        netROI: Math.round(tradNetROI * 100) / 100,
+        netProfit: Math.round(tradProfit * 100) / 100
+      },
+      poly: {
+        status: 'ok',
+        netROI: Math.round(polyNetROI * 100) / 100,
+        netProfit: Math.round(polyProfit * 100) / 100,
+        shares: Math.round(sharesBought * 100) / 100,
+        details: {
+          gasDeducted: gasCost,
+          feeRateApplied: `${feeRate * 100}%`,
+          exchangeFeeAmt: Math.round(exchangeFeeAmt * 10000) / 10000,
+          effectivePrice: Math.round(effectiveCostPerShare * 10000) / 10000
+        }
+      },
+      verdict: {
+        betterPlatform: roiDiff > 0 ? 'Polymarket' : 'Traditional',
+        roiAdvantage: Math.round(Math.abs(roiDiff) * 100) / 100
+      }
+    }
+  }
+
   const arbitrageResult = calculateArbitrage()
   const kellyResult = calculateKelly()
+  const netROIResult = calculateNetROI()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -287,22 +403,67 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
           </button>
         </div>
 
-        {/* Mode Tabs - Only show for match type; championship is locked to Kelly */}
+        {/* Mode Tabs */}
         {type === 'match' ? (
           <div className="flex p-2 gap-2 border-b border-[#30363d]">
             <button
               onClick={() => setMode('arbitrage')}
-              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-3 rounded-lg transition-all ${
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-2 rounded-lg transition-all ${
                 mode === 'arbitrage'
                   ? 'bg-[#3fb950] text-black'
                   : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
               }`}
             >
-              <span className="text-base font-bold flex items-center gap-1.5">
+              <span className="text-sm font-bold flex items-center gap-1">
                 <span>🛡️</span>
                 <span>Arbitrage</span>
               </span>
-              <span className="text-xs opacity-80 font-normal">Risk-Free</span>
+              <span className="text-[10px] opacity-80 font-normal">Risk-Free</span>
+            </button>
+            <button
+              onClick={() => setMode('roi')}
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-2 rounded-lg transition-all ${
+                mode === 'roi'
+                  ? 'bg-[#d29922] text-black'
+                  : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+              }`}
+            >
+              <span className="text-sm font-bold flex items-center gap-1">
+                <span>📊</span>
+                <span>Net ROI</span>
+              </span>
+              <span className="text-[10px] opacity-80 font-normal">Compare</span>
+            </button>
+            <button
+              onClick={() => setMode('kelly')}
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-2 rounded-lg transition-all ${
+                mode === 'kelly'
+                  ? 'bg-[#58a6ff] text-white'
+                  : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+              }`}
+            >
+              <span className="text-sm font-bold flex items-center gap-1">
+                <span>🎯</span>
+                <span>Kelly</span>
+              </span>
+              <span className="text-[10px] opacity-80 font-normal">Value Bet</span>
+            </button>
+          </div>
+        ) : (
+          <div className="flex p-2 gap-2 border-b border-[#30363d]">
+            <button
+              onClick={() => setMode('roi')}
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-3 rounded-lg transition-all ${
+                mode === 'roi'
+                  ? 'bg-[#d29922] text-black'
+                  : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+              }`}
+            >
+              <span className="text-base font-bold flex items-center gap-1.5">
+                <span>📊</span>
+                <span>Net ROI</span>
+              </span>
+              <span className="text-xs opacity-80 font-normal">Compare</span>
             </button>
             <button
               onClick={() => setMode('kelly')}
@@ -318,16 +479,6 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               </span>
               <span className="text-xs opacity-80 font-normal">Value Bet</span>
             </button>
-          </div>
-        ) : (
-          <div className="flex p-2 gap-2 border-b border-[#30363d]">
-            <div className="flex-1 flex flex-col items-center justify-center h-14 py-3 px-3 rounded-lg bg-[#58a6ff] text-white">
-              <span className="text-base font-bold flex items-center gap-1.5">
-                <span>🎯</span>
-                <span>Kelly Criterion</span>
-              </span>
-              <span className="text-xs opacity-80 font-normal">Value Bet</span>
-            </div>
           </div>
         )}
 
@@ -585,6 +736,173 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
                   Insufficient data for Kelly Criterion
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Net ROI Mode */}
+          {mode === 'roi' && (
+            <>
+              {/* Team Selector for Match type */}
+              {type === 'match' && (
+                <div>
+                  <label className="block text-xs text-[#8b949e] mb-2">Select Team</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedTeam('home')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        selectedTeam === 'home'
+                          ? 'bg-[#238636] text-white'
+                          : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                      }`}
+                    >
+                      {data.homeTeam || 'Home'}
+                    </button>
+                    <button
+                      onClick={() => setSelectedTeam('away')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        selectedTeam === 'away'
+                          ? 'bg-[#238636] text-white'
+                          : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                      }`}
+                    >
+                      {data.awayTeam || 'Away'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Investment Input */}
+              <div>
+                <label className="block text-xs text-[#8b949e] mb-2">Investment ($)</label>
+                <input
+                  type="number"
+                  value={roiInvestment}
+                  onChange={(e) => setRoiInvestment(Number(e.target.value) || 0)}
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#58a6ff] focus:outline-none"
+                  min={0}
+                />
+              </div>
+
+              {/* Gas Cost Input */}
+              <div>
+                <label className="block text-xs text-[#8b949e] mb-2">Gas Cost ($)</label>
+                <input
+                  type="number"
+                  value={gasCost}
+                  onChange={(e) => setGasCost(Number(e.target.value) || 0)}
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#58a6ff] focus:outline-none"
+                  min={0}
+                  step={0.01}
+                />
+              </div>
+
+              {/* Fee Type Toggle */}
+              <div>
+                <label className="block text-xs text-[#8b949e] mb-2">Order Type</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setFeeType('taker')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      feeType === 'taker'
+                        ? 'bg-[#f85149] text-white'
+                        : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    Taker (2%)
+                  </button>
+                  <button
+                    onClick={() => setFeeType('maker')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      feeType === 'maker'
+                        ? 'bg-[#3fb950] text-black'
+                        : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    Maker (0%)
+                  </button>
+                </div>
+                <div className="text-xs text-[#8b949e] mt-1">
+                  {feeType === 'taker' && 'Market order - Instant execution, 2% fee'}
+                  {feeType === 'maker' && 'Limit order - May not fill, 0% fee'}
+                </div>
+              </div>
+
+              {/* Net ROI Results */}
+              {netROIResult ? (
+                <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
+                  {/* Verdict Banner */}
+                  <div className={`text-center py-2 px-3 rounded-lg ${
+                    netROIResult.verdict.betterPlatform === 'Polymarket'
+                      ? 'bg-[#58a6ff]/20 text-[#58a6ff]'
+                      : 'bg-[#d29922]/20 text-[#d29922]'
+                  }`}>
+                    <span className="font-bold">{netROIResult.verdict.betterPlatform}</span>
+                    <span className="text-sm"> is better by </span>
+                    <span className="font-bold">+{netROIResult.verdict.roiAdvantage.toFixed(2)}%</span>
+                  </div>
+
+                  {/* ROI Comparison */}
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    <div className={`p-3 rounded-lg ${
+                      netROIResult.verdict.betterPlatform === 'Traditional'
+                        ? 'bg-[#d29922]/10 border border-[#d29922]/40'
+                        : 'bg-[#21262d]'
+                    }`}>
+                      <div className="text-xs text-[#d29922] mb-1">{data.sourceBookmaker || 'Web2'}</div>
+                      <div className={`text-xl font-mono font-bold ${
+                        netROIResult.trad.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                      }`}>
+                        {netROIResult.trad.netROI > 0 ? '+' : ''}{netROIResult.trad.netROI.toFixed(2)}%
+                      </div>
+                      <div className="text-xs text-[#8b949e]">
+                        ${netROIResult.trad.netProfit.toFixed(2)} profit
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg ${
+                      netROIResult.verdict.betterPlatform === 'Polymarket'
+                        ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/40'
+                        : 'bg-[#21262d]'
+                    }`}>
+                      <div className="text-xs text-[#58a6ff] mb-1">Polymarket</div>
+                      <div className={`text-xl font-mono font-bold ${
+                        netROIResult.poly.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                      }`}>
+                        {netROIResult.poly.netROI > 0 ? '+' : ''}{netROIResult.poly.netROI.toFixed(2)}%
+                      </div>
+                      <div className="text-xs text-[#8b949e]">
+                        ${netROIResult.poly.netProfit.toFixed(2)} profit
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hidden Costs Breakdown */}
+                  <div className="pt-2 border-t border-[#30363d]">
+                    <div className="text-xs text-[#8b949e] mb-2">Polymarket Hidden Costs</div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-[#6e7681]">Gas Fee:</span>
+                        <span className="text-[#f85149]">-${netROIResult.poly.details.gasDeducted.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[#6e7681]">Exchange Fee ({netROIResult.poly.details.feeRateApplied}):</span>
+                        <span className="text-[#f85149]">-${netROIResult.poly.details.exchangeFeeAmt.toFixed(4)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[#6e7681]">Effective Price:</span>
+                        <span className="text-[#e6edf3]">${netROIResult.poly.details.effectivePrice.toFixed(4)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[#6e7681]">Shares Bought:</span>
+                        <span className="text-[#e6edf3]">{netROIResult.poly.shares.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
+                  Insufficient data to calculate Net ROI
                 </div>
               )}
             </>
