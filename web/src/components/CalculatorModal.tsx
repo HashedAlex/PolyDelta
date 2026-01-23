@@ -912,7 +912,8 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         {/* Footer */}
         <div className="p-4 border-t border-[#30363d]">
           <p className="text-xs text-[#8b949e] text-center">
-            This calculator is for educational purposes only. Always verify odds before placing bets.
+            This calculator is for educational purposes only.<br />
+            Always verify odds before placing bets.
           </p>
         </div>
       </div>
