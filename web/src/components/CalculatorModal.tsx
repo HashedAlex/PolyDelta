@@ -941,7 +941,8 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
               {/* Footer Disclaimer */}
               <div className="mt-3 text-[10px] text-[#6e7681] text-center">
-                *Based on {kellyRiskMode === 'conservative' ? '1/4' : '1/2'} Kelly with 20% max cap. Fees: 2% Taker + $0.05 Gas.
+                *Based on {kellyRiskMode === 'conservative' ? '1/4' : '1/2'} Kelly with 20% max cap.<br />
+                Fees: 2% Taker + $0.05 Gas.
               </div>
             </div>
           )}
