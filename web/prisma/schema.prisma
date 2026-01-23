@@ -57,11 +57,28 @@ model DailyMatch {
 
 model OddsHistory {
   id               Int      @id @default(autoincrement())
-  event_type       String   @db.VarChar(20)
-  event_id         String   @db.VarChar(100)
+  event_type       String   @db.VarChar(20)   // "championship" or "daily"
+  event_id         String   @db.VarChar(100)  // team_name for championship, match_id for daily
   sport_type       String   @db.VarChar(20)
+
+  // Championship 单一赔率 (向后兼容)
   web2_odds        Float?
   polymarket_price Float?
+
+  // Daily Matches 主客场赔率
+  web2_home_odds   Float?
+  web2_away_odds   Float?
+  poly_home_price  Float?
+  poly_away_price  Float?
+
+  // 流动性深度
+  liquidity_usdc   Float?   // Championship 流动性
+  liquidity_home   Float?   // Daily 主队流动性
+  liquidity_away   Float?   // Daily 客队流动性
+
+  // 计算指标
+  ev               Float?   // EV 差值
+
   recorded_at      DateTime @default(now()) @db.Timestamp(6)
 
   @@index([event_type, event_id], map: "idx_history_event")

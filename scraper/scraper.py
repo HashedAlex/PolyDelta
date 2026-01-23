@@ -1565,27 +1565,23 @@ def save_daily_matches(matches):
                 ai_analysis,
                 analysis_timestamp,
             ))
-            # 保存历史记录 (主队) - 智能去重
-            if save_odds_history(
-                cursor,
-                event_type="daily",
-                event_id=f"{match_id}_home",
-                sport_type="nba",
-                web2_odds=m["home_odds"],
-                polymarket_price=m.get("poly_home_price")
-            ):
-                history_saved += 1
-            else:
-                history_skipped += 1
+            # 保存历史记录 - 智能去重 (完整记录主客场数据)
+            # 计算 EV (主队方向)
+            home_ev = None
+            if m["home_odds"] and m.get("poly_home_price") and m.get("poly_home_price") > 0:
+                home_ev = (m["home_odds"] - m.get("poly_home_price")) / m.get("poly_home_price")
 
-            # 保存历史记录 (客队) - 智能去重
-            if save_odds_history(
+            if save_odds_history_daily(
                 cursor,
-                event_type="daily",
-                event_id=f"{match_id}_away",
+                match_id=match_id,
                 sport_type="nba",
-                web2_odds=m["away_odds"],
-                polymarket_price=m.get("poly_away_price")
+                web2_home_odds=m["home_odds"],
+                web2_away_odds=m["away_odds"],
+                poly_home_price=m.get("poly_home_price"),
+                poly_away_price=m.get("poly_away_price"),
+                liquidity_home=m.get("liquidity_home"),
+                liquidity_away=m.get("liquidity_away"),
+                ev=home_ev
             ):
                 history_saved += 1
             else:
@@ -1672,58 +1668,95 @@ def merge_and_save_data(sport_type, web2_data, poly_data, kalshi_data):
     return merged_data
 
 
-def save_odds_history(cursor, event_type, event_id, sport_type, web2_odds, polymarket_price, threshold=0.005):
-    """
-    保存赔率历史记录（智能去重模式）
-    只有当数据变化超过阈值时才记录，节省数据库空间
+def _check_value_changed(new_val, old_val, threshold):
+    """检查单个值是否发生显著变化"""
+    if new_val is not None and old_val is not None:
+        return abs(new_val - old_val) >= threshold
+    elif new_val is not None or old_val is not None:
+        return True  # 从 None 变为有值，或反之
+    return False
 
-    Args:
-        threshold: 变化阈值，默认 0.5% (0.005)
+
+def save_odds_history_championship(cursor, event_id, sport_type, web2_odds, polymarket_price,
+                                    liquidity_usdc=None, ev=None, threshold=0.005):
+    """
+    保存冠军盘口历史记录（智能去重）
 
     Returns:
-        bool: True 表示插入了新记录，False 表示跳过（数据未变化）
+        bool: True 表示插入了新记录，False 表示跳过
     """
-    # 查询该事件的最新记录
-    query_sql = """
-    SELECT web2_odds, polymarket_price
-    FROM odds_history
-    WHERE event_type = %s AND event_id = %s
-    ORDER BY recorded_at DESC
-    LIMIT 1
-    """
-    cursor.execute(query_sql, (event_type, event_id))
-    last_record = cursor.fetchone()
+    # 查询最新记录
+    cursor.execute("""
+        SELECT web2_odds, polymarket_price, liquidity_usdc, ev
+        FROM odds_history
+        WHERE event_type = 'championship' AND event_id = %s
+        ORDER BY recorded_at DESC LIMIT 1
+    """, (event_id,))
+    last = cursor.fetchone()
 
-    # 如果有历史记录，检查是否有显著变化
-    if last_record:
-        last_web2, last_poly = last_record
-
-        # 计算变化幅度
-        web2_changed = False
-        poly_changed = False
-
-        if web2_odds is not None and last_web2 is not None:
-            web2_changed = abs(web2_odds - last_web2) >= threshold
-        elif web2_odds is not None or last_web2 is not None:
-            web2_changed = True  # 从 None 变为有值，或反之
-
-        if polymarket_price is not None and last_poly is not None:
-            poly_changed = abs(polymarket_price - last_poly) >= threshold
-        elif polymarket_price is not None or last_poly is not None:
-            poly_changed = True  # 从 None 变为有值，或反之
-
-        # 如果两个值都没有显著变化，跳过
-        if not web2_changed and not poly_changed:
+    if last:
+        last_web2, last_poly, last_liq, last_ev = last
+        # 检查是否有显著变化
+        if not any([
+            _check_value_changed(web2_odds, last_web2, threshold),
+            _check_value_changed(polymarket_price, last_poly, threshold),
+            _check_value_changed(liquidity_usdc, last_liq, 1.0),  # 流动性变化 >= $1
+            _check_value_changed(ev, last_ev, threshold),
+        ]):
             return False
 
-    # 插入新记录
-    insert_sql = """
-    INSERT INTO odds_history
-        (event_type, event_id, sport_type, web2_odds, polymarket_price, recorded_at)
-    VALUES
-        (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+    cursor.execute("""
+        INSERT INTO odds_history
+            (event_type, event_id, sport_type, web2_odds, polymarket_price,
+             liquidity_usdc, ev, recorded_at)
+        VALUES ('championship', %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+    """, (event_id, sport_type, web2_odds, polymarket_price, liquidity_usdc, ev))
+    return True
+
+
+def save_odds_history_daily(cursor, match_id, sport_type,
+                            web2_home_odds, web2_away_odds,
+                            poly_home_price, poly_away_price,
+                            liquidity_home=None, liquidity_away=None,
+                            ev=None, threshold=0.005):
     """
-    cursor.execute(insert_sql, (event_type, event_id, sport_type, web2_odds, polymarket_price))
+    保存每日比赛历史记录（智能去重）
+
+    Returns:
+        bool: True 表示插入了新记录，False 表示跳过
+    """
+    # 查询最新记录
+    cursor.execute("""
+        SELECT web2_home_odds, web2_away_odds, poly_home_price, poly_away_price,
+               liquidity_home, liquidity_away, ev
+        FROM odds_history
+        WHERE event_type = 'daily' AND event_id = %s
+        ORDER BY recorded_at DESC LIMIT 1
+    """, (match_id,))
+    last = cursor.fetchone()
+
+    if last:
+        (last_w2h, last_w2a, last_ph, last_pa, last_lh, last_la, last_ev) = last
+        # 检查是否有显著变化
+        if not any([
+            _check_value_changed(web2_home_odds, last_w2h, threshold),
+            _check_value_changed(web2_away_odds, last_w2a, threshold),
+            _check_value_changed(poly_home_price, last_ph, threshold),
+            _check_value_changed(poly_away_price, last_pa, threshold),
+            _check_value_changed(liquidity_home, last_lh, 1.0),
+            _check_value_changed(liquidity_away, last_la, 1.0),
+            _check_value_changed(ev, last_ev, threshold),
+        ]):
+            return False
+
+    cursor.execute("""
+        INSERT INTO odds_history
+            (event_type, event_id, sport_type,
+             web2_home_odds, web2_away_odds, poly_home_price, poly_away_price,
+             liquidity_home, liquidity_away, ev, recorded_at)
+        VALUES ('daily', %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+    """, (match_id, sport_type, web2_home_odds, web2_away_odds,
+          poly_home_price, poly_away_price, liquidity_home, liquidity_away, ev))
     return True
 
 
@@ -1853,14 +1886,15 @@ def save_to_database(all_data):
                 ai_analysis,
                 analysis_timestamp
             ))
-            # 保存历史记录 - 智能去重
-            if save_odds_history(
+            # 保存历史记录 - 智能去重 (含流动性和 EV)
+            if save_odds_history_championship(
                 cursor,
-                event_type="championship",
                 event_id=record["team_name"],
                 sport_type=record["sport_type"],
                 web2_odds=record["web2_odds"],
-                polymarket_price=record["polymarket_price"]
+                polymarket_price=record["polymarket_price"],
+                liquidity_usdc=record.get("liquidity_usdc"),
+                ev=ev
             ):
                 history_saved += 1
             else:
