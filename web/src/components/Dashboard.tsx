@@ -72,30 +72,16 @@ function getMatchPriority(match: DailyMatchItem): number {
 }
 
 /**
- * 冠军盘口排序：按 EV 降序，数据不全的排在最后
- * - Tier 1: 双边数据齐全，按 EV 从高到低
- * - Tier 2: 数据不全，排在最后
+ * 冠军盘口排序：按胜率（polymarket_price）降序
+ * - 热门球队（高胜率）排在前面
+ * - 冷门球队（低胜率）排在后面
  */
 function sortChampionMarkets(markets: MarketItem[]): MarketItem[] {
   return [...markets].sort((a, b) => {
-    const aComplete = a.web2_odds != null && a.polymarket_price != null
-    const bComplete = b.web2_odds != null && b.polymarket_price != null
-
-    // 数据齐全的排前面
-    if (aComplete && !bComplete) return -1
-    if (!aComplete && bComplete) return 1
-
-    // 都齐全时，按 EV 降序
-    if (aComplete && bComplete) {
-      const aEV = a.ev ?? -Infinity
-      const bEV = b.ev ?? -Infinity
-      return bEV - aEV
-    }
-
-    // 都不全时，按 polymarket 价格或 web2 赔率排序
-    const aValue = a.polymarket_price ?? a.web2_odds ?? 0
-    const bValue = b.polymarket_price ?? b.web2_odds ?? 0
-    return bValue - aValue
+    // 按 polymarket 价格（胜率）降序排序
+    const aPrice = a.polymarket_price ?? 0
+    const bPrice = b.polymarket_price ?? 0
+    return bPrice - aPrice
   })
 }
 
