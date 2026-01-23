@@ -1510,6 +1510,8 @@ def save_daily_matches(matches):
 
         ai_generated_count = 0
         ai_reused_count = 0
+        history_saved = 0
+        history_skipped = 0
 
         for m in matches:
             match_id = m["match_id"]
@@ -1563,29 +1565,36 @@ def save_daily_matches(matches):
                 ai_analysis,
                 analysis_timestamp,
             ))
-            # 保存历史记录 (主队)
-            save_odds_history(
+            # 保存历史记录 (主队) - 智能去重
+            if save_odds_history(
                 cursor,
                 event_type="daily",
                 event_id=f"{match_id}_home",
                 sport_type="nba",
                 web2_odds=m["home_odds"],
                 polymarket_price=m.get("poly_home_price")
-            )
-            # 保存历史记录 (客队)
-            save_odds_history(
+            ):
+                history_saved += 1
+            else:
+                history_skipped += 1
+
+            # 保存历史记录 (客队) - 智能去重
+            if save_odds_history(
                 cursor,
                 event_type="daily",
                 event_id=f"{match_id}_away",
                 sport_type="nba",
                 web2_odds=m["away_odds"],
                 polymarket_price=m.get("poly_away_price")
-            )
+            ):
+                history_saved += 1
+            else:
+                history_skipped += 1
 
         conn.commit()
         print(f"[入库] 成功保存 {len(matches)} 场比赛")
         print(f"[入库] AI 报告: 新生成 {ai_generated_count} 个, 复用 {ai_reused_count} 个")
-        print(f"[入库] 每日比赛历史记录已追加")
+        print(f"[入库] 历史记录: 新增 {history_saved} 条, 跳过 {history_skipped} 条 (无变化)")
 
         cursor.close()
         conn.close()
@@ -1663,10 +1672,51 @@ def merge_and_save_data(sport_type, web2_data, poly_data, kalshi_data):
     return merged_data
 
 
-def save_odds_history(cursor, event_type, event_id, sport_type, web2_odds, polymarket_price):
+def save_odds_history(cursor, event_type, event_id, sport_type, web2_odds, polymarket_price, threshold=0.005):
     """
-    保存赔率历史记录（追加模式）
+    保存赔率历史记录（智能去重模式）
+    只有当数据变化超过阈值时才记录，节省数据库空间
+
+    Args:
+        threshold: 变化阈值，默认 0.5% (0.005)
+
+    Returns:
+        bool: True 表示插入了新记录，False 表示跳过（数据未变化）
     """
+    # 查询该事件的最新记录
+    query_sql = """
+    SELECT web2_odds, polymarket_price
+    FROM odds_history
+    WHERE event_type = %s AND event_id = %s
+    ORDER BY recorded_at DESC
+    LIMIT 1
+    """
+    cursor.execute(query_sql, (event_type, event_id))
+    last_record = cursor.fetchone()
+
+    # 如果有历史记录，检查是否有显著变化
+    if last_record:
+        last_web2, last_poly = last_record
+
+        # 计算变化幅度
+        web2_changed = False
+        poly_changed = False
+
+        if web2_odds is not None and last_web2 is not None:
+            web2_changed = abs(web2_odds - last_web2) >= threshold
+        elif web2_odds is not None or last_web2 is not None:
+            web2_changed = True  # 从 None 变为有值，或反之
+
+        if polymarket_price is not None and last_poly is not None:
+            poly_changed = abs(polymarket_price - last_poly) >= threshold
+        elif polymarket_price is not None or last_poly is not None:
+            poly_changed = True  # 从 None 变为有值，或反之
+
+        # 如果两个值都没有显著变化，跳过
+        if not web2_changed and not poly_changed:
+            return False
+
+    # 插入新记录
     insert_sql = """
     INSERT INTO odds_history
         (event_type, event_id, sport_type, web2_odds, polymarket_price, recorded_at)
@@ -1674,6 +1724,7 @@ def save_odds_history(cursor, event_type, event_id, sport_type, web2_odds, polym
         (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
     """
     cursor.execute(insert_sql, (event_type, event_id, sport_type, web2_odds, polymarket_price))
+    return True
 
 
 def save_to_database(all_data):
@@ -1724,6 +1775,8 @@ def save_to_database(all_data):
         ai_generated_count = 0
         ai_reused_count = 0
         ai_skipped_count = 0
+        history_saved = 0
+        history_skipped = 0
 
         for record in all_data:
             team_name = record["team_name"]
@@ -1800,18 +1853,21 @@ def save_to_database(all_data):
                 ai_analysis,
                 analysis_timestamp
             ))
-            # 保存历史记录
-            save_odds_history(
+            # 保存历史记录 - 智能去重
+            if save_odds_history(
                 cursor,
                 event_type="championship",
                 event_id=record["team_name"],
                 sport_type=record["sport_type"],
                 web2_odds=record["web2_odds"],
                 polymarket_price=record["polymarket_price"]
-            )
+            ):
+                history_saved += 1
+            else:
+                history_skipped += 1
 
         conn.commit()
-        print(f"[入库] 历史记录已追加")
+        print(f"[入库] 历史记录: 新增 {history_saved} 条, 跳过 {history_skipped} 条 (无变化)")
         print(f"[入库] 成功写入 {len(all_data)} 条记录")
         print(f"[入库] AI 报告: 新生成 {ai_generated_count} 个, 复用 {ai_reused_count} 个, 跳过 {ai_skipped_count} 个")
 
