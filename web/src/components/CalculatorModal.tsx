@@ -51,7 +51,11 @@ interface ArbitrageResult {
 interface KellyResult {
   recommendedStake: number
   stakePercent: number
+  rawKellyPercent: number  // 原始全凯利百分比 (未调整)
   expectedValue: number
+  effectiveNetOdds: number // 扣费后真实净赔率
+  reason: string           // 建议理由
+  isCapped: boolean        // 是否被 20% 上限限制
 }
 
 // Net ROI 对比结果
@@ -266,27 +270,71 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     const p = web2Odds
     const q = 1 - p
 
-    // Polymarket 十进制赔率
-    const decimalOdds = 1 / polyPrice
-    const b = decimalOdds - 1 // 净赔率
+    // === 计算扣费后的真实净赔率 (Fee-Adjusted Net Odds) ===
+    // 使用 Taker 模式 (2% fee) + 默认 Gas ($0.05) 来计算真实回报
+    const testInvestment = 100
+    const testGas = 0.05
+    const testFeeRate = 0.02 // Taker fee
 
-    // 凯利公式
-    let kellyPercent = (b * p - q) / b
+    const capitalAfterGas = testInvestment - testGas
+    const effectiveCostPerShare = polyPrice * (1 + testFeeRate)
+    const sharesBought = capitalAfterGas / effectiveCostPerShare
+    const grossPayout = sharesBought * 1.0
+    const polyProfit = grossPayout - testInvestment
+    const polyNetROI = (polyProfit / testInvestment) // 小数形式
+
+    // 扣费后真实净赔率 = ROI (例如 ROI=91% -> net_odds=0.91)
+    const effectiveNetOdds = polyNetROI
+
+    // 如果净赔率为负或零，无法计算
+    if (effectiveNetOdds <= 0) {
+      return {
+        recommendedStake: 0,
+        stakePercent: 0,
+        rawKellyPercent: 0,
+        expectedValue: polyNetROI * 100,
+        effectiveNetOdds: effectiveNetOdds,
+        reason: "Negative odds after fees",
+        isCapped: false
+      }
+    }
+
+    // 凯利公式: f* = (bp - q) / b
+    const rawKelly = (effectiveNetOdds * p - q) / effectiveNetOdds
+
+    // 如果原始凯利为负，说明是负EV交易
+    if (rawKelly <= 0) {
+      return {
+        recommendedStake: 0,
+        stakePercent: 0,
+        rawKellyPercent: Math.round(rawKelly * 10000) / 100,
+        expectedValue: polyNetROI * 100,
+        effectiveNetOdds: effectiveNetOdds,
+        reason: "Negative EV - Don't bet",
+        isCapped: false
+      }
+    }
 
     // 应用 Kelly 分数
     const fractionMultiplier = kellyFraction === 'full' ? 1 : kellyFraction === 'half' ? 0.5 : 0.25
-    kellyPercent = kellyPercent * fractionMultiplier
+    let adjustedKelly = rawKelly * fractionMultiplier
 
-    // 限制在 0-100% 之间
-    kellyPercent = Math.max(0, Math.min(1, kellyPercent))
+    // 20% 最大上限 (防止过度激进)
+    const MAX_CAP = 0.20
+    const isCapped = adjustedKelly > MAX_CAP
+    const finalKelly = Math.min(adjustedKelly, MAX_CAP)
 
-    const recommendedStake = bankroll * kellyPercent
-    const expectedValue = ((web2Odds - polyPrice) / polyPrice) * 100
+    const recommendedStake = bankroll * finalKelly
+    const expectedValue = polyNetROI * 100
 
     return {
       recommendedStake: Math.round(recommendedStake * 100) / 100,
-      stakePercent: Math.round(kellyPercent * 10000) / 100,
-      expectedValue: Math.round(expectedValue * 100) / 100
+      stakePercent: Math.round(finalKelly * 10000) / 100,
+      rawKellyPercent: Math.round(rawKelly * 10000) / 100,
+      expectedValue: Math.round(expectedValue * 100) / 100,
+      effectiveNetOdds: Math.round(effectiveNetOdds * 10000) / 10000,
+      reason: isCapped ? "Capped at 20% max" : "Positive EV",
+      isCapped
     }
   }
 
@@ -711,7 +759,18 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               {/* Kelly Results */}
               {kellyResult ? (
                 <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  <div className="text-sm font-medium text-[#e6edf3] mb-2">Kelly Criterion Recommendation</div>
+                  {/* Status Banner */}
+                  <div className={`text-center py-2 px-3 rounded-lg text-sm font-medium ${
+                    kellyResult.stakePercent > 0
+                      ? 'bg-[#3fb950]/20 text-[#3fb950]'
+                      : 'bg-[#f85149]/20 text-[#f85149]'
+                  }`}>
+                    {kellyResult.reason}
+                    {kellyResult.isCapped && (
+                      <span className="ml-2 text-xs opacity-80">(Raw: {kellyResult.rawKellyPercent.toFixed(1)}%)</span>
+                    )}
+                  </div>
+
                   <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
                     <span className="text-sm text-[#8b949e]">Win Probability (Web2):</span>
                     <span className="font-mono text-[#d29922]">{(web2Odds * 100).toFixed(1)}%</span>
@@ -719,6 +778,10 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                   <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
                     <span className="text-sm text-[#8b949e]">Polymarket Price:</span>
                     <span className="font-mono text-[#58a6ff]">{(polyPrice * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
+                    <span className="text-sm text-[#8b949e]">Effective Net Odds (after fees):</span>
+                    <span className="font-mono text-[#e6edf3]">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
                     <span className="text-sm text-[#8b949e]">Recommended Stake:</span>
@@ -731,6 +794,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     <span className={`font-mono font-bold text-lg ${kellyResult.expectedValue >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
                       {kellyResult.expectedValue > 0 ? '+' : ''}{kellyResult.expectedValue.toFixed(1)}%
                     </span>
+                  </div>
+
+                  {/* Fee disclaimer */}
+                  <div className="text-[10px] text-[#6e7681] mt-2 text-center border-t border-[#30363d] pt-2">
+                    *Calculated using Taker fee (2%) + Gas ($0.05). Max position capped at 20%.
                   </div>
                 </div>
               ) : (
