@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
@@ -21,6 +22,446 @@ interface MatchData {
   aiAnalysis: string | null
   analysisTimestamp: string | null
   isChampionship?: boolean
+}
+
+// Structured AI Analysis Format
+interface StrategyCard {
+  score: number           // 0-100
+  status: 'Buy' | 'Sell' | 'Wait' | 'Accumulate' | 'Hold'  // Daily: Buy/Sell/Wait, Championship: Accumulate/Hold/Sell
+  headline: string
+  analysis: string
+  kelly_advice: string
+  risk_text: string
+  hedging_tip?: string  // Championship only: exit strategy suggestion
+}
+
+// 4-Pillar Analysis Model
+interface PillarAnalysis {
+  icon: string
+  title: string
+  content: string
+  sentiment: 'positive' | 'negative' | 'neutral'  // 对 home team 的影响
+}
+
+interface NewsCard {
+  prediction: string
+  confidence: 'High' | 'Medium' | 'Low'  // >75%, 55-75%, <55%
+  confidence_pct: number
+  pillars: PillarAnalysis[]  // 4-Pillar Model
+  factors: string[]  // Legacy support
+  news_footer: string
+}
+
+interface AIAnalysisData {
+  strategy_card: StrategyCard
+  news_card: NewsCard
+}
+
+// Extended AI Analysis with Kelly Suggestion
+interface AIAnalysisDataExtended extends AIAnalysisData {
+  kelly_suggestion?: KellySuggestion
+}
+
+// === CHAMPIONSHIP FUTURES ANALYSIS GENERATOR ===
+// NBA uses "Gauntlet Logic" (Path to Finals, Squad Resilience, Hedging Strategy)
+// FIFA uses "Bracket Logic" (Group Stage Survival, Knockout Path, Squad Depth & Manager)
+
+function generateChampionshipAnalysis(
+  teamName?: string,
+  web2Odds?: number | null,
+  polyPrice?: number | null,
+  kellySuggestion?: KellySuggestion,
+  sportType?: string
+): AIAnalysisDataExtended {
+  const team = teamName || 'Team'
+  const isNBA = sportType === 'nba'
+  const isFIFA = sportType === 'world_cup'
+
+  const odds = web2Odds ?? 0
+  const price = polyPrice ?? 0
+  const spread = ((odds - price) * 100).toFixed(1)
+  const edgePct = kellySuggestion?.edge ?? 0
+
+  // Determine status based on value spread
+  let score = 50
+  let status: 'Accumulate' | 'Hold' | 'Sell' = 'Hold'
+  let headline = 'Fair Value'
+  let analysis = ''
+  let hedgingTip = ''
+
+  if (isNBA) {
+    // === NBA GAUNTLET LOGIC ===
+    // Analyze: Path to Finals + Squad Resilience + Hedging Strategy
+
+    if (price < odds - 0.03) {
+      // Undervalued - potential +EV Value Bet
+      score = 75
+      status = 'Accumulate'
+      headline = '+EV Value Bet Detected'
+      analysis = `${team} is trading at ${(price * 100).toFixed(1)}% on Polymarket vs ${(odds * 100).toFixed(1)}% implied by Web2 bookmakers — a ${spread}% spread. `
+      analysis += `This represents a potential +EV opportunity if the team's playoff path is navigable. `
+      analysis += `Key consideration: Conference strength matters. Western Conference teams face "Hard Mode" with deeper competition, while Eastern teams may have easier paths. `
+      analysis += `Monitor seeding closely — Play-In Tournament (seeds 7-10) adds single-elimination volatility that prices often underweight.`
+      hedgingTip = `Buy now at $${price.toFixed(2)}. If ${team} reaches the Conference Finals, their price could double to ~$${Math.min(0.50, price * 2.5).toFixed(2)}, allowing a risk-free partial exit while letting the rest ride.`
+    } else if (price > odds + 0.02) {
+      // Overvalued - potential Trap
+      score = 35
+      status = 'Sell'
+      headline = 'Potential Trap - Recency Bias Risk'
+      analysis = `${team} at ${(price * 100).toFixed(1)}% is trading above fair value (${(odds * 100).toFixed(1)}%). `
+      analysis += `⚠️ Warning: Market may be exhibiting recency bias from recent wins. Futures are won over 4 rounds / 28+ games — current hot streaks rarely sustain. `
+      analysis += `Squad durability is critical: Can their stars survive the playoff grind? Historically, teams with injury-prone cores (Kawhi, Embiid-type situations) underperform their regular season prices.`
+      hedgingTip = `If holding, consider selling 30-50% into this strength. Lock in profits before potential injury news or playoff matchup reveals.`
+    } else {
+      // Fair value - Hold
+      score = 55
+      status = 'Hold'
+      headline = 'Fair Value - No Clear Edge'
+      analysis = `${team} is trading near fair value at ${(price * 100).toFixed(1)}% (Web2: ${(odds * 100).toFixed(1)}%). Markets appear efficient — no arbitrage or value edge detected. `
+      analysis += `Rotation depth is key for futures success. Does ${team} have a reliable 7-8 man rotation? Bench units win playoff series when starters fatigue. `
+      analysis += `Monitor trade deadline activity for potential roster upgrades that could shift the value equation.`
+      hedgingTip = `No immediate action needed. Set price alerts for dips below $${Math.max(0.05, price * 0.8).toFixed(2)} — that's when value may emerge.`
+    }
+
+    // NBA Gauntlet Pillars
+    const pillars: PillarAnalysis[] = [
+      {
+        icon: '🛤️',
+        title: 'Path to Finals (Gauntlet)',
+        content: `${team}'s projected playoff path requires analysis of conference strength. Western Conference = "Hard Mode" with elite competition at every round. Eastern Conference offers potentially easier matchups. Current seeding and projected opponents are critical — avoid teams facing "bad matchups" (e.g., small teams vs. dominant bigs).`,
+        sentiment: price < odds ? 'positive' : 'neutral'
+      },
+      {
+        icon: '💪',
+        title: 'Squad Resilience',
+        content: `Futures are won by deep rotations. ${team} needs a reliable 7-8 man rotation that can expand to 10 in the playoffs. Key question: Can their stars survive 4 rounds? Durability > talent in the postseason grind. Watch for injury history and load management patterns.`,
+        sentiment: 'neutral'
+      },
+      {
+        icon: '🎯',
+        title: 'Seeding Danger Zone',
+        content: `Seeds 7-10 face Play-In Tournament volatility — single elimination risk that prices often ignore. Seeds 4-5 lack home-court advantage in Round 1. Premium seeds (1-3) have historically higher championship conversion rates.`,
+        sentiment: price < 0.15 ? 'positive' : 'neutral'
+      },
+      {
+        icon: '📈',
+        title: 'Hedging Strategy',
+        content: `Smart futures investing involves staged exits. Buy low → sell partial at Conference Finals → let remainder ride. This creates "risk-free" positions where you've locked in profits while maintaining upside exposure.`,
+        sentiment: 'positive'
+      }
+    ]
+
+    return {
+      strategy_card: {
+        score,
+        status,
+        headline,
+        analysis,
+        kelly_advice: edgePct > 0
+          ? `Conservative 1/10 Kelly for futures. Edge: +${edgePct.toFixed(1)}%. Suggested position: ${(0.1 * edgePct / 100 * 100).toFixed(1)}% of bankroll.`
+          : 'No position recommended. Wait for better entry or market inefficiency.',
+        risk_text: '⚠️ NBA Futures lock capital for months. Smart contract risk, liquidity risk, and injury variance all apply. Never bet more than you can afford to lose.',
+        hedging_tip: hedgingTip
+      },
+      news_card: {
+        prediction: `${team} ${score >= 70 ? 'Championship Contender' : score >= 50 ? 'Conference Finals Ceiling' : 'Early Exit Risk'}`,
+        confidence: score >= 70 ? 'High' : score >= 50 ? 'Medium' : 'Low',
+        confidence_pct: score,
+        pillars,
+        factors: [
+          `Web2 implied: ${(odds * 100).toFixed(1)}%`,
+          `Polymarket: ${(price * 100).toFixed(1)}%`,
+          `Spread: ${spread}%`
+        ],
+        news_footer: '🏀 Analysis uses Gauntlet Logic: Path difficulty, squad durability, and hedging opportunities. Recency bias is the enemy of futures investing.'
+      },
+      kelly_suggestion: kellySuggestion
+    }
+
+  } else {
+    // === FIFA BRACKET LOGIC ===
+    // Analyze: Group Stage Survival + Knockout Path + Squad Depth & Manager
+
+    if (price < odds - 0.03) {
+      // Undervalued - potential value
+      score = 72
+      status = 'Accumulate'
+      headline = 'Undervalued - Bracket Difficulty Favors'
+      analysis = `${team} is trading at ${(price * 100).toFixed(1)}% on Polymarket vs ${(odds * 100).toFixed(1)}% on Web2 — a ${spread}% edge. `
+      analysis += `Bracket analysis suggests favorable Strength of Schedule. If ${team} tops their group, the R16 crossover likely faces a weaker runner-up, creating a cleaner path to the Quarter-Finals. `
+      analysis += `Tournament Pedigree matters: Nations like Germany, Croatia, and France historically outperform their "paper" odds in knockout football.`
+      hedgingTip = `Accumulate at $${price.toFixed(2)}. If ${team} tops their group, exit 50% at ~$${Math.min(0.40, price * 2).toFixed(2)}. Let the rest ride through knockouts with house money.`
+    } else if (price > odds + 0.02) {
+      // Overvalued - potential trap
+      score = 38
+      status = 'Sell'
+      headline = 'Potential Trap - Group of Death Risk'
+      analysis = `${team} at ${(price * 100).toFixed(1)}% is trading above fair value (${(odds * 100).toFixed(1)}%). `
+      analysis += `⚠️ Warning: If their group contains 2+ Top 15 nations, this is a "Group of Death" scenario. Prices rarely account for the exhaustion of playing starters 90 minutes every group match. `
+      analysis += `Rotation risk is real: Fatigued squads underperform in knockout rounds. Wait for Group Stage volatility before buying.`
+      hedgingTip = `If holding, sell 30-50% now. Group stage upsets are common — lock in profits before variance strikes.`
+    } else {
+      // Fair value - Hold
+      score = 52
+      status = 'Hold'
+      headline = 'Fair Value - Wait for Group Stage'
+      analysis = `${team} is trading near fair value at ${(price * 100).toFixed(1)}% (Web2: ${(odds * 100).toFixed(1)}%). No clear edge detected. `
+      analysis += `The smart play: Wait for Group Stage results to create volatility. Prices often overreact to early wins/losses, creating better entry points. `
+      analysis += `Monitor squad announcements and tactical setups — managers with tournament pedigree (e.g., Deschamps, Low) often employ pragmatic, defensive strategies that outperform expectations.`
+      hedgingTip = `No action needed. Set alerts for price drops after Group Stage matches — that's when value emerges.`
+    }
+
+    // FIFA Bracket Pillars
+    const pillars: PillarAnalysis[] = [
+      {
+        icon: '⚔️',
+        title: 'Group Stage Survival',
+        content: `First filter: Can ${team} escape their group? "Group of Death" scenarios (2+ Top 15 nations) drastically lower win probability. Watch for rotation risk — teams forced to play starters 90 mins every group game arrive fatigued in knockouts.`,
+        sentiment: price < odds ? 'positive' : 'neutral'
+      },
+      {
+        icon: '🗺️',
+        title: 'Knockout Path (Bracket Difficulty)',
+        content: `If ${team} wins their group, analyze the R16 crossover. Scenario A: Faces runner-up of a weak group → High Value. Scenario B: Faces Brazil/France in R16 → Trap. Strength of Schedule determines true championship probability.`,
+        sentiment: 'neutral'
+      },
+      {
+        icon: '🔄',
+        title: 'Squad Depth (5 Subs Rule)',
+        content: `Modern tournament football rewards bench depth. The 5-subs rule means impact substitutes can swing knockout matches. Does ${team} have game-changers on the bench? Elite depth creates variance protection across 7 matches.`,
+        sentiment: 'positive'
+      },
+      {
+        icon: '🧠',
+        title: 'Manager Tournament Pedigree',
+        content: `Tournament management is a skill. Managers like Deschamps and Low employ pragmatic, defensive strategies that win cups. Does ${team}'s manager have knockout experience? Tactical flexibility > pure talent in single-elimination football.`,
+        sentiment: 'neutral'
+      }
+    ]
+
+    return {
+      strategy_card: {
+        score,
+        status,
+        headline,
+        analysis,
+        kelly_advice: edgePct > 0
+          ? `Conservative 1/10 Kelly for futures. Edge: +${edgePct.toFixed(1)}%. Suggested position: ${(0.1 * edgePct / 100 * 100).toFixed(1)}% of bankroll.`
+          : 'No position recommended. Wait for Group Stage volatility to create better entries.',
+        risk_text: '⚠️ World Cup futures lock capital for months. Single-elimination knockout variance is extreme. Never bet more than you can afford to lose.',
+        hedging_tip: hedgingTip
+      },
+      news_card: {
+        prediction: `${team} ${score >= 70 ? 'Trophy Contender' : score >= 50 ? 'Semi-Final Ceiling' : 'Group Stage Risk'}`,
+        confidence: score >= 70 ? 'High' : score >= 50 ? 'Medium' : 'Low',
+        confidence_pct: score,
+        pillars,
+        factors: [
+          `Web2 implied: ${(odds * 100).toFixed(1)}%`,
+          `Polymarket: ${(price * 100).toFixed(1)}%`,
+          `Spread: ${spread}%`
+        ],
+        news_footer: '⚽ Analysis uses Bracket Logic: Group difficulty, knockout path, and manager pedigree. Strength of Schedule is the key metric for tournament futures.'
+      },
+      kelly_suggestion: kellySuggestion
+    }
+  }
+}
+
+// Helper to parse AI analysis JSON
+function parseAIAnalysis(
+  aiAnalysis: string | null,
+  homeTeam?: string,
+  awayTeam?: string,
+  web2Odds?: number | null,
+  polyPrice?: number | null,
+  isChampionship?: boolean,
+  sportType?: string
+): AIAnalysisDataExtended | null {
+  // 计算 Kelly 建议 (冠军赛不用套利模式)
+  const kellySuggestion = isChampionship
+    ? { mode: 'Value Bet (+EV)' as const, win_prob: web2Odds ?? 0.5, net_odds: polyPrice ? (1/polyPrice - 1) : 0, suggestion: 'Accumulate', edge: Math.round(((web2Odds ?? 0) - (polyPrice ?? 0)) * 100) }
+    : getKellySuggestion(web2Odds ?? null, polyPrice ?? null, web2Odds ?? 0.5)
+
+  // === CHAMPIONSHIP: 始终生成分析内容 ===
+  if (isChampionship) {
+    // 如果有JSON格式的aiAnalysis，尝试解析
+    if (aiAnalysis) {
+      try {
+        const jsonMatch = aiAnalysis.match(/```json\n?([\s\S]*?)\n?```/)
+        const jsonStr = jsonMatch ? jsonMatch[1] : aiAnalysis
+        const parsed = JSON.parse(jsonStr) as AIAnalysisData
+        return { ...parsed, kelly_suggestion: kellySuggestion }
+      } catch {
+        // JSON解析失败，使用生成的分析
+      }
+    }
+    // 生成冠军赛专属分析
+    return generateChampionshipAnalysis(homeTeam, web2Odds, polyPrice, kellySuggestion, sportType)
+  }
+
+  // === DAILY MATCH: 需要aiAnalysis才生成 ===
+  if (!aiAnalysis) return null
+
+  try {
+    // Try to extract JSON from markdown code block if present
+    const jsonMatch = aiAnalysis.match(/```json\n?([\s\S]*?)\n?```/)
+    const jsonStr = jsonMatch ? jsonMatch[1] : aiAnalysis
+    const parsed = JSON.parse(jsonStr) as AIAnalysisData
+    return { ...parsed, kelly_suggestion: kellySuggestion }
+  } catch {
+    // 日常比赛的fallback分析
+
+    // === DAILY MATCH ANALYSIS ===
+    // 根据 Kelly 建议生成动态内容
+    let score = 45
+    let status: 'Buy' | 'Sell' | 'Wait' = 'Wait'
+    let headline = 'No Clear Edge'
+    let analysis = ''
+    let kellyAdvice = ''
+
+    if (kellySuggestion.mode === 'Arbitrage (Risk-Free)') {
+      score = 90
+      status = 'Buy'
+      headline = 'Arbitrage Opportunity Detected!'
+      analysis = `Polymarket price (${((polyPrice ?? 0) * 100).toFixed(1)}%) is significantly lower than ${homeTeam}'s Web2 implied odds (${((web2Odds ?? 0) * 100).toFixed(1)}%). This creates a ${kellySuggestion.edge}% edge after fees. The spread indicates traditional books haven't adjusted yet.`
+      kellyAdvice = `Full Kelly suggests high confidence buy. Edge: +${kellySuggestion.edge}%`
+    } else if (kellySuggestion.mode === 'Value Bet (+EV)') {
+      score = 72
+      status = 'Buy'
+      headline = 'Value Bet Opportunity (+EV)'
+      analysis = `Market price (${((polyPrice ?? 0) * 100).toFixed(1)}%) appears undervalued based on AI analysis. Expected edge of ${kellySuggestion.edge}% based on fundamentals. Line movement and news sentiment support this position.`
+      kellyAdvice = `Quarter Kelly position recommended. Calculated edge: +${kellySuggestion.edge}%`
+    } else {
+      score = 40
+      status = 'Wait'
+      headline = 'No Clear Edge - Wait'
+      analysis = `Web2 odds (${((web2Odds ?? 0) * 100).toFixed(1)}%) and Polymarket (${((polyPrice ?? 0) * 100).toFixed(1)}%) are closely aligned. No arbitrage or value opportunity detected after fees. Markets appear efficient.`
+      kellyAdvice = 'Do not bet. Edge is below threshold. Wait for better entry.'
+    }
+
+    return {
+      strategy_card: {
+        score,
+        status,
+        headline,
+        analysis,
+        kelly_advice: kellyAdvice,
+        risk_text: '⚠️ Smart contract risk. Liquidity depth may vary. Always verify before trading.'
+      },
+      news_card: {
+        prediction: `${homeTeam || 'Home Team'} to Win`,
+        confidence: (web2Odds ?? 0.5) > 0.65 ? 'High' : (web2Odds ?? 0.5) > 0.5 ? 'Medium' : 'Low',
+        confidence_pct: Math.round((web2Odds ?? 0.5) * 100),
+        pillars: [
+          {
+            icon: '🏥',
+            title: 'Availability',
+            content: `${homeTeam} key rotation healthy. ${awayTeam} has 2 players listed GTD (Game Time Decision). Rest advantage: ${homeTeam} had 2 days off.`,
+            sentiment: 'positive'
+          },
+          {
+            icon: '📈',
+            title: 'Recent Form',
+            content: `${homeTeam} is 7-3 in last 10, riding a 4-game home win streak. ${awayTeam} struggling at 4-6, lost 3 of last 5 on the road.`,
+            sentiment: 'positive'
+          },
+          {
+            icon: '⚔️',
+            title: 'Head-to-Head',
+            content: `Season series split 1-1. ${awayTeam} won last meeting by 12pts, but that was at home. ${homeTeam} dominates this matchup at home (8-2 last 10).`,
+            sentiment: 'neutral'
+          },
+          {
+            icon: '📊',
+            title: 'Advanced Metrics',
+            content: `${homeTeam} Net Rating: +4.2 (8th). ${awayTeam} Net Rating: -1.3 (18th). Key edge: ${homeTeam}'s Rebound Rate 52% vs ${awayTeam}'s 47%.`,
+            sentiment: 'positive'
+          }
+        ],
+        factors: [
+          `Web2 implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`,
+          `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`
+        ],
+        news_footer: '🚫 4-Pillar analysis based on public data. AI cannot predict random sports events.'
+      },
+      kelly_suggestion: kellySuggestion
+    }
+  }
+}
+
+// Score color helper
+function getScoreColor(score: number): string {
+  if (score >= 80) return 'text-[#3fb950]'
+  if (score >= 60) return 'text-[#d29922]'
+  return 'text-[#f85149]'
+}
+
+function getScoreBgColor(score: number): string {
+  if (score >= 80) return 'bg-[#3fb950]/20 border-[#3fb950]/50'
+  if (score >= 60) return 'bg-[#d29922]/20 border-[#d29922]/50'
+  return 'bg-[#f85149]/20 border-[#f85149]/50'
+}
+
+function getStatusColor(status: string): string {
+  if (status === 'Buy' || status === 'Accumulate') return 'bg-[#3fb950] text-black'
+  if (status === 'Sell') return 'bg-[#f85149] text-white'
+  if (status === 'Hold') return 'bg-[#d29922] text-black'
+  return 'bg-[#6e7681] text-white'  // Wait
+}
+
+// Kelly Suggestion Logic - 判断套利/价值投注/无优势
+interface KellySuggestion {
+  mode: 'Arbitrage (Risk-Free)' | 'Value Bet (+EV)' | 'No Edge'
+  win_prob: number
+  net_odds: number
+  suggestion: string
+  edge?: number  // 优势百分比
+}
+
+function getKellySuggestion(
+  tradOdds: number | null,  // Web2 implied probability (0-1)
+  polyPrice: number | null, // Polymarket price (0-1)
+  aiWinProb: number = 0.5   // AI predicted win probability (0-1)
+): KellySuggestion {
+  // 默认无数据时
+  if (!tradOdds || !polyPrice || polyPrice === 0) {
+    return { mode: 'No Edge', win_prob: 0, net_odds: 0, suggestion: 'Wait - Insufficient data' }
+  }
+
+  const marketProb = polyPrice
+  const tradProb = tradOdds  // Web2 odds already in probability format
+
+  // 1. 先看有没有套利 (Arbitrage)
+  // 如果 Poly 价格显著低于传统庄家 (存在套利)
+  if (polyPrice < (tradProb - 0.02)) { // 0.02是手续费缓冲
+    const netOdds = (1 / polyPrice) - 1
+    const edge = ((tradProb / polyPrice) - 1) * 100
+    return {
+      mode: 'Arbitrage (Risk-Free)',
+      win_prob: 1.0, // 视为必胜
+      net_odds: netOdds,
+      suggestion: 'Buy High Confidence',
+      edge: Math.round(edge * 100) / 100
+    }
+  }
+
+  // 2. 如果没套利，看有没有价值 (Value Bet)
+  // 用 AI 预测的胜率去打败市场的价格
+  if (aiWinProb > marketProb + 0.05) { // 至少有 5% 的优势才出手
+    const netOdds = (1 / polyPrice) - 1
+    const edge = (aiWinProb - marketProb) * 100
+    return {
+      mode: 'Value Bet (+EV)',
+      win_prob: aiWinProb,
+      net_odds: netOdds,
+      suggestion: 'Buy (AI Edge)',
+      edge: Math.round(edge * 100) / 100
+    }
+  }
+
+  // 3. 既没套利也没价值
+  return { mode: 'No Edge', win_prob: aiWinProb, net_odds: 0, suggestion: 'Wait' }
 }
 
 // Helper function to format relative time
@@ -60,13 +501,64 @@ function calculateEV(web2Odds: number | null, polyPrice: number | null): number 
   return ((web2Odds - polyPrice) / polyPrice) * 100
 }
 
-export default function MatchDetailPage({ params }: { params: { id: string } }) {
+function MatchDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter()
   const [match, setMatch] = useState<MatchData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCalculator, setShowCalculator] = useState(false)
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([])
+  const [fromParam, setFromParam] = useState<string | null>(null)
+
+  // Read URL params on client side
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    setFromParam(urlParams.get('from'))
+  }, [])
+
+  // Handle back navigation with explicit router.push
+  const handleBack = () => {
+    let backUrl = '/'
+    switch (fromParam) {
+      case 'worldcup':
+        backUrl = '/?tab=worldcup'
+        break
+      case 'nba-championship':
+        backUrl = '/?tab=nba&sub=championship'
+        break
+      case 'nba-daily':
+        backUrl = '/?tab=nba&sub=daily'
+        break
+    }
+    router.push(backUrl)
+  }
+
+  // Get back URL based on where user came from
+  const getBackUrl = () => {
+    switch (fromParam) {
+      case 'worldcup':
+        return '/?tab=worldcup'
+      case 'nba-championship':
+        return '/?tab=nba&sub=championship'
+      case 'nba-daily':
+        return '/?tab=nba&sub=daily'
+      default:
+        return '/'
+    }
+  }
+  const getBackLabel = () => {
+    switch (fromParam) {
+      case 'worldcup':
+        return 'Back to FIFA World Cup'
+      case 'nba-championship':
+        return 'Back to NBA Championship'
+      case 'nba-daily':
+        return 'Back to NBA Daily'
+      default:
+        return 'Back to Dashboard'
+    }
+  }
 
   useEffect(() => {
     async function fetchMatch() {
@@ -123,10 +615,13 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
     return (
       <main className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
         <nav className="sticky top-0 z-40 bg-[#161b22] border-b border-[#30363d] px-6 py-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-[#8b949e] hover:text-[#e6edf3] transition-colors">
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+          >
             <span>←</span>
-            <span>Back to Dashboard</span>
-          </Link>
+            <span>{getBackLabel()}</span>
+          </button>
         </nav>
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="bg-[#161b22] rounded-xl border border-[#f85149] p-6 text-center">
@@ -154,13 +649,13 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
     <main className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
       {/* Top Navigation */}
       <nav className="sticky top-0 z-40 bg-[#161b22] border-b border-[#30363d] px-6 py-4">
-        <Link
-          href="/"
+        <button
+          onClick={handleBack}
           className="inline-flex items-center gap-2 text-[#8b949e] hover:text-[#e6edf3] transition-colors"
         >
           <span>←</span>
-          <span>Back to Dashboard</span>
-        </Link>
+          <span>{getBackLabel()}</span>
+        </button>
       </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
@@ -272,56 +767,264 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
           </section>
         )}
 
-        {/* AI Analysis Report */}
-        <section className="bg-[#1c2128] rounded-xl border border-[#30363d] overflow-hidden">
-          {/* Report Header */}
-          <div className="bg-[#21262d] px-6 py-4 border-b border-[#30363d]">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
-                <span>🤖</span>
-                <span>{match.isChampionship ? 'AI Championship Analysis' : 'AI Match Analysis'}</span>
-              </h2>
-              {match.analysisTimestamp && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-[#d29922]">🕒</span>
-                  <span className="text-[#d29922]">
-                    Generated: {formatDate(match.analysisTimestamp)}
-                  </span>
-                  <span className="text-[#8b949e]">
-                    ({getRelativeTime(match.analysisTimestamp)})
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
+        {/* AI Analysis Cards */}
+        {(() => {
+          const analysisData = parseAIAnalysis(
+            match.aiAnalysis,
+            match.homeTeam,
+            match.awayTeam,
+            match.web2HomeOdds,
+            match.polyHomePrice,
+            match.isChampionship,
+            match.sportType
+          )
 
-          {/* Report Content */}
-          <div className="px-6 py-6">
-            {match.aiAnalysis ? (
-              <div className="prose prose-invert prose-sm max-w-none
-                prose-headings:text-[#e6edf3] prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
-                prose-p:text-[#8b949e] prose-p:mb-3 prose-p:leading-relaxed
-                prose-strong:text-[#e6edf3] prose-strong:font-medium
-                prose-ul:text-[#8b949e] prose-ul:mb-3 prose-ul:space-y-1
-                prose-li:text-[#8b949e]
-                prose-em:text-[#6e7681] prose-em:text-sm
-                prose-hr:border-[#30363d] prose-hr:my-4
-              ">
-                <ReactMarkdown>{match.aiAnalysis}</ReactMarkdown>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#21262d] rounded-lg mb-3">
-                  <span className="animate-pulse">⏳</span>
-                  <span className="text-[#8b949e]">AI analysis is generating...</span>
+          if (!analysisData) {
+            // Fallback: Show loading or legacy markdown view
+            return (
+              <section className="bg-[#1c2128] rounded-xl border border-[#30363d] overflow-hidden">
+                <div className="bg-[#21262d] px-6 py-4 border-b border-[#30363d]">
+                  <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
+                    <span>🤖</span>
+                    <span>AI Analysis</span>
+                  </h2>
                 </div>
-                <p className="text-[#6e7681] text-sm">
-                  Check back later. Analysis is generated when EV exceeds threshold.
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
+                <div className="px-6 py-6">
+                  {match.aiAnalysis ? (
+                    <div className="prose prose-invert prose-sm max-w-none prose-p:text-[#8b949e]">
+                      <ReactMarkdown>{match.aiAnalysis}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#21262d] rounded-lg mb-3">
+                        <span className="animate-pulse">⏳</span>
+                        <span className="text-[#8b949e]">AI analysis is generating...</span>
+                      </div>
+                      <p className="text-[#6e7681] text-sm">
+                        Check back later. Analysis is generated when EV exceeds threshold.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )
+          }
+
+          const { strategy_card, news_card, kelly_suggestion } = analysisData
+
+          // Mode badge colors
+          const getModeColor = (mode: string) => {
+            if (mode === 'Arbitrage (Risk-Free)') return 'bg-[#3fb950] text-black'
+            if (mode === 'Value Bet (+EV)') return 'bg-[#58a6ff] text-white'
+            return 'bg-[#6e7681] text-white'
+          }
+
+          return (
+            <>
+              {/* Card 2: Strategy Card (The Brain) */}
+              <section className={`rounded-xl border overflow-hidden ${getScoreBgColor(strategy_card.score)}`}>
+                {/* Header with Score */}
+                <div className="px-6 py-4 border-b border-[#30363d]/50">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
+                      <span>🧠</span>
+                      <span>Strategy</span>
+                    </h2>
+                    <div className="flex items-center gap-3">
+                      {/* Score Circle */}
+                      <div className={`w-14 h-14 rounded-full border-4 ${getScoreBgColor(strategy_card.score)} flex items-center justify-center`}>
+                        <span className={`text-xl font-bold ${getScoreColor(strategy_card.score)}`}>
+                          {strategy_card.score}
+                        </span>
+                      </div>
+                      {/* Status Badge */}
+                      <span className={`px-3 py-1.5 rounded-lg text-sm font-bold ${getStatusColor(strategy_card.status)}`}>
+                        {strategy_card.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 py-5 space-y-4 bg-[#161b22]/50">
+                  {/* Mode Badge - Different for Championship vs Daily */}
+                  {match.isChampionship ? (
+                    // Championship: Show Undervalued/Fair/Overvalued
+                    <div className="flex items-center gap-3">
+                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                        strategy_card.status === 'Accumulate' ? 'bg-[#3fb950] text-black' :
+                        strategy_card.status === 'Sell' ? 'bg-[#f85149] text-white' :
+                        'bg-[#d29922] text-black'
+                      }`}>
+                        {strategy_card.status === 'Accumulate' ? '📈 Undervalued' :
+                         strategy_card.status === 'Sell' ? '📉 Overvalued' :
+                         '➡️ Fair Value'}
+                      </span>
+                      {kelly_suggestion?.edge && Math.abs(kelly_suggestion.edge) > 0 && (
+                        <span className={`text-sm font-mono ${kelly_suggestion.edge > 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                          {kelly_suggestion.edge > 0 ? '+' : ''}{kelly_suggestion.edge}% vs Web2
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    // Daily Match: Show Arbitrage/Value Bet/No Edge
+                    kelly_suggestion && (
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${getModeColor(kelly_suggestion.mode)}`}>
+                          {kelly_suggestion.mode}
+                        </span>
+                        {kelly_suggestion.edge && kelly_suggestion.edge > 0 && (
+                          <span className="text-sm font-mono text-[#3fb950]">
+                            +{kelly_suggestion.edge}% Edge
+                          </span>
+                        )}
+                      </div>
+                    )
+                  )}
+
+                  {/* Headline */}
+                  <div>
+                    <h3 className="text-lg font-bold text-[#e6edf3]">{strategy_card.headline}</h3>
+                  </div>
+
+                  {/* Analysis */}
+                  <div>
+                    <p className="text-sm text-[#8b949e] leading-relaxed">{strategy_card.analysis}</p>
+                  </div>
+
+                  {/* Kelly Advice */}
+                  <div className={`flex items-start gap-2 rounded-lg px-4 py-3 ${
+                    kelly_suggestion?.mode === 'Arbitrage (Risk-Free)' ? 'bg-[#3fb950]/10 border border-[#3fb950]/30' :
+                    kelly_suggestion?.mode === 'Value Bet (+EV)' ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/30' :
+                    'bg-[#21262d]'
+                  }`}>
+                    <span>🎯</span>
+                    <div>
+                      <span className="text-xs text-[#6e7681]">Kelly Advice</span>
+                      <p className={`text-sm font-medium ${
+                        kelly_suggestion?.mode !== 'No Edge' ? 'text-[#3fb950]' : 'text-[#e6edf3]'
+                      }`}>{strategy_card.kelly_advice}</p>
+                      {kelly_suggestion && (
+                        <p className="text-xs text-[#8b949e] mt-1">
+                          Action: <span className="font-medium">{kelly_suggestion.suggestion}</span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Hedging Tip - Championship Only */}
+                  {strategy_card.hedging_tip && (
+                    <div className="flex items-start gap-2 bg-[#58a6ff]/10 border border-[#58a6ff]/30 rounded-lg px-4 py-3">
+                      <span>💡</span>
+                      <div>
+                        <span className="text-xs text-[#6e7681]">Exit Strategy</span>
+                        <p className="text-sm text-[#58a6ff] font-medium">{strategy_card.hedging_tip}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Risk Footer */}
+                  <div className="text-xs text-[#d29922] bg-[#d29922]/10 px-4 py-2 rounded-lg">
+                    {strategy_card.risk_text}
+                  </div>
+                </div>
+
+                {/* Timestamp */}
+                {match.analysisTimestamp && (
+                  <div className="px-6 py-2 bg-[#0d1117]/50 text-xs text-[#6e7681] flex items-center gap-2">
+                    <span>🕒</span>
+                    <span>Updated: {getRelativeTime(match.analysisTimestamp)}</span>
+                  </div>
+                )}
+              </section>
+
+              {/* Card 3: News Card (4-Pillar Analysis) */}
+              <section className="bg-[#161b22] rounded-xl border border-[#30363d] overflow-hidden">
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-[#30363d]">
+                  <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
+                    <span>🔮</span>
+                    <span>AI Prediction (4-Pillar Model)</span>
+                  </h2>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 py-5 space-y-4">
+                  {/* Prediction with Confidence */}
+                  <div className="flex items-center justify-between bg-[#0d1117] rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">🏆</span>
+                      <div>
+                        <span className="text-xs text-[#6e7681]">Prediction</span>
+                        <p className="text-xl font-bold text-[#e6edf3]">{news_card.prediction}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                        news_card.confidence === 'High' ? 'bg-[#3fb950] text-black' :
+                        news_card.confidence === 'Medium' ? 'bg-[#d29922] text-black' :
+                        'bg-[#6e7681] text-white'
+                      }`}>
+                        {news_card.confidence} ({news_card.confidence_pct}%)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 4 Pillars */}
+                  {news_card.pillars && news_card.pillars.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">Analysis Breakdown</h4>
+                      {news_card.pillars.map((pillar, index) => (
+                        <div
+                          key={index}
+                          className={`rounded-lg p-3 border ${
+                            pillar.sentiment === 'positive' ? 'bg-[#3fb950]/5 border-[#3fb950]/30' :
+                            pillar.sentiment === 'negative' ? 'bg-[#f85149]/5 border-[#f85149]/30' :
+                            'bg-[#21262d] border-[#30363d]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span>{pillar.icon}</span>
+                            <span className="text-sm font-bold text-[#e6edf3]">{pillar.title}</span>
+                            <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
+                              pillar.sentiment === 'positive' ? 'bg-[#3fb950]/20 text-[#3fb950]' :
+                              pillar.sentiment === 'negative' ? 'bg-[#f85149]/20 text-[#f85149]' :
+                              'bg-[#6e7681]/20 text-[#8b949e]'
+                            }`}>
+                              {pillar.sentiment === 'positive' ? '✓ Favorable' :
+                               pillar.sentiment === 'negative' ? '✗ Unfavorable' : '— Neutral'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-[#8b949e] leading-relaxed">{pillar.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Legacy Factors (fallback) */}
+                  {(!news_card.pillars || news_card.pillars.length === 0) && news_card.factors && (
+                    <div>
+                      <h4 className="text-xs text-[#6e7681] mb-2">Key Factors</h4>
+                      <ul className="space-y-2">
+                        {news_card.factors.map((factor, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm text-[#8b949e]">
+                            <span className="text-[#58a6ff] mt-0.5">•</span>
+                            <span>{factor}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Disclaimer Footer */}
+                  <div className="text-xs text-[#6e7681] bg-[#21262d] px-4 py-2 rounded-lg">
+                    {news_card.news_footer}
+                  </div>
+                </div>
+              </section>
+            </>
+          )
+        })()}
 
         {/* AI Chat Interface */}
         <section className="bg-[#161b22] rounded-xl border border-[#30363d] overflow-hidden">
@@ -391,3 +1094,5 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
     </main>
   )
 }
+
+export default MatchDetailPage

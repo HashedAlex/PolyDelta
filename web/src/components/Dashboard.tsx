@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { ArbitrageCard } from './ArbitrageCard'
 import { MatchCard } from './MatchCard'
 
@@ -86,10 +87,32 @@ function sortChampionMarkets(markets: MarketItem[]): MarketItem[] {
 }
 
 export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: DashboardProps) {
-  const [activeSport, setActiveSport] = useState<SportType>('nba')
-  const [nbaSubTab, setNbaSubTab] = useState<NbaSubTab>('daily')
+  // Use URL as the single source of truth for tab state
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Read tab state directly from URL (not useState)
+  const tab = searchParams.get('tab')
+  const sub = searchParams.get('sub')
+  const activeSport: SportType = tab === 'nba' ? 'nba' : 'worldcup'
+  const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
+
+  // Only local UI state uses useState
   const [hideLowOdds, setHideLowOdds] = useState(true)
   const [showBanner, setShowBanner] = useState(true)
+
+  // Navigation handlers - update URL instead of state
+  const setActiveSport = (sport: SportType) => {
+    if (sport === 'nba') {
+      router.push('/?tab=nba&sub=championship', { scroll: false })
+    } else {
+      router.push('/?tab=worldcup', { scroll: false })
+    }
+  }
+
+  const setNbaSubTab = (subTab: NbaSubTab) => {
+    router.push(`/?tab=nba&sub=${subTab}`, { scroll: false })
+  }
 
   // 冠军盘口数据过滤
   const filterChampionMarkets = (markets: MarketItem[]) => {

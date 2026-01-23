@@ -230,7 +230,7 @@ export function ArbitrageCard({
 
       {/* AI Analysis Link */}
       <Link
-        href={`/match/championship-${sportType}-${generateTeamSlug(teamName)}`}
+        href={`/match/championship-${sportType}-${generateTeamSlug(teamName)}?from=${sportType === 'nba' ? 'nba-championship' : 'worldcup'}`}
         className="mt-2 flex items-center justify-center gap-2 py-2 px-3 bg-[#1f6feb]/20 hover:bg-[#1f6feb]/30 text-[#58a6ff] text-sm font-medium rounded-md transition-colors border border-[#1f6feb]/40"
       >
         <span>🤖</span>

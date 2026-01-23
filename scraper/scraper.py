@@ -23,8 +23,9 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 ODDS_API_KEY = os.getenv('ODDS_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-# 导入 OpenRouter AI 分析模块 (用于冠军盘口)
-from ai_analyst import generate_ai_report as generate_championship_ai_report
+# 导入 AI 分析模块
+from ai_analyst import generate_ai_report as generate_daily_ai_report
+from sports_prompt_builder import generate_championship_analysis, generate_daily_match_analysis
 
 # 缓存文件目录
 CACHE_DIR = os.path.dirname(__file__)
@@ -85,20 +86,23 @@ def generate_ai_report(match_data, existing_analysis=None, existing_timestamp=No
             except:
                 pass
 
-    # 尝试使用 OpenRouter API (新增)
+    # 尝试使用新的 SportsPromptBuilder (每日比赛专用 Prompt)
     try:
-        match_data_for_openrouter = {
-            'title': f"{home_team} vs {away_team}",
-            'web2_odds': (home_odds or 0) * 100,
-            'polymarket_price': (poly_home or 0) * 100,
-            'ev': max_ev,
-        }
-        report = generate_championship_ai_report(match_data_for_openrouter, is_championship=False)
+        report = generate_daily_match_analysis(
+            home_team=home_team,
+            away_team=away_team,
+            sport_type='nba',
+            home_odds=home_odds or 0,
+            away_odds=away_odds or 0,
+            poly_home=poly_home or 0,
+            poly_away=poly_away or 0,
+            max_ev=max_ev
+        )
         if report:
-            print(f"  [AI] OpenRouter 报告生成成功")
+            print(f"  [AI] SportsPromptBuilder 报告生成成功")
             return report, datetime.utcnow().isoformat()
     except Exception as e:
-        print(f"  [AI] OpenRouter 错误: {e}")
+        print(f"  [AI] SportsPromptBuilder 错误: {e}")
 
     # 尝试使用 OpenAI API
     if OPENAI_API_KEY:
@@ -1853,16 +1857,17 @@ def save_to_database(all_data):
 
             # ============================================
             # 步骤 4: 调用 AI 生成报告 (高 EV 且未复用)
+            # 使用 SportsPromptBuilder - NBA 用 Gauntlet Logic, FIFA 用 Bracket Logic
             # ============================================
             if not skip_ai and ev >= 0.05:  # 冠军盘口 EV >= 5% 才生成
                 try:
-                    match_data_for_ai = {
-                        'title': f"{team_name} ({record['sport_type']})",
-                        'web2_odds': web2_odds * 100 if web2_odds else 0,
-                        'polymarket_price': poly_price * 100 if poly_price else 0,
-                        'ev': ev,
-                    }
-                    new_report = generate_championship_ai_report(match_data_for_ai, is_championship=True)
+                    new_report = generate_championship_analysis(
+                        team_name=team_name,
+                        sport_type=record['sport_type'],
+                        web2_odds=web2_odds if web2_odds else 0,
+                        poly_price=poly_price if poly_price else 0,
+                        ev=ev
+                    )
                     if new_report:
                         ai_analysis = new_report
                         analysis_timestamp = datetime.utcnow()
