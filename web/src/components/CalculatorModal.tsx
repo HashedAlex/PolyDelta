@@ -96,23 +96,40 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
   // For match type, which team to calculate
   const [selectedTeam, setSelectedTeam] = useState<'home' | 'away'>('home')
 
+  // Helper to normalize odds value
+  const normalizeOdds = (value: number | null | undefined): number => {
+    if (value === null || value === undefined) return 0
+    return value > 1 ? value / 100 : value
+  }
+
   // Reset states when modal opens
   useEffect(() => {
     if (isOpen) {
       setTotalInvestment(1000)
       setBankroll(10000)
       setKellyRiskMode('conservative')
-      setWinProbability(55)
       setSelectedTeam('home')
       setRoiInvestment(1000)
       setGasCost(0.05)
       setFeeType('taker')
+
+      // Set default win probability from Web2 odds (if available)
+      const defaultWeb2Odds = type === 'championship'
+        ? normalizeOdds(data.web2Odds)
+        : normalizeOdds(data.web2HomeOdds) // Default to home team
+
+      if (defaultWeb2Odds > 0) {
+        setWinProbability(Math.round(defaultWeb2Odds * 100))
+      } else {
+        setWinProbability(55) // Fallback
+      }
+
       // Force ROI mode for championship (can't do arbitrage on same outcome)
       if (type === 'championship') {
         setMode('roi')
       }
     }
-  }, [isOpen, type])
+  }, [isOpen, type, data.web2Odds, data.web2HomeOdds])
 
   if (!isOpen) return null
 
@@ -741,7 +758,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                   <label className="block text-xs text-[#8b949e] mb-2">Select Team</label>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setSelectedTeam('home')}
+                      onClick={() => {
+                        setSelectedTeam('home')
+                        const homeOdds = normalizeOdds(data.web2HomeOdds)
+                        if (homeOdds > 0) setWinProbability(Math.round(homeOdds * 100))
+                      }}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                         selectedTeam === 'home'
                           ? 'bg-[#238636] text-white'
@@ -751,7 +772,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                       {data.homeTeam || 'Home'}
                     </button>
                     <button
-                      onClick={() => setSelectedTeam('away')}
+                      onClick={() => {
+                        setSelectedTeam('away')
+                        const awayOdds = normalizeOdds(data.web2AwayOdds)
+                        if (awayOdds > 0) setWinProbability(Math.round(awayOdds * 100))
+                      }}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                         selectedTeam === 'away'
                           ? 'bg-[#238636] text-white'
@@ -804,16 +829,32 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     {winProbability}%
                   </span>
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="99"
-                  value={winProbability}
-                  onChange={(e) => setWinProbability(Number(e.target.value))}
-                  className="w-full h-2 bg-[#30363d] rounded-lg appearance-none cursor-pointer accent-[#58a6ff]"
-                />
+                {/* Slider with Web2 Reference Marker */}
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="99"
+                    value={winProbability}
+                    onChange={(e) => setWinProbability(Number(e.target.value))}
+                    className="w-full h-2 bg-[#30363d] rounded-lg appearance-none cursor-pointer accent-[#58a6ff]"
+                  />
+                  {/* Web2 Reference Marker */}
+                  {web2Odds > 0 && (
+                    <div
+                      className="absolute top-0 w-0.5 h-2 bg-[#d29922]"
+                      style={{ left: `${web2Odds * 100}%` }}
+                      title={`Web2: ${(web2Odds * 100).toFixed(1)}%`}
+                    />
+                  )}
+                </div>
                 <div className="flex justify-between text-[10px] text-[#6e7681] mt-1">
                   <span>Uncertain (1%)</span>
+                  {web2Odds > 0 && (
+                    <span className="text-[#d29922]">
+                      Web2: {(web2Odds * 100).toFixed(1)}%
+                    </span>
+                  )}
                   <span>Very Confident (99%)</span>
                 </div>
               </div>
@@ -823,28 +864,41 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 <div className="bg-[#0d1117]/50 rounded-lg p-4 border border-[#30363d]/50">
                   {/* Buy Signal */}
                   {kellyResult.signal === 'buy' && (
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-[#3fb950]/20 p-2 rounded-full">
-                          <span className="text-xl">📈</span>
+                    <>
+                      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-[#3fb950]/20 p-2 rounded-full">
+                            <span className="text-xl">📈</span>
+                          </div>
+                          <div>
+                            <p className="text-sm text-[#8b949e]">
+                              Suggested Position ({kellyResult.stakePercent.toFixed(1)}%)
+                              {kellyResult.isCapped && <span className="text-[#d29922] ml-1">(Capped)</span>}
+                            </p>
+                            <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
+                              ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </p>
+                          </div>
                         </div>
+                        <div className="text-right border-l border-[#30363d] pl-4">
+                          <p className="text-xs text-[#6e7681]">Edge</p>
+                          <p className="text-lg font-mono text-[#3fb950]">
+                            +{kellyResult.edge.toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                      {/* Details Row */}
+                      <div className="mt-3 pt-3 border-t border-[#30363d]/50 grid grid-cols-2 gap-4 text-xs">
                         <div>
-                          <p className="text-sm text-[#8b949e]">
-                            Suggested Position ({kellyResult.stakePercent.toFixed(1)}%)
-                            {kellyResult.isCapped && <span className="text-[#d29922] ml-1">(Capped)</span>}
-                          </p>
-                          <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
-                            ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                          </p>
+                          <span className="text-[#6e7681]">Effective Net Odds: </span>
+                          <span className="text-[#e6edf3] font-mono">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[#6e7681]">Raw Kelly: </span>
+                          <span className="text-[#e6edf3] font-mono">{kellyResult.rawKellyPercent.toFixed(1)}%</span>
                         </div>
                       </div>
-                      <div className="text-right border-l border-[#30363d] pl-4">
-                        <p className="text-xs text-[#6e7681]">Edge</p>
-                        <p className="text-lg font-mono text-[#3fb950]">
-                          +{kellyResult.edge.toFixed(2)}%
-                        </p>
-                      </div>
-                    </div>
+                    </>
                   )}
 
                   {/* Negative EV / Loss Signal */}
