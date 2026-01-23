@@ -31,7 +31,7 @@ interface CalculatorModalProps {
 }
 
 type CalculatorMode = 'arbitrage' | 'kelly' | 'roi'
-type KellyFraction = 'full' | 'half' | 'quarter'
+type KellyRiskMode = 'conservative' | 'aggressive'  // 1/4 Kelly vs 1/2 Kelly
 type FeeType = 'taker' | 'maker'
 
 // 套利计算器结果
@@ -52,9 +52,9 @@ interface KellyResult {
   recommendedStake: number
   stakePercent: number
   rawKellyPercent: number  // 原始全凯利百分比 (未调整)
-  expectedValue: number
+  edge: number             // 预期优势 (Edge) = p(1+b) - 1
   effectiveNetOdds: number // 扣费后真实净赔率
-  reason: string           // 建议理由
+  signal: 'buy' | 'negative_ev' | 'loss'  // 信号类型
   isCapped: boolean        // 是否被 20% 上限限制
 }
 
@@ -85,8 +85,9 @@ interface NetROIResult {
 export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModalProps) {
   const [mode, setMode] = useState<CalculatorMode>('arbitrage')
   const [totalInvestment, setTotalInvestment] = useState(1000)
-  const [bankroll, setBankroll] = useState(1000)
-  const [kellyFraction, setKellyFraction] = useState<KellyFraction>('half')
+  const [bankroll, setBankroll] = useState(10000)
+  const [kellyRiskMode, setKellyRiskMode] = useState<KellyRiskMode>('conservative')
+  const [winProbability, setWinProbability] = useState(55) // 用户信心值 (1-99%)
   // Net ROI 模式状态
   const [roiInvestment, setRoiInvestment] = useState(1000)
   const [gasCost, setGasCost] = useState(0.05)
@@ -99,8 +100,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
   useEffect(() => {
     if (isOpen) {
       setTotalInvestment(1000)
-      setBankroll(1000)
-      setKellyFraction('half')
+      setBankroll(10000)
+      setKellyRiskMode('conservative')
+      setWinProbability(55)
       setSelectedTeam('home')
       setRoiInvestment(1000)
       setGasCost(0.05)
@@ -258,20 +260,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     }
   }
 
-  // === 凯利公式计算 ===
-  // f* = (bp - q) / b
-  // b = decimal odds - 1 (净赔率)
-  // p = 胜率 (使用 Web2 隐含概率作为真实概率估计)
-  // q = 1 - p
+  // === 凯利公式计算 (Kelly Criterion with Slider) ===
   const calculateKelly = (): KellyResult | null => {
-    if (!web2Odds || !polyPrice || polyPrice === 0) return null
+    if (!polyPrice || polyPrice === 0) return null
 
-    // 真实胜率估计（使用 Web2 隐含概率）
-    const p = web2Odds
-    const q = 1 - p
-
-    // === 计算扣费后的真实净赔率 (Fee-Adjusted Net Odds) ===
-    // 使用 Taker 模式 (2% fee) + 默认 Gas ($0.05) 来计算真实回报
+    // === 1. 计算扣费后的真实净赔率 (Fee-Adjusted Net Odds) ===
     const testInvestment = 100
     const testGas = 0.05
     const testFeeRate = 0.02 // Taker fee
@@ -281,10 +274,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     const sharesBought = capitalAfterGas / effectiveCostPerShare
     const grossPayout = sharesBought * 1.0
     const polyProfit = grossPayout - testInvestment
-    const polyNetROI = (polyProfit / testInvestment) // 小数形式
-
-    // 扣费后真实净赔率 = ROI (例如 ROI=91% -> net_odds=0.91)
-    const effectiveNetOdds = polyNetROI
+    const effectiveNetOdds = polyProfit / testInvestment // 净赔率 (例如 0.915 = 91.5%)
 
     // 如果净赔率为负或零，无法计算
     if (effectiveNetOdds <= 0) {
@@ -292,14 +282,22 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         recommendedStake: 0,
         stakePercent: 0,
         rawKellyPercent: 0,
-        expectedValue: polyNetROI * 100,
+        edge: -100,
         effectiveNetOdds: effectiveNetOdds,
-        reason: "Negative odds after fees",
+        signal: 'loss',
         isCapped: false
       }
     }
 
-    // 凯利公式: f* = (bp - q) / b
+    // === 2. 使用用户的信心值 (Win Probability Slider) ===
+    const p = winProbability / 100 // 用户设定的胜率
+    const q = 1 - p
+
+    // === 3. 计算预期优势 (Edge) ===
+    // Edge = p(1+b) - 1, 其中 b = effectiveNetOdds
+    const edge = p * (1 + effectiveNetOdds) - 1
+
+    // === 4. 凯利公式: f* = (bp - q) / b ===
     const rawKelly = (effectiveNetOdds * p - q) / effectiveNetOdds
 
     // 如果原始凯利为负，说明是负EV交易
@@ -308,32 +306,32 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         recommendedStake: 0,
         stakePercent: 0,
         rawKellyPercent: Math.round(rawKelly * 10000) / 100,
-        expectedValue: polyNetROI * 100,
+        edge: Math.round(edge * 10000) / 100,
         effectiveNetOdds: effectiveNetOdds,
-        reason: "Negative EV - Don't bet",
+        signal: 'negative_ev',
         isCapped: false
       }
     }
 
-    // 应用 Kelly 分数
-    const fractionMultiplier = kellyFraction === 'full' ? 1 : kellyFraction === 'half' ? 0.5 : 0.25
+    // === 5. 应用分数凯利 (Fractional Kelly) ===
+    // Conservative: 1/4 Kelly, Aggressive: 1/2 Kelly
+    const fractionMultiplier = kellyRiskMode === 'conservative' ? 0.25 : 0.50
     let adjustedKelly = rawKelly * fractionMultiplier
 
-    // 20% 最大上限 (防止过度激进)
+    // === 6. 安全上限 (Hard Cap at 20%) ===
     const MAX_CAP = 0.20
     const isCapped = adjustedKelly > MAX_CAP
     const finalKelly = Math.min(adjustedKelly, MAX_CAP)
 
     const recommendedStake = bankroll * finalKelly
-    const expectedValue = polyNetROI * 100
 
     return {
       recommendedStake: Math.round(recommendedStake * 100) / 100,
       stakePercent: Math.round(finalKelly * 10000) / 100,
       rawKellyPercent: Math.round(rawKelly * 10000) / 100,
-      expectedValue: Math.round(expectedValue * 100) / 100,
+      edge: Math.round(edge * 10000) / 100,
       effectiveNetOdds: Math.round(effectiveNetOdds * 10000) / 10000,
-      reason: isCapped ? "Capped at 20% max" : "Positive EV",
+      signal: 'buy',
       isCapped
     }
   }
@@ -702,111 +700,196 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
           {/* Kelly Mode */}
           {mode === 'kelly' && (
-            <>
-              <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Bankroll ($)</label>
-                <input
-                  type="number"
-                  value={bankroll}
-                  onChange={(e) => setBankroll(Number(e.target.value) || 0)}
-                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#58a6ff] focus:outline-none"
-                  min={0}
-                />
-                {/* Liquidity Warning for Kelly */}
-                {(() => {
-                  // Get liquidity for the selected team
-                  const relevantLiq = type === 'championship'
-                    ? data.liquidityUsdc
-                    : (selectedTeam === 'home' ? data.liquidityHome : data.liquidityAway)
-
-                  // Warning if recommended stake would exceed liquidity
-                  if (relevantLiq && kellyResult && kellyResult.recommendedStake > relevantLiq) {
-                    return (
-                      <div className="mt-2 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
-                        <span>⚠️</span>
-                        <span>Order book thin. Expected slippage applies. Available liquidity: ${relevantLiq.toLocaleString()}</span>
-                      </div>
-                    )
-                  }
-                  return null
-                })()}
+            <div className={`rounded-lg border p-4 transition-all ${
+              kellyResult?.signal === 'buy' ? 'border-[#3fb950]/50 bg-[#3fb950]/5' :
+              kellyResult?.signal === 'negative_ev' ? 'border-[#f85149]/50 bg-[#f85149]/5' :
+              'border-[#30363d] bg-[#0d1117]'
+            }`}>
+              {/* Header with Risk Mode Toggle */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-[#e6edf3] flex items-center gap-2">
+                  <span>🎯</span>
+                  Kelly Advisor
+                </h3>
+                <div className="flex bg-[#21262d] rounded-lg p-1 text-xs">
+                  <button
+                    onClick={() => setKellyRiskMode('conservative')}
+                    className={`px-3 py-1 rounded-md transition-all ${
+                      kellyRiskMode === 'conservative'
+                        ? 'bg-[#58a6ff] text-white'
+                        : 'text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    Conservative (1/4)
+                  </button>
+                  <button
+                    onClick={() => setKellyRiskMode('aggressive')}
+                    className={`px-3 py-1 rounded-md transition-all ${
+                      kellyRiskMode === 'aggressive'
+                        ? 'bg-[#58a6ff] text-white'
+                        : 'text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    Aggressive (1/2)
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Kelly Criterion Fraction (Risk Level)</label>
-                <div className="flex gap-2">
-                  {(['quarter', 'half', 'full'] as KellyFraction[]).map((fraction) => (
+              {/* Team Selector for Match type */}
+              {type === 'match' && (
+                <div className="mb-4">
+                  <label className="block text-xs text-[#8b949e] mb-2">Select Team</label>
+                  <div className="flex gap-2">
                     <button
-                      key={fraction}
-                      onClick={() => setKellyFraction(fraction)}
+                      onClick={() => setSelectedTeam('home')}
                       className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                        kellyFraction === fraction
-                          ? 'bg-[#58a6ff] text-white'
+                        selectedTeam === 'home'
+                          ? 'bg-[#238636] text-white'
                           : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
                       }`}
                     >
-                      {fraction === 'quarter' ? '1/4' : fraction === 'half' ? '1/2' : 'Full'}
+                      {data.homeTeam || 'Home'}
                     </button>
-                  ))}
+                    <button
+                      onClick={() => setSelectedTeam('away')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                        selectedTeam === 'away'
+                          ? 'bg-[#238636] text-white'
+                          : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                      }`}
+                    >
+                      {data.awayTeam || 'Away'}
+                    </button>
+                  </div>
                 </div>
-                <div className="text-xs text-[#8b949e] mt-1">
-                  {kellyFraction === 'quarter' && 'Conservative - Lower risk, slower growth'}
-                  {kellyFraction === 'half' && 'Balanced - Moderate risk, steady growth'}
-                  {kellyFraction === 'full' && 'Aggressive - Higher risk, maximum growth'}
+              )}
+
+              {/* Input Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* Bankroll Input */}
+                <div>
+                  <label className="text-xs text-[#8b949e] mb-1.5 block flex items-center gap-1">
+                    💰 Bankroll
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2 text-[#8b949e]">$</span>
+                    <input
+                      type="number"
+                      value={bankroll}
+                      onChange={(e) => setBankroll(Number(e.target.value) || 0)}
+                      className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg py-2 pl-7 pr-3 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff] text-sm font-mono"
+                      min={0}
+                    />
+                  </div>
+                </div>
+
+                {/* Polymarket Price Display */}
+                <div>
+                  <label className="text-xs text-[#8b949e] mb-1.5 block flex items-center gap-1">
+                    📊 Polymarket Price
+                  </label>
+                  <div className="bg-[#0d1117] border border-[#30363d] rounded-lg py-2 px-3 text-[#58a6ff] text-sm font-mono">
+                    {polyPrice ? `${(polyPrice * 100).toFixed(1)}%` : 'N/A'}
+                  </div>
                 </div>
               </div>
 
-              {/* Kelly Results */}
+              {/* Win Probability Slider */}
+              <div className="mb-4">
+                <div className="flex justify-between mb-2">
+                  <label className="text-xs text-[#8b949e] flex items-center gap-1">
+                    🎯 Your Confidence (Win Probability)
+                  </label>
+                  <span className={`text-sm font-bold ${winProbability > 50 ? 'text-[#3fb950]' : 'text-[#8b949e]'}`}>
+                    {winProbability}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="99"
+                  value={winProbability}
+                  onChange={(e) => setWinProbability(Number(e.target.value))}
+                  className="w-full h-2 bg-[#30363d] rounded-lg appearance-none cursor-pointer accent-[#58a6ff]"
+                />
+                <div className="flex justify-between text-[10px] text-[#6e7681] mt-1">
+                  <span>Uncertain (1%)</span>
+                  <span>Very Confident (99%)</span>
+                </div>
+              </div>
+
+              {/* Results Card */}
               {kellyResult ? (
-                <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  {/* Status Banner */}
-                  <div className={`text-center py-2 px-3 rounded-lg text-sm font-medium ${
-                    kellyResult.stakePercent > 0
-                      ? 'bg-[#3fb950]/20 text-[#3fb950]'
-                      : 'bg-[#f85149]/20 text-[#f85149]'
-                  }`}>
-                    {kellyResult.reason}
-                    {kellyResult.isCapped && (
-                      <span className="ml-2 text-xs opacity-80">(Raw: {kellyResult.rawKellyPercent.toFixed(1)}%)</span>
-                    )}
-                  </div>
+                <div className="bg-[#0d1117]/50 rounded-lg p-4 border border-[#30363d]/50">
+                  {/* Buy Signal */}
+                  {kellyResult.signal === 'buy' && (
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-[#3fb950]/20 p-2 rounded-full">
+                          <span className="text-xl">📈</span>
+                        </div>
+                        <div>
+                          <p className="text-sm text-[#8b949e]">
+                            Suggested Position ({kellyResult.stakePercent.toFixed(1)}%)
+                            {kellyResult.isCapped && <span className="text-[#d29922] ml-1">(Capped)</span>}
+                          </p>
+                          <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
+                            ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right border-l border-[#30363d] pl-4">
+                        <p className="text-xs text-[#6e7681]">Edge</p>
+                        <p className="text-lg font-mono text-[#3fb950]">
+                          +{kellyResult.edge.toFixed(2)}%
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#8b949e]">Win Probability (Web2):</span>
-                    <span className="font-mono text-[#d29922]">{(web2Odds * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#8b949e]">Polymarket Price:</span>
-                    <span className="font-mono text-[#58a6ff]">{(polyPrice * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#8b949e]">Effective Net Odds (after fees):</span>
-                    <span className="font-mono text-[#e6edf3]">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#8b949e]">Recommended Stake:</span>
-                    <span className="font-mono font-bold text-[#e6edf3]">
-                      ${kellyResult.recommendedStake.toFixed(2)} ({kellyResult.stakePercent.toFixed(1)}%)
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-sm text-[#8b949e]">Expected Value (EV):</span>
-                    <span className={`font-mono font-bold text-lg ${kellyResult.expectedValue >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                      {kellyResult.expectedValue > 0 ? '+' : ''}{kellyResult.expectedValue.toFixed(1)}%
-                    </span>
-                  </div>
-
-                  {/* Fee disclaimer */}
-                  <div className="text-[10px] text-[#6e7681] mt-2 text-center border-t border-[#30363d] pt-2">
-                    *Calculated using Taker fee (2%) + Gas ($0.05). Max position capped at 20%.
-                  </div>
+                  {/* Negative EV / Loss Signal */}
+                  {(kellyResult.signal === 'negative_ev' || kellyResult.signal === 'loss') && (
+                    <div className="flex items-center gap-3 text-[#f85149]">
+                      <span className="text-2xl">⚠️</span>
+                      <div>
+                        <p className="font-bold">Don&apos;t Bet</p>
+                        <p className="text-xs text-[#f85149]/70">
+                          {kellyResult.signal === 'loss'
+                            ? "Net odds after fees are negative"
+                            : "Your confidence doesn't justify the risk (Negative EV)"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
                   Insufficient data for Kelly Criterion
                 </div>
               )}
-            </>
+
+              {/* Liquidity Warning */}
+              {(() => {
+                const relevantLiq = type === 'championship'
+                  ? data.liquidityUsdc
+                  : (selectedTeam === 'home' ? data.liquidityHome : data.liquidityAway)
+
+                if (relevantLiq && kellyResult && kellyResult.recommendedStake > relevantLiq) {
+                  return (
+                    <div className="mt-3 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span>Order book thin. Available liquidity: ${relevantLiq.toLocaleString()}</span>
+                    </div>
+                  )
+                }
+                return null
+              })()}
+
+              {/* Footer Disclaimer */}
+              <div className="mt-3 text-[10px] text-[#6e7681] text-center">
+                *Based on {kellyRiskMode === 'conservative' ? '1/4' : '1/2'} Kelly with 20% max cap. Fees: 2% Taker + $0.05 Gas.
+              </div>
+            </div>
           )}
 
           {/* Net ROI Mode */}
