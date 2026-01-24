@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { ArbitrageCard } from './ArbitrageCard'
 import { MatchCard } from './MatchCard'
 import { LanguageToggle } from './LanguageToggle'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // 市场数据类型 (冠军盘口)
 export interface MarketItem {
@@ -92,7 +92,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   // Use URL as the single source of truth for tab state
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { t, language } = useTranslation()
+  const { language } = useLanguage()
 
   // Read tab state directly from URL (not useState)
   const tab = searchParams.get('tab')
@@ -167,9 +167,9 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              {t('dashboard.title')}
+              {language === 'zh' ? 'PolyDelta' : 'PolyDelta'}
             </h1>
-            <p className="text-[#8b949e] mt-1">{t('dashboard.subtitle')}</p>
+            <p className="text-[#8b949e] mt-1">{language === 'zh' ? '发现跨市场套利机会' : 'Discover cross-market arbitrage opportunities'}</p>
           </div>
           <div className="flex items-center gap-6">
             {/* Stats */}

@@ -155,6 +155,7 @@ export const FIFA_TEAM_NAMES: Record<string, string> = {
 }
 
 // 获取球队的中文名称
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getTeamNameChinese(englishName: string, sportType?: string): string {
   // 先尝试完全匹配
   if (NBA_TEAM_NAMES[englishName]) {
