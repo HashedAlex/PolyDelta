@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "首页",
+    "nba": "NBA",
+    "worldcup": "世界杯",
+    "calculator": "计算器"
+  },
+  "dashboard": {
+    "title": "PolyDelta",
+    "subtitle": "传统赔率 vs 链上赔率 实时套利",
+    "nba_daily": "NBA 每日赛事",
+    "nba_championship": "NBA 总冠军",
+    "worldcup": "FIFA 2026 世界杯"
+  },
+  "match": {
+    "home": "主队",
+    "away": "客队",
+    "vs": "vs",
+    "commence_time": "比赛时间",
+    "trad_odds": "传统赔率",
+    "poly_price": "Polymarket",
+    "ev": "期望值",
+    "view_details": "查看详情",
+    "no_matches": "暂无比赛"
+  },
+  "analysis": {
+    "title": "AI 智能分析",
+    "strategy": "策略建议",
+    "prediction": "AI 预测",
+    "generating": "AI 分析生成中...",
+    "check_later": "稍后查看。当 EV 超过阈值时会自动生成分析。",
+    "kelly_advice": "凯利公式建议",
+    "risk_warning": "风险提示",
+    "exit_strategy": "退出策略",
+    "pillars_title": "分析拆解",
+    "favorable": "利好",
+    "unfavorable": "利空",
+    "neutral": "中性"
+  },
+  "calculator": {
+    "title": "套利计算器",
+    "bankroll": "本金",
+    "confidence": "置信度",
+    "bet_amount": "下注金额",
+    "potential_profit": "潜在收益",
+    "roi": "回报率",
+    "calculate": "计算",
+    "kelly_criterion": "凯利公式",
+    "full_kelly": "全凯利",
+    "half_kelly": "半凯利",
+    "quarter_kelly": "四分之一凯利"
+  },
+  "chat": {
+    "title": "AI 智能问答",
+    "placeholder": "询问赔率分析、球队状态、投注策略...",
+    "send": "发送",
+    "hint": "可以询问赔率分析、球队近况、投注策略或市场情绪。"
+  },
+  "status": {
+    "buy": "买入",
+    "sell": "卖出",
+    "wait": "观望",
+    "hold": "持有",
+    "accumulate": "建仓",
+    "undervalued": "低估",
+    "overvalued": "高估",
+    "fair_value": "合理价值"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "back": "返回",
+    "close": "关闭",
+    "sources": "数据来源"
+  }
+}

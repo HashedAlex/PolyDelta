@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "Home",
+    "nba": "NBA",
+    "worldcup": "World Cup",
+    "calculator": "Calculator"
+  },
+  "dashboard": {
+    "title": "PolyDelta",
+    "subtitle": "Real-time Traditional vs On-Chain Arbitrage",
+    "nba_daily": "NBA Daily",
+    "nba_championship": "NBA Championship",
+    "worldcup": "FIFA World Cup 2026"
+  },
+  "match": {
+    "home": "Home",
+    "away": "Away",
+    "vs": "vs",
+    "commence_time": "Game Time",
+    "trad_odds": "Trad Odds",
+    "poly_price": "Polymarket",
+    "ev": "EV",
+    "view_details": "View Details",
+    "no_matches": "No matches available"
+  },
+  "analysis": {
+    "title": "AI Analysis",
+    "strategy": "Strategy",
+    "prediction": "AI Prediction",
+    "generating": "AI analysis is generating...",
+    "check_later": "Check back later. Analysis is generated when EV exceeds threshold.",
+    "kelly_advice": "Kelly Advice",
+    "risk_warning": "Risk Warning",
+    "exit_strategy": "Exit Strategy",
+    "pillars_title": "Analysis Breakdown",
+    "favorable": "Favorable",
+    "unfavorable": "Unfavorable",
+    "neutral": "Neutral"
+  },
+  "calculator": {
+    "title": "Arbitrage Calculator",
+    "bankroll": "Bankroll",
+    "confidence": "Confidence",
+    "bet_amount": "Bet Amount",
+    "potential_profit": "Potential Profit",
+    "roi": "ROI",
+    "calculate": "Calculate",
+    "kelly_criterion": "Kelly Criterion",
+    "full_kelly": "Full Kelly",
+    "half_kelly": "Half Kelly",
+    "quarter_kelly": "Quarter Kelly"
+  },
+  "chat": {
+    "title": "Ask AI About This Match",
+    "placeholder": "Ask about odds analysis, team form, betting strategies...",
+    "send": "Send",
+    "hint": "Ask about odds analysis, team form, betting strategies, or market sentiment."
+  },
+  "status": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "wait": "Wait",
+    "hold": "Hold",
+    "accumulate": "Accumulate",
+    "undervalued": "Undervalued",
+    "overvalued": "Overvalued",
+    "fair_value": "Fair Value"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back",
+    "close": "Close",
+    "sources": "Sources"
+  }
+}

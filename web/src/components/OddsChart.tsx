@@ -147,7 +147,7 @@ export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChart
                   <Line
                     type="monotone"
                     dataKey="web2"
-                    name="Web2 Implied"
+                    name="Trad Implied"
                     stroke="#f85149"
                     strokeWidth={2}
                     dot={false}
@@ -169,7 +169,7 @@ export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChart
               <div className="flex justify-center gap-4 mt-2 text-xs">
                 <span className="flex items-center gap-1">
                   <span className="inline-block w-3 h-0.5 bg-[#f85149]"></span>
-                  <span className="text-[#8b949e]">Web2 Implied Probability</span>
+                  <span className="text-[#8b949e]">Trad Implied Probability</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="inline-block w-3 h-0.5 bg-[#58a6ff]"></span>

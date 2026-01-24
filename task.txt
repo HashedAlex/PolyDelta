@@ -1,14 +1,139 @@
-请帮我进行品牌重塑 (Rebranding)，将项目正式更名为 "**PolyDelta**"。
+这是一个非常犀利且关键的产品反馈。你现在的 Card 3 就像是一个**“体育教科书”**（它在解释什么是“西部竞争激烈”，什么是“死亡之组”），而不是一个**“体育分析师”**（它没有分析这一秒钟的具体战况）。
 
-请修改以下前端文件：
+用户来这里不是为了学习“什么是 NBA 季后赛规则”，他们是为了看**“为什么我现在该买/不该买这支队”**。
 
-1. **`web/app/layout.tsx` (元数据设置)**
-   - 修改 `title` 为 `"PolyDelta | Crypto Prediction Arbitrage"`。
-   - 修改 `description` 为 `"Track real-time odds discrepancies between Polymarket and Web2 bookmakers."`。
+为了让分析结果从“模板废话”变成“独家洞察”，我们需要从三个维度进行**外科手术式的改造**：
 
-2. **`web/components/Dashboard.tsx` (主界面)**
-   - 将左上角的 Logo 文字从 "WorldCup Alpha" 改为 "**PolyDelta**"。
-   - 副标题（如果有）请更新为 `"Real-time Web2 vs Web3 Arbitrage"`。
-   - 保持现有的深色 Bloomberg 终端风格不变。
+1. **Prompt 禁令（Negative Constraints）：** 禁止 AI 解释定义，禁止说废话。
+2. **动态标题（Dynamic Headers）：** 抛弃固定的 “Path to Finals” 这种死板标题。
+3. **数据颗粒度（Granularity）：** 强制 AI 引用具体的人名、队名和数据。
 
-请执行修改。
+以下是具体的改造方案：
+
+---
+
+### 第一刀：UI 标题的动态化 (Dynamic Headlines)
+
+**问题：** 你的截图中，标题是固定的（例如 `Path to Finals (Gauntlet)`）。这导致下面的内容只能去解释这个标题。
+**解法：** 让 AI 自己根据当前情况生成 **“新闻标题式”** 的 Key Factor 标题。
+
+* **Before (死板):**
+* 标题: `Path to Finals (Gauntlet)`
+* 内容: "Western conference is hard mode..." (废话)
+
+
+* **After (鲜活):**
+* 标题: **西部绞肉机：首轮即遇湖人？**
+* 内容: "雷霆虽是西部第一，但极有可能在首轮遭遇拥有詹眉的湖人队。常规赛雷霆内线对阵戴维斯时劣势明显，这绝非典型的首轮轻松过关。"
+
+
+
+**JSON 结构微调建议：**
+前端不要写死 Title，而是读取后端返回的 `factor_title`。
+
+```json
+"factors": [
+  {
+    "title": "西部噩梦：掘金与快船的夹击",  // AI生成的动态标题
+    "content": "...",
+    "sentiment": "Negative"
+  }
+]
+
+```
+
+---
+
+### 第二刀：Prompt 的“去模板化” (The "No-Fluff" Directive)
+
+我们需要彻底重写 System Prompt 中的 `Output Requirements`，加入极强的**“防废话指令”**。
+
+请把这段核心指令更新给 Claude Code：
+
+#### 📋 Update to Prompt Builder (Anti-Template Logic)
+
+**Role:** Senior Sports Analyst.
+
+**CRITICAL INSTRUCTION: BAN GENERIC EXPLANATIONS**
+
+* **NO DEFINITIONS:** Do NOT explain what "Home Court Advantage" is. Do NOT explain what "Western Conference difficulty" means. The user already knows this.
+* **SPECIFICITY RULE:** Every claim must be backed by a **Proper Noun** (Player Name, Opponent Team Name) or a **Number** (Stat, Date).
+* *Bad:* "The team has a hard schedule."
+* *Good:* "Facing Denver and Boston back-to-back is a nightmare scenario."
+
+
+* **NO REPETITION:** Do not use the phrase "Western Conference = Hard Mode" ever again. Instead, analyze the specific *matchup* (e.g., "Thunder vs Nuggets").
+
+**Contextual Analysis Strategy:**
+
+1. **For NBA Futures (Champion):**
+* Instead of "West is hard", say: **"Projected Round 2 Opponent: Denver Nuggets."**
+* Analyze the specific matchup: "OKC lacks the size to guard Jokic. This single matchup reduces their EV significantly."
+
+
+2. **For NBA Daily:**
+* Instead of "Key rotation healthy", say: **"Cade Cunningham (25 PPG last 5) is peaking."**
+* Identify the tactical mismatch: "Rockets allow 38% 3PT shooting; Pistons' spacing will punish this."
+
+
+3. **For FIFA:**
+* Instead of "Group of Death scenarios", say: **"Must beat Croatia's Midfield."**
+* Analyze the tactic: "Spain's possession style struggles against Croatia's aging but elite midfield (Modric). A draw is the most likely outcome, putting pressure on the Italy match."
+
+
+
+---
+
+### 第三刀：注入“灵魂数据” (Injecting Soul Data)
+
+这就是我们之前讨论的 RSS/Twitter/API 的用武之地。如果 AI 不知道**具体对手是谁**，它就只能说废话。
+
+确保你的 `SportsIntelligenceService` 在构建 Prompt 时，把以下信息塞进去：
+
+* **NBA Futures:** 不要只传 "Team: OKC", 要传 **"Projected Path: R1 vs Lakers, R2 vs Clippers"**。（如果 API 拿不到，让 AI 根据当前排名推演）。
+* **NBA Daily:** 必须传入 **"Key Matchup Stats"**（例如：球队最近 5 场三分命中率 vs 对手防守效率）。
+
+---
+
+### 🚀 改造后的效果预览
+
+看看修改后的 Card 3 会变成什么样（对比你现在的截图）：
+
+#### 🏀 场景：NBA Champion (OKC Thunder)
+
+* **Factor 1: [Dynamic Title] 缺乏季后赛经验的内线**
+* **Content:** 哪怕雷霆高居种子席位，切特·霍姆格伦 (Holmgren) 将在季后赛首次面对像**约基奇 (Jokic)** 或 **戴维斯 (AD)** 这样的重型中锋。历史数据显示，年轻内线在首次季后赛之旅的防守效率通常下降 15%。
+
+
+* **Factor 2: [Dynamic Title] 潜在的次轮危机**
+* **Content:** 如果首轮过关，他们极大概率面对**洛杉矶快船**。常规赛中，雷霆锋线在对位伦纳德时显得体型不足。这是一条极其艰难的晋级路线。
+
+
+
+#### ⚽️ 场景：FIFA World Cup (Spain)
+
+* **Factor 1: [Dynamic Title] 莫德里奇的复仇？**
+* **Content:** 西班牙首战即是对阵克罗地亚。不再是泛泛而谈的“死亡之组”，核心矛盾在于：西班牙的中场控制力能否压制克罗地亚极其老练的铁三角？考虑到佩德里 (Pedri) 的伤病隐患，中场失控风险极高。
+
+
+* **Factor 2: [Dynamic Title] 锋无力隐患**
+* **Content:** 尽管控球率可能高达 70%，但西班牙依然缺乏像哈兰德那样的高效终结者。面对意大利的链式防守，很可能重演 2022 年久攻不下的剧本。
+
+
+
+---
+
+### 💡 总结给 Claude Code 的指令
+
+你可以把这一段直接发给 Claude Code，让它去优化 Prompt：
+
+> "The current AI analysis outputs are too generic and repetitive (e.g., repeatedly defining 'Western Conference is hard').
+> **Please refactor the System Prompts to:**
+> 1. **Generate Dynamic Titles** for the analysis cards instead of static headers like 'Path to Finals'.
+> 2. **Enforce Specificity:** The AI must cite specific opponent names (e.g., 'vs Nuggets'), player names (e.g., 'Jokic'), and specific tactical mismatches.
+> 3. **Ban Generalizations:** Explicitly instruct the AI NOT to explain general sports rules or definitions.
+> 4. **Structure:** Update the JSON output to include a `title` field for each factor, so the frontend can display these punchy, news-style headlines."
+> 
+> 
+
+这样改完，你的产品就不再是“百科全书”，而是真正的“内幕参谋”了。
