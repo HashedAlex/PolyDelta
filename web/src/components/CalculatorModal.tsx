@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // 计算器数据类型（兼容 MatchCard 和 ArbitrageCard）
 export interface CalculatorData {
@@ -83,6 +84,70 @@ interface NetROIResult {
 }
 
 export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModalProps) {
+  const { language } = useLanguage()
+
+  // 翻译文本
+  const txt = {
+    tradingCalc: language === 'zh' ? '交易计算器' : 'Trading Calculator',
+    arbitrage: language === 'zh' ? '套利' : 'Arbitrage',
+    riskFree: language === 'zh' ? '无风险' : 'Risk-Free',
+    netRoi: language === 'zh' ? '净回报率' : 'Net ROI',
+    compare: language === 'zh' ? '对比' : 'Compare',
+    kelly: language === 'zh' ? '凯利' : 'Kelly',
+    kellyCriterion: language === 'zh' ? '凯利公式' : 'Kelly Criterion',
+    valueBet: language === 'zh' ? '价值投注' : 'Value Bet',
+    selectTeam: language === 'zh' ? '选择球队' : 'Select Team',
+    forKelly: language === 'zh' ? '(用于凯利公式)' : '(for Kelly Criterion)',
+    hedgingStrategy: language === 'zh' ? '对冲策略 (自动检测)' : 'Hedging Strategy (Auto-Detected)',
+    currentOdds: language === 'zh' ? '当前赔率' : 'Current Odds',
+    totalInvestment: language === 'zh' ? '总投资 ($)' : 'Total Investment ($)',
+    recommendedAlloc: language === 'zh' ? '建议分配' : 'Recommended Allocation',
+    bet: language === 'zh' ? '下注' : 'Bet',
+    guaranteedProfit: language === 'zh' ? '保证利润' : 'Guaranteed Profit',
+    insufficientData: language === 'zh' ? '数据不足，无法计算' : 'Insufficient data to calculate',
+    kellyAdvisor: language === 'zh' ? '凯利顾问' : 'Kelly Advisor',
+    conservative: language === 'zh' ? '保守 (1/4)' : 'Conservative (1/4)',
+    aggressive: language === 'zh' ? '激进 (1/2)' : 'Aggressive (1/2)',
+    bankroll: language === 'zh' ? '资金池' : 'Bankroll',
+    polyPrice: language === 'zh' ? 'Polymarket 价格' : 'Polymarket Price',
+    yourConfidence: language === 'zh' ? '您的信心 (胜率)' : 'Your Confidence (Win Probability)',
+    suggestedPos: language === 'zh' ? '建议仓位' : 'Suggested Position',
+    capped: language === 'zh' ? '(已封顶)' : '(Capped)',
+    edge: language === 'zh' ? '优势' : 'Edge',
+    effectiveOdds: language === 'zh' ? '有效净赔率' : 'Effective Net Odds',
+    rawKelly: language === 'zh' ? '原始凯利' : 'Raw Kelly',
+    dontBet: language === 'zh' ? '不建议下注' : "Don't Bet",
+    negativeEv: language === 'zh' ? '您的信心不足以支撑该风险 (负期望值)' : "Your confidence doesn't justify the risk (Negative EV)",
+    negativeOdds: language === 'zh' ? '扣费后净赔率为负' : 'Net odds after fees are negative',
+    insufficientKelly: language === 'zh' ? '数据不足，无法计算凯利' : 'Insufficient data for Kelly Criterion',
+    orderBookThin: language === 'zh' ? '订单簿深度不足。可用流动性: ' : 'Order book thin. Available liquidity: ',
+    investment: language === 'zh' ? '投资 ($)' : 'Investment ($)',
+    gasCost: language === 'zh' ? 'Gas 费用 ($)' : 'Gas Cost ($)',
+    orderType: language === 'zh' ? '订单类型' : 'Order Type',
+    taker: language === 'zh' ? '吃单 (2%)' : 'Taker (2%)',
+    maker: language === 'zh' ? '挂单 (0%)' : 'Maker (0%)',
+    takerDesc: language === 'zh' ? '市价单 - 即时成交，2% 费用' : 'Market order - Instant execution, 2% fee',
+    makerDesc: language === 'zh' ? '限价单 - 可能不成交，0% 费用' : 'Limit order - May not fill, 0% fee',
+    isBetterBy: language === 'zh' ? ' 更优 ' : ' is better by ',
+    profit: language === 'zh' ? '利润' : 'profit',
+    hiddenCosts: language === 'zh' ? 'Polymarket 隐藏成本' : 'Polymarket Hidden Costs',
+    gasFee: language === 'zh' ? 'Gas 费用' : 'Gas Fee',
+    exchangeFee: language === 'zh' ? '交易费用' : 'Exchange Fee',
+    effectivePrice: language === 'zh' ? '有效价格' : 'Effective Price',
+    sharesBought: language === 'zh' ? '购买份额' : 'Shares Bought',
+    insufficientRoi: language === 'zh' ? '数据不足，无法计算净回报率' : 'Insufficient data to calculate Net ROI',
+    disclaimer: language === 'zh' ? '此计算器仅供教育参考。下注前请核实赔率。' : 'This calculator is for educational purposes only. Always verify odds before placing bets.',
+    slippageWarning: language === 'zh' ? '订单簿深度不足，预计会有滑点。可用流动性: ' : 'Order book thin. Expected slippage applies. Available liquidity: ',
+    calcNote: language === 'zh' ? '*计算不包含交易费用 (Gas/存款)。' : '*Calculations do not include transaction fees (gas/deposit).',
+    insufficientArb: language === 'zh' ? '数据不足，无法计算套利' : 'Insufficient data to calculate arbitrage',
+    uncertain: language === 'zh' ? '不确定 (1%)' : 'Uncertain (1%)',
+    veryConfident: language === 'zh' ? '非常确信 (99%)' : 'Very Confident (99%)',
+    tradOdds: language === 'zh' ? '传统赔率' : 'Trad Odds',
+    basedOn: language === 'zh' ? '基于' : 'Based on',
+    withMaxCap: language === 'zh' ? '凯利公式，20% 上限' : 'Kelly with 20% max cap',
+    fees: language === 'zh' ? '费用: 2% 吃单 + $0.05 Gas' : 'Fees: 2% Taker + $0.05 Gas',
+  }
+
   const [mode, setMode] = useState<CalculatorMode>('arbitrage')
   const [totalInvestment, setTotalInvestment] = useState(1000)
   const [bankroll, setBankroll] = useState(10000)
@@ -454,7 +519,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         <div className="flex items-center justify-between p-4 border-b border-[#30363d]">
           <h2 className="text-lg font-bold text-[#e6edf3] flex items-center gap-2">
             <span>🧮</span>
-            Trading Calculator
+            {txt.tradingCalc}
           </h2>
           <button
             onClick={onClose}
@@ -479,9 +544,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-sm font-bold flex items-center gap-1">
                 <span>🛡️</span>
-                <span>Arbitrage</span>
+                <span>{txt.arbitrage}</span>
               </span>
-              <span className="text-[10px] opacity-80 font-normal">Risk-Free</span>
+              <span className="text-[10px] opacity-80 font-normal">{txt.riskFree}</span>
             </button>
             <button
               onClick={() => setMode('roi')}
@@ -493,9 +558,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-sm font-bold flex items-center gap-1">
                 <span>📊</span>
-                <span>Net ROI</span>
+                <span>{txt.netRoi}</span>
               </span>
-              <span className="text-[10px] opacity-80 font-normal">Compare</span>
+              <span className="text-[10px] opacity-80 font-normal">{txt.compare}</span>
             </button>
             <button
               onClick={() => setMode('kelly')}
@@ -507,9 +572,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-sm font-bold flex items-center gap-1">
                 <span>🎯</span>
-                <span>Kelly</span>
+                <span>{txt.kelly}</span>
               </span>
-              <span className="text-[10px] opacity-80 font-normal">Value Bet</span>
+              <span className="text-[10px] opacity-80 font-normal">{txt.valueBet}</span>
             </button>
           </div>
         ) : (
@@ -524,9 +589,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-base font-bold flex items-center gap-1.5">
                 <span>📊</span>
-                <span>Net ROI</span>
+                <span>{txt.netRoi}</span>
               </span>
-              <span className="text-xs opacity-80 font-normal">Compare</span>
+              <span className="text-xs opacity-80 font-normal">{txt.compare}</span>
             </button>
             <button
               onClick={() => setMode('kelly')}
@@ -538,9 +603,9 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-base font-bold flex items-center gap-1.5">
                 <span>🎯</span>
-                <span>Kelly Criterion</span>
+                <span>{txt.kellyCriterion}</span>
               </span>
-              <span className="text-xs opacity-80 font-normal">Value Bet</span>
+              <span className="text-xs opacity-80 font-normal">{txt.valueBet}</span>
             </button>
           </div>
         )}
@@ -550,7 +615,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
           {/* Team Selector for Match type - Only show in Kelly mode */}
           {type === 'match' && mode === 'kelly' && (
             <div>
-              <label className="block text-xs text-[#8b949e] mb-2">Select Team (for Kelly Criterion)</label>
+              <label className="block text-xs text-[#8b949e] mb-2">{txt.selectTeam} {txt.forKelly}</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setSelectedTeam('home')}
@@ -579,11 +644,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
           {/* Current Odds Display - Different for Arbitrage vs Kelly */}
           {mode === 'arbitrage' && type === 'match' && arbitrageResult ? (
             <div className="bg-[#0d1117] rounded-lg p-3">
-              <div className="text-xs text-[#8b949e] mb-2">Hedging Strategy (Auto-Detected)</div>
+              <div className="text-xs text-[#8b949e] mb-2">{txt.hedgingStrategy}</div>
               {/* Vertical stacked strategy display */}
               <div className="flex flex-col gap-2 bg-[#21262d] p-3 rounded-lg mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-[#d29922] font-medium">{data.sourceBookmaker || 'Web2'}:</span>
+                  <span className="text-[#d29922] font-medium">{data.sourceBookmaker || 'Trad Bookie'}:</span>
                   <span className="text-[#8b949e]">Bet</span>
                   <span className="text-[#3fb950] font-bold">{arbitrageResult.web2Team}</span>
                   <span className="text-xs text-[#8b949e] ml-auto">
@@ -604,7 +669,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <div className="text-xs text-[#d29922]">{data.sourceBookmaker || 'Web2'} ({arbitrageResult.web2Team})</div>
+                  <div className="text-xs text-[#d29922]">{data.sourceBookmaker || 'Trad Bookie'} ({arbitrageResult.web2Team})</div>
                   <div className="text-lg font-mono text-[#e6edf3]">
                     {arbitrageResult.web2Odds ? `${(arbitrageResult.web2Odds * 100).toFixed(1)}%` : 'N/A'}
                   </div>
@@ -625,10 +690,10 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             </div>
           ) : (
             <div className="bg-[#0d1117] rounded-lg p-3">
-              <div className="text-xs text-[#8b949e] mb-2">Current Odds - {teamName}</div>
+              <div className="text-xs text-[#8b949e] mb-2">{txt.currentOdds} - {teamName}</div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <div className="text-xs text-[#d29922]">{data.sourceBookmaker || 'Web2'}</div>
+                  <div className="text-xs text-[#d29922]">{data.sourceBookmaker || 'Trad Bookie'}</div>
                   <div className="text-lg font-mono text-[#e6edf3]">
                     {web2Odds ? `${(web2Odds * 100).toFixed(1)}%` : 'N/A'}
                   </div>
@@ -650,7 +715,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
           {mode === 'arbitrage' && (
             <>
               <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Total Investment ($)</label>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.totalInvestment}</label>
                 <input
                   type="number"
                   value={totalInvestment}
@@ -669,7 +734,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     return (
                       <div className="mt-2 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
                         <span>⚠️</span>
-                        <span>Order book thin. Expected slippage applies. Available liquidity: ${minLiq.toLocaleString()}</span>
+                        <span>{txt.slippageWarning}${minLiq.toLocaleString()}</span>
                       </div>
                     )
                   }
@@ -680,12 +745,12 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               {/* Arbitrage Results */}
               {arbitrageResult ? (
                 <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  <div className="text-sm font-medium text-[#e6edf3] mb-2">Recommended Allocation</div>
+                  <div className="text-sm font-medium text-[#e6edf3] mb-2">{txt.recommendedAlloc}</div>
                   <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
                     <span className="text-sm text-[#d29922]">
                       {type === 'match' && arbitrageResult.web2Team
-                        ? `Bet ${arbitrageResult.web2Team} (${data.sourceBookmaker || 'Web2'}):`
-                        : `Bet on ${data.sourceBookmaker || 'Web2'}:`}
+                        ? `Bet ${arbitrageResult.web2Team} (${data.sourceBookmaker || 'Trad Bookie'}):`
+                        : `Bet on ${data.sourceBookmaker || 'Trad Bookie'}:`}
                     </span>
                     <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betWeb2.toFixed(2)}</span>
                   </div>
@@ -698,18 +763,18 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betPoly.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
-                    <span className="text-sm text-[#8b949e]">Guaranteed Profit:</span>
+                    <span className="text-sm text-[#8b949e]">{txt.guaranteedProfit}:</span>
                     <span className={`font-mono font-bold text-lg ${arbitrageResult.guaranteedProfit >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
                       ${arbitrageResult.guaranteedProfit.toFixed(2)} ({arbitrageResult.roi > 0 ? '+' : ''}{arbitrageResult.roi.toFixed(2)}%)
                     </span>
                   </div>
                   <div className="text-[10px] text-[#6e7681] mt-2 text-center">
-                    *Calculations do not include transaction fees (gas/deposit).
+                    {txt.calcNote}
                   </div>
                 </div>
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  Insufficient data to calculate arbitrage
+                  {txt.insufficientArb}
                 </div>
               )}
             </>
@@ -726,7 +791,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-[#e6edf3] flex items-center gap-2">
                   <span>🎯</span>
-                  Kelly Advisor
+                  {txt.kellyAdvisor}
                 </h3>
                 <div className="flex bg-[#21262d] rounded-lg p-1 text-xs">
                   <button
@@ -737,7 +802,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         : 'text-[#8b949e] hover:text-[#e6edf3]'
                     }`}
                   >
-                    Conservative (1/4)
+                    {txt.conservative}
                   </button>
                   <button
                     onClick={() => setKellyRiskMode('aggressive')}
@@ -747,7 +812,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         : 'text-[#8b949e] hover:text-[#e6edf3]'
                     }`}
                   >
-                    Aggressive (1/2)
+                    {txt.aggressive}
                   </button>
                 </div>
               </div>
@@ -755,7 +820,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               {/* Team Selector for Match type */}
               {type === 'match' && (
                 <div className="mb-4">
-                  <label className="block text-xs text-[#8b949e] mb-2">Select Team</label>
+                  <label className="block text-xs text-[#8b949e] mb-2">{txt.selectTeam}</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
@@ -794,7 +859,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 {/* Bankroll Input */}
                 <div>
                   <label className="text-xs text-[#8b949e] mb-1.5 block flex items-center gap-1">
-                    💰 Bankroll
+                    💰 {txt.bankroll}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2 text-[#8b949e]">$</span>
@@ -811,7 +876,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 {/* Polymarket Price Display */}
                 <div>
                   <label className="text-xs text-[#8b949e] mb-1.5 block flex items-center gap-1">
-                    📊 Polymarket Price
+                    📊 {txt.polyPrice}
                   </label>
                   <div className="bg-[#0d1117] border border-[#30363d] rounded-lg py-2 px-3 text-[#58a6ff] text-sm font-mono">
                     {polyPrice ? `${(polyPrice * 100).toFixed(1)}%` : 'N/A'}
@@ -823,7 +888,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               <div className="mb-4">
                 <div className="flex justify-between mb-2">
                   <label className="text-xs text-[#8b949e] flex items-center gap-1">
-                    🎯 Your Confidence (Win Probability)
+                    🎯 {txt.yourConfidence}
                   </label>
                   <span className={`text-sm font-bold ${winProbability > 50 ? 'text-[#3fb950]' : 'text-[#8b949e]'}`}>
                     {winProbability}%
@@ -844,18 +909,18 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     <div
                       className="absolute top-0 w-0.5 h-2 bg-[#d29922]"
                       style={{ left: `${web2Odds * 100}%` }}
-                      title={`Web2: ${(web2Odds * 100).toFixed(1)}%`}
+                      title={`Trad Odds: ${(web2Odds * 100).toFixed(1)}%`}
                     />
                   )}
                 </div>
                 <div className="flex justify-between text-[10px] text-[#6e7681] mt-1">
-                  <span>Uncertain (1%)</span>
+                  <span>{txt.uncertain}</span>
                   {web2Odds > 0 && (
                     <span className="text-[#d29922]">
-                      Web2: {(web2Odds * 100).toFixed(1)}%
+                      {txt.tradOdds}: {(web2Odds * 100).toFixed(1)}%
                     </span>
                   )}
-                  <span>Very Confident (99%)</span>
+                  <span>{txt.veryConfident}</span>
                 </div>
               </div>
 
@@ -872,8 +937,8 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                           </div>
                           <div>
                             <p className="text-sm text-[#8b949e]">
-                              Suggested Position ({kellyResult.stakePercent.toFixed(1)}%)
-                              {kellyResult.isCapped && <span className="text-[#d29922] ml-1">(Capped)</span>}
+                              {txt.suggestedPos} ({kellyResult.stakePercent.toFixed(1)}%)
+                              {kellyResult.isCapped && <span className="text-[#d29922] ml-1">{txt.capped}</span>}
                             </p>
                             <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
                               ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -881,7 +946,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                           </div>
                         </div>
                         <div className="text-right border-l border-[#30363d] pl-4">
-                          <p className="text-xs text-[#6e7681]">Edge</p>
+                          <p className="text-xs text-[#6e7681]">{txt.edge}</p>
                           <p className="text-lg font-mono text-[#3fb950]">
                             +{kellyResult.edge.toFixed(2)}%
                           </p>
@@ -890,11 +955,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                       {/* Details Row */}
                       <div className="mt-3 pt-3 border-t border-[#30363d]/50 grid grid-cols-2 gap-4 text-xs">
                         <div>
-                          <span className="text-[#6e7681]">Effective Net Odds: </span>
+                          <span className="text-[#6e7681]">{txt.effectiveOdds}: </span>
                           <span className="text-[#e6edf3] font-mono">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[#6e7681]">Raw Kelly: </span>
+                          <span className="text-[#6e7681]">{txt.rawKelly}: </span>
                           <span className="text-[#e6edf3] font-mono">{kellyResult.rawKellyPercent.toFixed(1)}%</span>
                         </div>
                       </div>
@@ -906,11 +971,11 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                     <div className="flex items-center gap-3 text-[#f85149]">
                       <span className="text-2xl">⚠️</span>
                       <div>
-                        <p className="font-bold">Don&apos;t Bet</p>
+                        <p className="font-bold">{txt.dontBet}</p>
                         <p className="text-xs text-[#f85149]/70">
                           {kellyResult.signal === 'loss'
-                            ? "Net odds after fees are negative"
-                            : "Your confidence doesn't justify the risk (Negative EV)"}
+                            ? txt.negativeOdds
+                            : txt.negativeEv}
                         </p>
                       </div>
                     </div>
@@ -918,7 +983,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 </div>
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  Insufficient data for Kelly Criterion
+                  {txt.insufficientKelly}
                 </div>
               )}
 
@@ -932,7 +997,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                   return (
                     <div className="mt-3 text-xs text-[#d29922] bg-[#d29922]/10 px-3 py-2 rounded-lg flex items-start gap-2">
                       <span>⚠️</span>
-                      <span>Order book thin. Available liquidity: ${relevantLiq.toLocaleString()}</span>
+                      <span>{txt.orderBookThin}${relevantLiq.toLocaleString()}</span>
                     </div>
                   )
                 }
@@ -941,8 +1006,8 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
               {/* Footer Disclaimer */}
               <div className="mt-3 text-[10px] text-[#6e7681] text-center">
-                *Based on {kellyRiskMode === 'conservative' ? '1/4' : '1/2'} Kelly with 20% max cap.<br />
-                Fees: 2% Taker + $0.05 Gas.
+                *{txt.basedOn} {kellyRiskMode === 'conservative' ? '1/4' : '1/2'} {txt.withMaxCap}<br />
+                {txt.fees}
               </div>
             </div>
           )}
@@ -953,7 +1018,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               {/* Team Selector for Match type */}
               {type === 'match' && (
                 <div>
-                  <label className="block text-xs text-[#8b949e] mb-2">Select Team</label>
+                  <label className="block text-xs text-[#8b949e] mb-2">{txt.selectTeam}</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setSelectedTeam('home')}
@@ -981,7 +1046,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
               {/* Investment Input */}
               <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Investment ($)</label>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.investment}</label>
                 <input
                   type="number"
                   value={roiInvestment}
@@ -993,7 +1058,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
               {/* Gas Cost Input */}
               <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Gas Cost ($)</label>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.gasCost}</label>
                 <input
                   type="number"
                   value={gasCost}
@@ -1006,7 +1071,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
               {/* Fee Type Toggle */}
               <div>
-                <label className="block text-xs text-[#8b949e] mb-2">Order Type</label>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.orderType}</label>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setFeeType('taker')}
@@ -1016,7 +1081,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
                     }`}
                   >
-                    Taker (2%)
+                    {txt.taker}
                   </button>
                   <button
                     onClick={() => setFeeType('maker')}
@@ -1026,12 +1091,12 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
                     }`}
                   >
-                    Maker (0%)
+                    {txt.maker}
                   </button>
                 </div>
                 <div className="text-xs text-[#8b949e] mt-1">
-                  {feeType === 'taker' && 'Market order - Instant execution, 2% fee'}
-                  {feeType === 'maker' && 'Limit order - May not fill, 0% fee'}
+                  {feeType === 'taker' && txt.takerDesc}
+                  {feeType === 'maker' && txt.makerDesc}
                 </div>
               </div>
 
@@ -1045,7 +1110,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                       : 'bg-[#d29922]/20 text-[#d29922]'
                   }`}>
                     <span className="font-bold">{netROIResult.verdict.betterPlatform}</span>
-                    <span className="text-sm"> is better by </span>
+                    <span className="text-sm">{txt.isBetterBy}</span>
                     <span className="font-bold">+{netROIResult.verdict.roiAdvantage.toFixed(2)}%</span>
                   </div>
 
@@ -1056,14 +1121,14 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         ? 'bg-[#d29922]/10 border border-[#d29922]/40'
                         : 'bg-[#21262d]'
                     }`}>
-                      <div className="text-xs text-[#d29922] mb-1">{data.sourceBookmaker || 'Web2'}</div>
+                      <div className="text-xs text-[#d29922] mb-1">{data.sourceBookmaker || 'Trad Bookie'}</div>
                       <div className={`text-xl font-mono font-bold ${
                         netROIResult.trad.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
                       }`}>
                         {netROIResult.trad.netROI > 0 ? '+' : ''}{netROIResult.trad.netROI.toFixed(2)}%
                       </div>
                       <div className="text-xs text-[#8b949e]">
-                        ${netROIResult.trad.netProfit.toFixed(2)} profit
+                        ${netROIResult.trad.netProfit.toFixed(2)} {txt.profit}
                       </div>
                     </div>
                     <div className={`p-3 rounded-lg ${
@@ -1078,29 +1143,29 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                         {netROIResult.poly.netROI > 0 ? '+' : ''}{netROIResult.poly.netROI.toFixed(2)}%
                       </div>
                       <div className="text-xs text-[#8b949e]">
-                        ${netROIResult.poly.netProfit.toFixed(2)} profit
+                        ${netROIResult.poly.netProfit.toFixed(2)} {txt.profit}
                       </div>
                     </div>
                   </div>
 
                   {/* Hidden Costs Breakdown */}
                   <div className="pt-2 border-t border-[#30363d]">
-                    <div className="text-xs text-[#8b949e] mb-2">Polymarket Hidden Costs</div>
+                    <div className="text-xs text-[#8b949e] mb-2">{txt.hiddenCosts}</div>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-[#6e7681]">Gas Fee:</span>
+                        <span className="text-[#6e7681]">{txt.gasFee}:</span>
                         <span className="text-[#f85149]">-${netROIResult.poly.details.gasDeducted.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6e7681]">Exchange Fee ({netROIResult.poly.details.feeRateApplied}):</span>
+                        <span className="text-[#6e7681]">{txt.exchangeFee} ({netROIResult.poly.details.feeRateApplied}):</span>
                         <span className="text-[#f85149]">-${netROIResult.poly.details.exchangeFeeAmt.toFixed(4)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6e7681]">Effective Price:</span>
+                        <span className="text-[#6e7681]">{txt.effectivePrice}:</span>
                         <span className="text-[#e6edf3]">${netROIResult.poly.details.effectivePrice.toFixed(4)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6e7681]">Shares Bought:</span>
+                        <span className="text-[#6e7681]">{txt.sharesBought}:</span>
                         <span className="text-[#e6edf3]">{netROIResult.poly.shares.toFixed(2)}</span>
                       </div>
                     </div>
@@ -1108,7 +1173,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 </div>
               ) : (
                 <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  Insufficient data to calculate Net ROI
+                  {txt.insufficientRoi}
                 </div>
               )}
             </>
@@ -1118,8 +1183,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         {/* Footer */}
         <div className="p-4 border-t border-[#30363d]">
           <p className="text-xs text-[#8b949e] text-center">
-            This calculator is for educational purposes only.<br />
-            Always verify odds before placing bets.
+            {txt.disclaimer}
           </p>
         </div>
       </div>

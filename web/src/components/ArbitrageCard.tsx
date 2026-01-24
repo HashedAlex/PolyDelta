@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { CalculatorModal, CalculatorData } from './CalculatorModal'
 import { OddsChart } from './OddsChart'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { getLocalizedTeamName } from '@/utils/teamNames'
 
 // Generate URL-friendly slug from team name
 function generateTeamSlug(teamName: string): string {
@@ -71,6 +73,21 @@ export function ArbitrageCard({
   liquidity,
 }: ArbitrageCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
+  const { language } = useLanguage()
+
+  // 翻译文本
+  const txt = {
+    valueBet: language === 'zh' ? '价值投注' : 'Value Bet',
+    evDiff: language === 'zh' ? '期望值差' : 'EV Diff',
+    liquidity: language === 'zh' ? '深度' : 'Liquidity',
+    betOnPoly: language === 'zh' ? '在 Polymarket 下注' : 'Bet on Polymarket',
+    viewOnPoly: language === 'zh' ? '查看 Polymarket' : 'View on Polymarket',
+    noPolyData: language === 'zh' ? '暂无 Polymarket 数据' : 'No Polymarket Data',
+    analysis: language === 'zh' ? 'AI 分析' : 'Analysis & Chat',
+  }
+
+  // 本地化球队名称
+  const localTeamName = getLocalizedTeamName(teamName, language, sportType)
 
   // Normalize probability helper (defined early for calculatorData)
   const normalizeProb = (value: number | null): number | null => {
@@ -107,7 +124,7 @@ export function ArbitrageCard({
   }
 
   // 显示的 bookmaker 名称
-  const bookmakerDisplay = sourceBookmaker || 'Web2'
+  const bookmakerDisplay = sourceBookmaker || 'Trad Bookie'
 
   return (
     <div
@@ -122,13 +139,13 @@ export function ArbitrageCard({
       {/* Value Bet Badge - Show when EV >= 5% */}
       {isArbitrage && (
         <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-[#58a6ff] text-white text-xs font-bold rounded-full">
-          Value Bet
+          {txt.valueBet}
         </div>
       )}
 
       {/* Team Name */}
       <h3 className="text-lg font-semibold text-[#e6edf3] mb-3 pr-16">
-        {teamName}
+        {localTeamName}
       </h3>
 
       {/* Odds Comparison */}
@@ -169,7 +186,7 @@ export function ArbitrageCard({
 
         {/* EV Display */}
         <div className="flex items-center">
-          <span className="text-[#8b949e] text-sm flex-1">EV Diff</span>
+          <span className="text-[#8b949e] text-sm flex-1">{txt.evDiff}</span>
           <span
             className={`
               font-mono font-bold text-lg w-16 text-right
@@ -190,7 +207,7 @@ export function ArbitrageCard({
         {/* Liquidity Display */}
         {liquidity !== null && liquidity !== undefined && (
           <div className="flex items-center">
-            <span className="text-[#8b949e] text-sm flex-1">Liquidity</span>
+            <span className="text-[#8b949e] text-sm flex-1">{txt.liquidity}</span>
             <LiquidityBadge liquidity={liquidity} />
           </div>
         )}
@@ -212,7 +229,7 @@ export function ArbitrageCard({
               }
             `}
           >
-            {isArbitrage ? 'Bet on Polymarket' : 'View on Polymarket'}
+            {isArbitrage ? txt.betOnPoly : txt.viewOnPoly}
           </a>
           <button
             onClick={() => setShowCalculator(true)}
@@ -224,7 +241,7 @@ export function ArbitrageCard({
         </div>
       ) : (
         <div className="w-full py-2 px-4 rounded text-center text-sm text-[#8b949e] bg-[#21262d] border border-[#30363d]">
-          No Polymarket Data
+          {txt.noPolyData}
         </div>
       )}
 
@@ -234,7 +251,7 @@ export function ArbitrageCard({
         className="mt-2 flex items-center justify-center gap-2 py-2 px-3 bg-[#1f6feb]/20 hover:bg-[#1f6feb]/30 text-[#58a6ff] text-sm font-medium rounded-md transition-colors border border-[#1f6feb]/40"
       >
         <span>🤖</span>
-        <span>Analysis & Chat</span>
+        <span>{txt.analysis}</span>
       </Link>
 
       {/* History Chart */}

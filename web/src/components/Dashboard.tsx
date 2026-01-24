@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ArbitrageCard } from './ArbitrageCard'
 import { MatchCard } from './MatchCard'
+import { LanguageToggle } from './LanguageToggle'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 // 市场数据类型 (冠军盘口)
 export interface MarketItem {
@@ -90,6 +92,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   // Use URL as the single source of truth for tab state
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { t, language } = useTranslation()
 
   // Read tab state directly from URL (not useState)
   const tab = searchParams.get('tab')
@@ -100,6 +103,11 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   // Only local UI state uses useState
   const [hideLowOdds, setHideLowOdds] = useState(true)
   const [showBanner, setShowBanner] = useState(true)
+
+  // Banner text based on language
+  const bannerText = language === 'zh'
+    ? '测试版本。赔率可能有延迟。请在官方平台验证。'
+    : 'Beta Version. Odds may be delayed. Always verify on official platforms.'
 
   // Navigation handlers - update URL instead of state
   const setActiveSport = (sport: SportType) => {
@@ -140,7 +148,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <div className="mb-4 -mt-2 bg-[#d29922]/20 border border-[#d29922]/40 rounded-lg px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-[#d29922]">
             <span>⚠️</span>
-            <span>Beta Version. Odds may be delayed. Always verify on official platforms.</span>
+            <span>{bannerText}</span>
           </div>
           <button
             onClick={() => setShowBanner(false)}
@@ -159,27 +167,32 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              PolyDelta
+              {t('dashboard.title')}
             </h1>
-            <p className="text-[#8b949e] mt-1">Real-time Web2 vs Web3 Arbitrage</p>
+            <p className="text-[#8b949e] mt-1">{t('dashboard.subtitle')}</p>
           </div>
-          <div className="flex gap-6 text-sm">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#58a6ff]">{stats.dailyMatchCount}</div>
-              <div className="text-[#8b949e]">Today&apos;s Games</div>
+          <div className="flex items-center gap-6">
+            {/* Stats */}
+            <div className="flex gap-6 text-sm">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#58a6ff]">{stats.dailyMatchCount}</div>
+                <div className="text-[#8b949e]">{language === 'zh' ? '今日赛事' : "Today's Games"}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
+                <div className="text-[#8b949e]">{language === 'zh' ? '冠军盘口' : 'Champions'}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#3fb950]">{stats.arbitrageCount}</div>
+                <div className="text-[#8b949e]">{language === 'zh' ? '套利机会' : 'Arbitrage'}</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
-              <div className="text-[#8b949e]">Champions</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#3fb950]">{stats.arbitrageCount}</div>
-              <div className="text-[#8b949e]">Arbitrage</div>
-            </div>
+            {/* Language Toggle - Rightmost */}
+            <LanguageToggle />
           </div>
         </div>
         <div className="mt-2 text-xs text-[#8b949e]">
-          Last Updated: {stats.lastUpdate}
+          {language === 'zh' ? '最后更新' : 'Last Updated'}: {stats.lastUpdate}
         </div>
       </header>
 
@@ -198,7 +211,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             `}
           >
             <span>⚽</span>
-            <span>FIFA World Cup</span>
+            <span>{language === 'zh' ? 'FIFA 世界杯' : 'FIFA World Cup'}</span>
             <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'worldcup' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
               {worldCupMarkets.length}
             </span>
@@ -239,7 +252,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
               `}
             >
               <span>📅</span>
-              <span>Daily Matches</span>
+              <span>{language === 'zh' ? '每日赛事' : 'Daily Matches'}</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${nbaSubTab === 'daily' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
                 {dailyMatches.length}
               </span>
@@ -256,7 +269,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
               `}
             >
               <span>🏆</span>
-              <span>Championship</span>
+              <span>{language === 'zh' ? '冠军赛' : 'Championship'}</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${nbaSubTab === 'championship' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
                 {nbaMarkets.length}
               </span>
@@ -276,7 +289,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                 <div className={`w-10 h-5 rounded-full transition-colors duration-200 ${hideLowOdds ? 'bg-[#3fb950]' : 'bg-[#30363d]'}`} />
                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${hideLowOdds ? 'translate-x-5' : 'translate-x-0'}`} />
               </div>
-              <span className="text-sm text-[#8b949e]">Hide &lt; 1%</span>
+              <span className="text-sm text-[#8b949e]">{language === 'zh' ? '隐藏 < 1%' : 'Hide < 1%'}</span>
             </label>
           )}
         </div>
@@ -296,7 +309,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
               <div className={`w-10 h-5 rounded-full transition-colors duration-200 ${hideLowOdds ? 'bg-[#3fb950]' : 'bg-[#30363d]'}`} />
               <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${hideLowOdds ? 'translate-x-5' : 'translate-x-0'}`} />
             </div>
-            <span className="text-sm text-[#8b949e]">Hide &lt; 1%</span>
+            <span className="text-sm text-[#8b949e]">{language === 'zh' ? '隐藏 < 1%' : 'Hide < 1%'}</span>
           </label>
         </div>
       )}
@@ -306,11 +319,11 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">⚽</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">FIFA World Cup 2026</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">{language === 'zh' ? 'FIFA 世界杯 2026' : 'FIFA World Cup 2026'}</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {hideLowOdds && filteredWorldCupMarkets.length !== worldCupMarkets.length
-                ? `${filteredWorldCupMarkets.length} / ${worldCupMarkets.length} teams`
-                : `${filteredWorldCupMarkets.length} teams`}
+                ? `${filteredWorldCupMarkets.length} / ${worldCupMarkets.length} ${language === 'zh' ? '支球队' : 'teams'}`
+                : `${filteredWorldCupMarkets.length} ${language === 'zh' ? '支球队' : 'teams'}`}
             </span>
           </div>
 
@@ -333,7 +346,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              No World Cup data available
+              {language === 'zh' ? '暂无世界杯数据' : 'No World Cup data available'}
             </div>
           )}
         </section>
@@ -344,9 +357,9 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">📅</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Daily Matches</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">{language === 'zh' ? 'NBA 每日赛事' : 'NBA Daily Matches'}</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
-              {dailyMatches.length} games
+              {dailyMatches.length} {language === 'zh' ? '场比赛' : 'games'}
             </span>
           </div>
 
@@ -373,8 +386,8 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              <p>No NBA games scheduled for today.</p>
-              <p className="text-sm mt-2">Check back later for upcoming matches.</p>
+              <p>{language === 'zh' ? '今日无 NBA 比赛安排' : 'No NBA games scheduled for today.'}</p>
+              <p className="text-sm mt-2">{language === 'zh' ? '稍后查看更多比赛' : 'Check back later for upcoming matches.'}</p>
             </div>
           )}
         </section>
@@ -385,11 +398,11 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">🏆</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Championship</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">{language === 'zh' ? 'NBA 冠军赛' : 'NBA Championship'}</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {hideLowOdds && filteredNbaMarkets.length !== nbaMarkets.length
-                ? `${filteredNbaMarkets.length} / ${nbaMarkets.length} teams`
-                : `${filteredNbaMarkets.length} teams`}
+                ? `${filteredNbaMarkets.length} / ${nbaMarkets.length} ${language === 'zh' ? '支球队' : 'teams'}`
+                : `${filteredNbaMarkets.length} ${language === 'zh' ? '支球队' : 'teams'}`}
             </span>
           </div>
 
@@ -412,7 +425,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              No NBA Championship data available
+              {language === 'zh' ? '暂无 NBA 冠军赛数据' : 'No NBA Championship data available'}
             </div>
           )}
         </section>
@@ -421,18 +434,18 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
       {/* Footer - Disclaimer */}
       <footer className="mt-12 pt-8 pb-6 bg-[#0d1117] border-t border-[#30363d]">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-sm text-[#8b949e] mb-3">
-            PolyDelta provides data for informational purposes only. No financial advice provided. Betting involves risk.
+          <p className="text-sm text-[#8b949e] mb-1">
+            {language === 'zh'
+              ? 'PolyDelta 仅供信息参考。不构成投资建议。'
+              : 'PolyDelta provides data for informational purposes only.'}
           </p>
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-[#6e7681]">
-            <span>Data sources: TheOddsAPI | Polymarket</span>
-            <span>•</span>
-            <span>Built for educational purposes</span>
-            <span>•</span>
-            <span>Always verify on official platforms</span>
-          </div>
-          <p className="mt-4 text-xs text-[#484f58]">
-            © {new Date().getFullYear()} PolyDelta. Not affiliated with any betting platform.
+          <p className="text-sm text-[#8b949e] mb-3">
+            {language === 'zh'
+              ? '投注有风险，请谨慎决策。'
+              : 'No financial advice provided. Betting involves risk.'}
+          </p>
+          <p className="text-xs text-[#484f58]">
+            © {new Date().getFullYear()} PolyDelta. {language === 'zh' ? '与任何博彩平台无关。' : 'Not affiliated with any betting platform.'}
           </p>
         </div>
       </footer>

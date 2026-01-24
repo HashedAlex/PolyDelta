@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
@@ -10,7 +11,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "PolyDelta | Crypto Prediction Arbitrage",
-  description: "Track real-time odds discrepancies between Polymarket and Web2 bookmakers.",
+  description: "Track real-time odds discrepancies between Polymarket and traditional bookmakers.",
 };
 
 export default function RootLayout({
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistMono.variable} font-mono antialiased bg-[#0d1117] text-[#e6edf3] min-h-screen`}>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
