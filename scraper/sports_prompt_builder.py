@@ -6,14 +6,19 @@ NBA 使用 "Gauntlet Logic": Path to Finals + Squad Resilience + Hedging Strateg
 FIFA 使用 "Bracket Logic": Group Stage Survival + Knockout Path + Squad Depth & Manager
 
 v2.0: 集成 SportsIntelligenceService 实时情报注入
+v3.0: 使用 LLMClient 多源轮询架构 (Gemini -> Groq -> SiliconFlow -> OpenRouter)
 """
 import os
 import time
 import json
-import httpx
 from typing import Dict, Any, Optional
-from openai import OpenAI
 from dotenv import load_dotenv
+
+# 导入 LLMClient (多源轮询架构)
+try:
+    from .ai_analyst import get_llm_client, LLMClient
+except ImportError:
+    from ai_analyst import get_llm_client, LLMClient
 
 # 导入情报服务
 try:
@@ -35,28 +40,10 @@ except ImportError:
         HAS_INTELLIGENCE_SERVICE = True
     except ImportError:
         HAS_INTELLIGENCE_SERVICE = False
-        print("⚠️ SportsIntelligenceService not available. Running without real-time intelligence.")
+        print("   SportsIntelligenceService not available. Running without real-time intelligence.")
 
 # 加载环境变量
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
-
-# OpenRouter 配置
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-YOUR_SITE_URL = "https://polydelta.vercel.app"
-APP_NAME = "PolyDelta AI Analyst"
-
-# 模型配置
-PRIMARY_MODEL = "google/gemini-2.0-flash-exp:free"
-FALLBACK_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
-
-# OpenRouter 客户端
-_client = None
-if OPENROUTER_API_KEY:
-    _client = OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=OPENROUTER_API_KEY,
-        timeout=httpx.Timeout(60.0, connect=10.0)
-    )
 
 
 class SportsPromptBuilder:
@@ -65,40 +52,7 @@ class SportsPromptBuilder:
     负责根据不同的体育项目 (NBA/FIFA) 和赛事类型 (Daily/Future) 生成定制化的 System Prompt
 
     v2.0: 支持实时情报注入 (Real-Time Intelligence Injection)
-    v3.0: 支持双语输出 (Bilingual Support - EN/ZH)
     """
-
-    # 中文模式指令集 (Chinese Mode Instruction Set)
-    CHINESE_INSTRUCTION = """
-# LANGUAGE REQUIREMENT: SIMPLIFIED CHINESE (简体中文)
-
-1. **Native Thought Process (原生思维):**
-   - Do not translate the English context word-for-word. Understand the data (RSS/Tweets) and synthesize a native Chinese analysis.
-   - 不要逐字翻译英文内容。理解数据后，用地道的中文撰写分析。
-
-2. **Identity Preservation (名称保留规则):**
-   - **Player/Team Names:** For the first mention, use: **中文名 (English Name)**.
-     - Example: "勒布朗·詹姆斯 (LeBron James) 出战成疑。"
-   - **Source Names:** Keep data source names in English.
-     - Example: "据 Underdog NBA 报道..." (NOT "据下风NBA...")
-
-3. **Professional Terminology (专业术语映射):**
-   - "Spread" -> "让分盘"
-   - "Moneyline" -> "独赢盘"
-   - "Total / Over-Under" -> "大小分"
-   - "Odds" -> "赔率"
-   - "Vig / Juice" -> "水位 / 抽水"
-   - "Liquidity" -> "流动性 / 深度"
-   - "Game Time Decision (GTD)" -> "赛前决定 (GTD)"
-   - "Arbitrage" -> "套利"
-   - "Expected Value (EV)" -> "期望值 (EV)"
-   - "Kelly Criterion" -> "凯利公式"
-   - "Polymarket" -> "Polymarket (链上市场)"
-
-4. **Tone (语气):**
-   - Professional, Objective, Analytical. 专业、客观、分析性强。
-   - Avoid generic translation style. 避免翻译腔。
-"""
 
     def __init__(self, enable_intelligence: bool = True):
         """
@@ -109,20 +63,19 @@ class SportsPromptBuilder:
         """
         self.enable_intelligence = enable_intelligence and HAS_INTELLIGENCE_SERVICE
 
-    def build(self, sport: str, event_type: str, data_context: Dict[str, Any], language: str = "en") -> str:
+    def build(self, sport: str, event_type: str, data_context: Dict[str, Any]) -> str:
         """
         工厂方法：根据赛事类型返回对应的 System Prompt
 
         :param sport: 'NBA' or 'FIFA'
         :param event_type: 'DAILY' (单场) or 'FUTURE' (冠军赛)
         :param data_context: 包含赔率、ROI、分组、伤病等数据的字典
-        :param language: 'en' (English, default) or 'zh' (Chinese)
         """
         # 获取实时情报 (如果启用)
         intelligence_context = self._fetch_intelligence(sport, event_type, data_context)
 
-        # 获取语言指令 (Anti-Regression Logic)
-        lang_instruction = self._get_language_instruction(language)
+        # Language instruction (English only)
+        lang_instruction = "Output strictly in English. Tone: Professional, Data-driven, and Direct."
 
         if sport.upper() == "NBA" and event_type.upper() == "FUTURE":
             return self._get_nba_playoff_prompt(data_context, intelligence_context, lang_instruction)
@@ -132,19 +85,6 @@ class SportsPromptBuilder:
             return self._get_daily_match_prompt(sport, data_context, intelligence_context, lang_instruction)
         else:
             return "Error: Unsupported sport/event combination."
-
-    def _get_language_instruction(self, language: str) -> str:
-        """
-        Anti-Regression Logic: 获取语言指令
-
-        严格分支逻辑确保英文版本不受影响
-        """
-        if language == "zh":
-            # 中文模式：注入专业术语和思维指令
-            return self.CHINESE_INSTRUCTION
-        else:
-            # 英文模式 (默认)：保持原有逻辑不变
-            return "Output strictly in English. Tone: Professional, Data-driven, and Direct."
 
     def _fetch_intelligence(self, sport: str, event_type: str, data_context: Dict[str, Any]) -> str:
         """
@@ -223,20 +163,46 @@ class SportsPromptBuilder:
         # 构建情报注入块
         intelligence_block = f"\n{intelligence}\n" if intelligence else ""
 
+        # 无情报时的警告
+        no_data_warning = ""
+        if not intelligence:
+            no_data_warning = """
+# ⚠️ NO REAL-TIME INTELLIGENCE AVAILABLE
+You have NO external data (injuries, news, tweets). You MUST:
+1. State "No specific injury/news data available" for health assessments
+2. Focus ONLY on publicly known facts: current standings, historical playoff records, roster construction
+3. Do NOT invent statistics (like "fitness drops 12%" or "shooting 38%") - these are hallucinations
+4. If uncertain, say "Insufficient data to assess"
+"""
+
         return f"""# Role
 You are PolyDelta's NBA Futures Trader & Senior Sports Analyst.
 Your goal is to evaluate if the current championship odds for **{team_name}** represent a "+EV Value Bet" or a "Trap".
 {lang_instruction}
 
-# CRITICAL INSTRUCTION: BAN GENERIC EXPLANATIONS
+# CRITICAL INSTRUCTION: ANTI-TEMPLATE RULES
 
-* **NO DEFINITIONS:** Do NOT explain what "Home Court Advantage" is. Do NOT explain what "Western Conference difficulty" means. The user already knows this.
-* **SPECIFICITY RULE:** Every claim must be backed by a **Proper Noun** (Player Name, Opponent Team Name) or a **Number** (Stat, Date).
-  - BAD: "The team has a hard schedule."
-  - GOOD: "Facing Denver (Jokic) and Boston (Tatum) back-to-back is a nightmare scenario."
-* **NO REPETITION:** Do NOT use generic phrases like "Western Conference = Hard Mode". Instead, analyze the SPECIFIC matchup (e.g., "Thunder vs Nuggets: OKC lacks the size to guard Jokic").
-* **DYNAMIC HEADLINES:** Generate punchy, news-style headlines for each analysis point. NOT "Path to Finals", but "首轮即遇湖人？" or "Round 2 Nightmare: Denver Awaits".
+## Rule 1: SELF-EXCLUSION (MANDATORY)
+When listing potential opponents, playoff paths, or "death mode" teams, you MUST EXCLUDE **{team_name}** itself.
+- The team being analyzed can NEVER appear as its own opponent.
+- Before outputting any opponent list, mentally check: "Is {team_name} in this list?" If yes, REMOVE IT.
 
+## Rule 2: NO HALLUCINATED STATISTICS
+- Do NOT invent specific percentages (e.g., "fitness drops 12%", "shooting 38% from 3")
+- Do NOT fabricate injury timelines unless provided in the context data
+- If no data exists, write: "No specific data available" or "Based on publicly known roster..."
+- Only cite statistics that are EXPLICITLY provided in the Context Data section below
+
+## Rule 3: NO COPY-PASTE EXAMPLES
+- Do NOT reuse any specific team/player combinations from your training
+- Every analysis must be UNIQUE to **{team_name}** and their ACTUAL conference/division rivals
+- Research {team_name}'s REAL playoff bracket position and likely opponents
+
+## Rule 4: DYNAMIC SENTENCE STRUCTURE
+- Vary your opening sentences. NEVER start multiple pillars with the same pattern
+- Each pillar title must be a unique, punchy headline - not a generic category name
+- Avoid repetitive phrases like "Key rotation healthy" or "Conference difficulty"
+{no_data_warning}
 # Context Data
 - Team: {team_name}
 - Web2 Bookmaker Implied Probability: {web2_odds:.1f}%
@@ -245,17 +211,17 @@ Your goal is to evaluate if the current championship odds for **{team_name}** re
 {intelligence_block}
 # Analysis Framework (The "Gauntlet" Logic)
 
-## 1. Projected Playoff Path (BE SPECIFIC)
-* **Name the opponents:** "R1 vs Lakers (LeBron/AD), R2 vs Nuggets (Jokic), WCF vs Clippers (Kawhi)"
-* **Matchup Analysis:** Identify the SPECIFIC weakness. Example: "Holmgren has never guarded Jokic in playoffs. This single matchup reduces OKC's EV significantly."
-* If Play-In: "Single-game variance against Miami's zone defense is a trap."
+## 1. Projected Playoff Path
+* Name the ACTUAL likely opponents based on current standings (NEVER include {team_name} itself)
+* Identify specific matchup concerns based on roster construction
+* If data is missing, acknowledge it: "Bracket TBD pending final standings"
 
-## 2. Squad Resilience (CITE PLAYERS)
-* **Health:** Don't say "injury concerns". Say "SGA has played 78+ games for 3 seasons - elite durability" or "Kawhi's load management means he'll miss 1-2 playoff games guaranteed."
-* **Depth Analysis:** "Bench mob averaging 42 PPG (3rd in NBA)" or "No reliable backup center behind Embiid."
+## 2. Squad Resilience
+* Health assessment: Only cite injuries from the Context Data. If none provided, state "No injury data available"
+* Depth analysis based on known roster - do not invent bench scoring numbers
 
-## 3. Hedging Strategy (SPECIFIC NUMBERS)
-* "Buy at {poly_price:.1f}%. Target sell at Conference Finals (~35%). Risk-free hedge possible."
+## 3. Hedging Strategy
+* Provide concrete entry/exit prices based on the Context Data above
 
 # Output Requirements
 Return a JSON object with the following structure:
@@ -264,31 +230,31 @@ Return a JSON object with the following structure:
   "strategy_card": {{
     "score": 75,
     "status": "Accumulate",
-    "headline": "Dynamic news-style headline here",
-    "analysis": "Specific analysis with player names and stats",
-    "kelly_advice": "Specific Kelly recommendation",
-    "risk_text": "Key risk with specific opponent/player",
-    "hedging_tip": "Specific hedge target price"
+    "headline": "Dynamic news-style headline UNIQUE to {team_name}",
+    "analysis": "Analysis using ONLY data from Context above",
+    "kelly_advice": "Kelly recommendation based on the EV spread",
+    "risk_text": "Key risk - cite specific opponent (NOT {team_name})",
+    "hedging_tip": "Target price based on poly_price above"
   }},
   "news_card": {{
-    "prediction": "Team's ceiling (Trophy Contender/Semi-Final/etc)",
+    "prediction": "Team's realistic ceiling based on current standings",
     "confidence": "High/Medium/Low",
     "confidence_pct": 72,
     "pillars": [
       {{
         "icon": "🎯",
-        "title": "DYNAMIC: Generate a punchy headline like '首轮噩梦：湖人等候' or 'Round 1 Trap: Lakers Await'",
-        "content": "SPECIFIC analysis with player names, not generic explanations",
+        "title": "UNIQUE headline for {team_name}'s specific situation",
+        "content": "Analysis using ONLY provided data. If no data, say so.",
         "sentiment": "positive/negative/neutral"
       }}
     ],
-    "factors": ["Trad implied: X%", "Polymarket: Y%", "Spread: Z%"],
-    "news_footer": "Brief methodology note"
+    "factors": ["Trad implied: {web2_odds:.1f}%", "Polymarket: {poly_price:.1f}%", "Spread: {ev*100:+.1f}%"],
+    "news_footer": "Analysis based on available data as of report generation"
   }}
 }}
 ```
 
-**REMEMBER:** NO generic explanations. Every sentence must have a proper noun or number.
+**FINAL CHECK:** Before submitting, verify: (1) {team_name} is NOT listed as its own opponent, (2) No fabricated statistics, (3) Headlines are unique to this team.
 """
 
     # ==============================================================================
@@ -303,20 +269,46 @@ Return a JSON object with the following structure:
         # 构建情报注入块
         intelligence_block = f"\n{intelligence}\n" if intelligence else ""
 
+        # 无情报时的警告
+        no_data_warning = ""
+        if not intelligence:
+            no_data_warning = """
+# ⚠️ NO REAL-TIME INTELLIGENCE AVAILABLE
+You have NO external data (injuries, squad news, manager updates). You MUST:
+1. State "No specific squad/injury data available" when discussing fitness
+2. Focus ONLY on publicly known facts: FIFA rankings, historical tournament records, known squad composition
+3. Do NOT invent statistics or specific matchup scenarios that aren't in the Context Data
+4. If uncertain about group opponents, say "Group draw pending" or "Opponents TBD"
+"""
+
         return f"""# Role
 You are PolyDelta's World Cup Strategist & Senior Football Analyst.
 Your goal is to analyze the "Tournament Tree" and evaluate if **{team_name}** is undervalued or a trap.
 {lang_instruction}
 
-# CRITICAL INSTRUCTION: BAN GENERIC EXPLANATIONS
+# CRITICAL INSTRUCTION: ANTI-TEMPLATE RULES
 
-* **NO DEFINITIONS:** Do NOT explain what a "Group of Death" is. Do NOT explain what "tournament fatigue" means. The user already knows this.
-* **SPECIFICITY RULE:** Every claim must be backed by a **Proper Noun** (Player Name, Opponent Team Name) or a **Number** (Stat, Date).
-  - BAD: "They have a tough group."
-  - GOOD: "Group with Croatia (Modric) and Italy (Donnarumma) - must beat both midfield battles."
-* **NO REPETITION:** Do NOT use generic phrases like "Group of Death scenarios". Instead, analyze the SPECIFIC matchup (e.g., "Spain vs Croatia: Pedri vs Modric midfield duel").
-* **DYNAMIC HEADLINES:** Generate punchy, news-style headlines. NOT "Group Stage Analysis", but "莫德里奇的复仇？" or "Modric's Revenge: Croatia Awaits".
+## Rule 1: SELF-EXCLUSION (MANDATORY)
+When listing group opponents, knockout path teams, or "Group of Death" scenarios:
+- **{team_name}** can NEVER appear as its own opponent
+- Before outputting any opponent list, verify {team_name} is NOT included
 
+## Rule 2: NO HALLUCINATED DATA
+- Do NOT copy generic examples like "Croatia (Modric) + Italy (Donnarumma)" for EVERY team
+- Do NOT invent fitness percentages, injury timelines, or specific stats
+- Only reference {team_name}'s ACTUAL group opponents if known and provided in Context Data
+- If group draw is unknown, state: "Group opponents pending draw"
+
+## Rule 3: TEAM-SPECIFIC ANALYSIS ONLY
+- Research {team_name}'s REAL FIFA ranking, recent tournament history, and known squad
+- Do NOT reuse the same "midfielder duel" or "keeper battle" examples for different teams
+- Each analysis must reflect {team_name}'s unique strengths/weaknesses
+
+## Rule 4: DYNAMIC SENTENCE STRUCTURE
+- Vary your opening sentences across different sections
+- Generate headlines SPECIFIC to {team_name}'s situation, not generic templates
+- Avoid phrases like "Group of Death" unless {team_name} is ACTUALLY in one
+{no_data_warning}
 # Context Data
 - Team: {team_name}
 - Web2 Bookmaker Implied Probability: {web2_odds:.1f}%
@@ -325,17 +317,19 @@ Your goal is to analyze the "Tournament Tree" and evaluate if **{team_name}** is
 {intelligence_block}
 # Analysis Framework (The "Bracket" Logic)
 
-## 1. Group Stage Survival (NAME THE OPPONENTS)
-* **Specific Matchups:** "Must beat Croatia's aging but elite midfield (Modric/Kovacic). A draw vs Italy puts pressure on dead rubber."
-* **Key Battles:** Identify the tactical mismatch. "Spain's possession style struggles against Croatia's compact 4-3-3."
+## 1. Group Stage Survival
+* Name ONLY the actual group opponents from Context Data (if available)
+* If group is unknown, state "Awaiting group draw" - do NOT fabricate opponents
+* Analyze based on {team_name}'s known playing style and historical performance
 
-## 2. The Knockout Path (NAME THE R16 OPPONENT)
-* **Crossover Analysis:** "Group winner plays Runner-up of Group F (likely Belgium/Morocco). Morocco's low block is Spain's worst nightmare."
-* **Historical Data:** "Spain has lost 3 of last 4 knockout games on penalties."
+## 2. The Knockout Path
+* Base crossover analysis on ACTUAL tournament bracket structure
+* Historical data: Only cite verifiable tournament records
+* If path is unknown, focus on general knockout round challenges for {team_name}'s style
 
-## 3. Squad Depth & Manager (CITE PLAYERS)
-* **Impact Subs:** "Bench includes Ferran Torres (12 goals last 20 caps) and Nico Williams (elite pace)."
-* **Manager Style:** "Luis de la Fuente favors 4-3-3 possession - vulnerable to counter-attacks."
+## 3. Squad Depth & Manager
+* Only cite players/stats from Context Data
+* If no squad data, state "Squad selection pending" and analyze known core players only
 
 # Output Requirements
 Return a JSON object with the following structure:
@@ -344,31 +338,31 @@ Return a JSON object with the following structure:
   "strategy_card": {{
     "score": 68,
     "status": "Accumulate",
-    "headline": "Dynamic news-style headline (e.g., '死亡之组：克罗地亚+意大利')",
-    "analysis": "Specific analysis with player names and tactical details",
-    "kelly_advice": "Specific Kelly recommendation",
-    "risk_text": "Key risk with specific opponent/player",
-    "hedging_tip": "Specific hedge target price"
+    "headline": "Headline UNIQUE to {team_name}'s actual situation",
+    "analysis": "Analysis using ONLY data from Context above",
+    "kelly_advice": "Kelly recommendation based on the EV spread",
+    "risk_text": "Key risk - do NOT list {team_name} as opponent",
+    "hedging_tip": "Target price based on poly_price above"
   }},
   "news_card": {{
-    "prediction": "Team's ceiling (Trophy Contender/Quarter-Final/etc)",
+    "prediction": "Team's realistic ceiling based on current data",
     "confidence": "High/Medium/Low",
     "confidence_pct": 65,
     "pillars": [
       {{
         "icon": "⚔️",
-        "title": "DYNAMIC: Generate a punchy headline like '莫德里奇的复仇？' or 'Midfield Battle: Modric Awaits'",
-        "content": "SPECIFIC tactical analysis, not generic explanations",
+        "title": "UNIQUE headline for {team_name}'s specific situation",
+        "content": "Analysis using ONLY provided data. If no data, acknowledge uncertainty.",
         "sentiment": "positive/negative/neutral"
       }}
     ],
-    "factors": ["Trad implied: X%", "Polymarket: Y%", "Spread: Z%"],
-    "news_footer": "Brief methodology note"
+    "factors": ["Trad implied: {web2_odds:.1f}%", "Polymarket: {poly_price:.1f}%", "Spread: {ev*100:+.1f}%"],
+    "news_footer": "Analysis based on available data as of report generation"
   }}
 }}
 ```
 
-**REMEMBER:** NO generic explanations. Every sentence must have a proper noun (player/team/manager) or number (stat/date).
+**FINAL CHECK:** Before submitting, verify: (1) {team_name} is NOT listed as its own opponent, (2) No fabricated statistics or copied examples, (3) Analysis reflects {team_name}'s real situation.
 """
 
     # ==============================================================================
@@ -386,45 +380,70 @@ Return a JSON object with the following structure:
         # 构建情报注入块
         intelligence_block = f"\n{intelligence}\n" if intelligence else ""
 
+        # 无情报时的警告
+        no_data_warning = ""
+        if not intelligence:
+            no_data_warning = """
+# ⚠️ NO REAL-TIME INTELLIGENCE AVAILABLE
+You have NO external data (injuries, lineups, recent news). You MUST:
+1. For Availability: State "No injury report available" - do NOT invent injuries or "GTD" statuses
+2. For Form: State "Recent form data unavailable" - do NOT fabricate win-loss records or shooting percentages
+3. For H2H: State "Season series data unavailable" if not provided
+4. For Advanced Stats: State "Advanced metrics unavailable" - do NOT invent Net Ratings or efficiency numbers
+5. Focus on what IS provided: the odds data and team names
+"""
+
         return f"""# Role
 You are a Senior Sports Analyst for {sport}.
 {lang_instruction}
 
-# CRITICAL INSTRUCTION: BAN GENERIC EXPLANATIONS
+# CRITICAL INSTRUCTION: ANTI-TEMPLATE RULES
 
-* **NO DEFINITIONS:** Do NOT explain what "Home Court Advantage" is. Do NOT say "Key rotation healthy." The user already knows this.
-* **SPECIFICITY RULE:** Every claim must be backed by a **Proper Noun** (Player Name) or a **Number** (Stat).
-  - BAD: "Key rotation healthy."
-  - GOOD: "Cade Cunningham (25 PPG last 5) is peaking. Ivey questionable (ankle)."
-  - BAD: "Team has good form."
-  - GOOD: "7-3 in last 10, including wins over Celtics and Bucks."
-* **TACTICAL MISMATCH:** Identify the SPECIFIC matchup advantage.
-  - "Rockets allow 38% 3PT shooting; Pistons' spacing will punish this."
-  - "Lakers' paint defense (ranked 3rd) neutralizes Embiid's post game."
-* **DYNAMIC HEADLINES:** Generate news-style headlines for each pillar. NOT "Availability", but "Cunningham热火状态" or "Cade's Hot Streak".
+## Rule 1: NO HALLUCINATED STATISTICS
+- Do NOT invent specific numbers like "fitness drops 12%", "7-3 L10", or "Net Rating +4.2"
+- Do NOT fabricate injury statuses unless EXPLICITLY provided in the Context Data below
+- If a statistic is not in the Context Data, say "Data unavailable" for that category
+- NEVER copy percentages from training examples - each game's data is unique
 
+## Rule 2: MATCH-SPECIFIC ANALYSIS ONLY
+- This analysis is ONLY for: **{home_team}** vs **{away_team}**
+- Do NOT reuse analysis patterns from other team matchups
+- Every claim must be verifiable from the Context Data provided
+
+## Rule 3: HONEST UNCERTAINTY
+- If injury data is missing: "No injury report available for this matchup"
+- If form data is missing: "Recent performance data not provided"
+- If H2H data is missing: "Season series records unavailable"
+- Honesty about data gaps is MORE valuable than fabricated confidence
+
+## Rule 4: DYNAMIC SENTENCE STRUCTURE
+- NEVER start multiple pillars with identical patterns
+- Vary your headline style for each pillar
+- Avoid the phrase "Key rotation healthy" - it's become a template marker
+{no_data_warning}
 # Match Data
 - **{home_team}** (Home) vs **{away_team}** (Away)
 - Web2 Odds: {home_team} {home_odds:.1f}% | {away_team} {away_odds:.1f}%
 - Polymarket: {home_team} {poly_home:.1f}% | {away_team} {poly_away:.1f}%
 - Max EV: {max_ev*100:+.1f}%
 {intelligence_block}
-# Analysis Framework (4-Pillar with SPECIFICITY)
+# Analysis Framework (4-Pillar)
 
-1. **Availability (CITE PLAYERS):**
-   - Name the injured players: "Jimmy Butler (knee) OUT. Herro GTD."
-   - Rest advantage: "Lakers on 2nd night of B2B, Pistons rested 3 days."
+1. **Availability:**
+   - ONLY cite injuries from the Context Data above
+   - If no injury data: State "Injury report: No data available"
 
-2. **Form (CITE STATS):**
-   - "Pistons 7-3 L10 with league-best 3PT% (41.2%)."
-   - "Lakers struggling: 4-6 L10, worst road record in West."
+2. **Form:**
+   - ONLY cite win-loss records from the Context Data
+   - If no form data: State "Recent form: Data unavailable"
 
-3. **Head-to-Head (CITE GAMES):**
-   - "Season series 1-1. Last meeting: Pistons won 112-108 (Cade 32pts)."
+3. **Head-to-Head:**
+   - ONLY cite H2H records from the Context Data
+   - If no H2H data: State "Season series: Records unavailable"
 
-4. **Advanced Stats (CITE NUMBERS):**
-   - "Net Rating: Pistons +4.2 (8th) vs Lakers -1.3 (18th)."
-   - "Key edge: Pistons Rebound Rate 52% vs Lakers 47%."
+4. **Odds Analysis:**
+   - Compare the Web2 vs Polymarket odds provided above
+   - This is the ONE area where you HAVE data - focus your analysis here
 
 # Output Requirements
 Return a JSON object:
@@ -433,48 +452,48 @@ Return a JSON object:
   "strategy_card": {{
     "score": 72,
     "status": "Buy",
-    "headline": "Dynamic headline (e.g., 'Cade热火状态碾压湖人')",
-    "analysis": "Specific analysis with player names and stats",
-    "kelly_advice": "Quarter Kelly. Edge: +X%",
-    "risk_text": "Key risk (e.g., 'If Butler returns, invalidates edge')"
+    "headline": "Headline specific to {home_team} vs {away_team}",
+    "analysis": "Analysis using ONLY provided Context Data",
+    "kelly_advice": "Kelly recommendation based on {max_ev*100:+.1f}% EV",
+    "risk_text": "Key risk - acknowledge data limitations if applicable"
   }},
   "news_card": {{
-    "prediction": "Team to Win",
-    "confidence": "High/Medium/Low",
+    "prediction": "Predicted winner based on available data",
+    "confidence": "High/Medium/Low (Lower if data is limited)",
     "confidence_pct": 68,
     "pillars": [
       {{
         "icon": "🏥",
-        "title": "DYNAMIC: 'Butler伤缺+Herro待定' or 'Butler OUT, Herro GTD'",
-        "content": "Specific injury analysis with player names",
+        "title": "Availability headline for {home_team}/{away_team}",
+        "content": "Injury data from Context, or 'No injury data available'",
         "sentiment": "positive/negative/neutral"
       }},
       {{
         "icon": "📈",
-        "title": "DYNAMIC: 'Cade 近5场25分' or 'Cade Averaging 25 PPG'",
-        "content": "Specific form stats",
+        "title": "Form headline - UNIQUE to this matchup",
+        "content": "Form data from Context, or 'Form data unavailable'",
         "sentiment": "positive/negative/neutral"
       }},
       {{
         "icon": "⚔️",
-        "title": "DYNAMIC: '赛季交锋1-1' or 'Season Series Split 1-1'",
-        "content": "Specific H2H analysis",
+        "title": "H2H headline for {home_team} vs {away_team}",
+        "content": "H2H data from Context, or 'H2H records unavailable'",
         "sentiment": "positive/negative/neutral"
       }},
       {{
         "icon": "📊",
-        "title": "DYNAMIC: '净效率差距+5.5' or 'Net Rating Gap +5.5'",
-        "content": "Specific advanced stat comparison",
+        "title": "Odds Analysis: {max_ev*100:+.1f}% Edge",
+        "content": "Compare Web2 ({home_odds:.1f}%/{away_odds:.1f}%) vs Poly ({poly_home:.1f}%/{poly_away:.1f}%)",
         "sentiment": "positive/negative/neutral"
       }}
     ],
-    "factors": ["Trad implied: X%", "Polymarket: Y%"],
-    "news_footer": "4-Pillar analysis based on public data."
+    "factors": ["Trad implied: {home_team} {home_odds:.1f}%", "Polymarket: {home_team} {poly_home:.1f}%"],
+    "news_footer": "Analysis based on available data. Limited data = lower confidence."
   }}
 }}
 ```
 
-**REMEMBER:** NO generic explanations. Every sentence must have a player name or stat number.
+**FINAL CHECK:** Before submitting, verify: (1) No fabricated statistics, (2) Data gaps are acknowledged honestly, (3) Analysis is unique to {home_team} vs {away_team}.
 """
 
 
@@ -483,57 +502,64 @@ def generate_championship_analysis(
     sport_type: str,
     web2_odds: float,
     poly_price: float,
-    ev: float,
-    language: str = "en"
+    ev: float
 ) -> Optional[str]:
     """
-    为冠军盘口生成 AI 分析报告
+    Generate AI analysis for championship futures
 
     Args:
-        team_name: 球队/国家名称
-        sport_type: 'nba' 或 'world_cup'
-        web2_odds: Web2 隐含胜率 (0-1 格式)
-        poly_price: Polymarket 价格 (0-1 格式)
-        ev: EV 差值 (0-1 格式)
-        language: 'en' (English) or 'zh' (Chinese)
+        team_name: Team/country name
+        sport_type: 'nba' or 'world_cup'
+        web2_odds: Web2 implied probability (0-1 format)
+        poly_price: Polymarket price (0-1 format)
+        ev: EV difference (0-1 format)
 
     Returns:
-        Markdown 格式的分析报告，或 None
+        Markdown analysis report, or None
     """
-    if not _client:
-        print("   ⚠️ OPENROUTER_API_KEY 未设置，跳过 AI 分析")
+    llm_client = get_llm_client()
+    if not any([llm_client.gemini_model, llm_client.groq_client,
+                llm_client.siliconflow_client, llm_client.openrouter_client]):
+        print("   No LLM provider configured, skipping AI analysis")
         return None
 
-    # EV 门槛：冠军盘口 >= 5%
-    if ev < 0.05:
+    # ============================================
+    # Low Probability Cutoff Filter (Cost-Saving)
+    # Skip LLM analysis for "Long Shot" teams (<1% probability)
+    # ============================================
+    LOW_PROBABILITY_CUTOFF = 0.01  # 1% threshold
+
+    # Use whichever probability is available (prefer Polymarket, fallback to Web2)
+    implied_probability = poly_price if poly_price and poly_price > 0 else web2_odds
+
+    if implied_probability and implied_probability < LOW_PROBABILITY_CUTOFF:
+        # Calculate equivalent decimal odds for logging
+        decimal_odds = 1 / implied_probability if implied_probability > 0 else float('inf')
+        print(f"   [SKIP] {team_name}: Probability {implied_probability*100:.2f}% (Odds {decimal_odds:.1f}) < 1% cutoff")
         return None
 
-    lang_label = "中文" if language == "zh" else "EN"
-    print(f"🧠 AI Analyst (Championship/{lang_label}): {team_name} ({sport_type}) - EV: +{ev*100:.1f}%")
+    print(f"   AI Analyst (Championship): {team_name} ({sport_type}) - EV: {ev*100:+.1f}%")
 
-    # 构建 prompt
+    # Build prompt
     builder = SportsPromptBuilder()
     context = {
         'team_name': team_name,
-        'web2_odds': web2_odds * 100,  # 转换为百分比
+        'web2_odds': web2_odds * 100,
         'poly_price': poly_price * 100,
         'ev': ev,
     }
 
-    # 根据 sport_type 选择分析框架
+    # Select analysis framework based on sport_type
     if sport_type == 'nba':
-        system_prompt = builder.build('NBA', 'FUTURE', context, language)
+        system_prompt = builder.build('NBA', 'FUTURE', context)
     else:
-        system_prompt = builder.build('FIFA', 'FUTURE', context, language)
+        system_prompt = builder.build('FIFA', 'FUTURE', context)
 
-    # 用户提示也根据语言调整
-    if language == "zh":
-        user_prompt = f"请分析 {team_name} 的冠军期货市场。现在提供你的分析。"
-    else:
-        user_prompt = f"Analyze the championship futures for {team_name}. Provide your analysis now."
+    user_prompt = f"Analyze the championship futures for {team_name}. Provide your analysis now."
 
-    # 调用 LLM
-    return _call_llm_with_fallback(system_prompt, user_prompt)
+    # Call LLM (using multi-provider architecture)
+    time.sleep(1)  # Rate limit protection
+    return llm_client.generate_analysis(system_prompt, user_prompt)
 
 
 def generate_daily_match_analysis(
@@ -544,38 +570,33 @@ def generate_daily_match_analysis(
     away_odds: float,
     poly_home: float,
     poly_away: float,
-    max_ev: float,
-    language: str = "en"
+    max_ev: float
 ) -> Optional[str]:
     """
-    为每日比赛生成 AI 分析报告
+    Generate AI analysis for daily matches
 
     Args:
-        home_team: 主队名称
-        away_team: 客队名称
-        sport_type: 'nba' 或 'world_cup'
-        home_odds: 主队 Web2 隐含胜率 (0-1)
-        away_odds: 客队 Web2 隐含胜率 (0-1)
-        poly_home: 主队 Polymarket 价格 (0-1)
-        poly_away: 客队 Polymarket 价格 (0-1)
-        max_ev: 最大 EV 差值 (0-1)
-        language: 'en' (English) or 'zh' (Chinese)
+        home_team: Home team name
+        away_team: Away team name
+        sport_type: 'nba' or 'world_cup'
+        home_odds: Home team Web2 implied probability (0-1)
+        away_odds: Away team Web2 implied probability (0-1)
+        poly_home: Home team Polymarket price (0-1)
+        poly_away: Away team Polymarket price (0-1)
+        max_ev: Maximum EV difference (0-1)
 
     Returns:
-        Markdown 格式的分析报告，或 None
+        Markdown analysis report, or None
     """
-    if not _client:
-        print("   ⚠️ OPENROUTER_API_KEY 未设置，跳过 AI 分析")
+    llm_client = get_llm_client()
+    if not any([llm_client.gemini_model, llm_client.groq_client,
+                llm_client.siliconflow_client, llm_client.openrouter_client]):
+        print("   No LLM provider configured, skipping AI analysis")
         return None
 
-    # EV 门槛：每日比赛 >= 2%
-    if max_ev < 0.02:
-        return None
+    print(f"   AI Analyst (Daily): {home_team} vs {away_team} - EV: {max_ev*100:+.1f}%")
 
-    lang_label = "中文" if language == "zh" else "EN"
-    print(f"🧠 AI Analyst (Daily/{lang_label}): {home_team} vs {away_team} - EV: +{max_ev*100:.1f}%")
-
-    # 构建 prompt
+    # Build prompt
     builder = SportsPromptBuilder()
     context = {
         'home_team': home_team,
@@ -588,71 +609,16 @@ def generate_daily_match_analysis(
     }
 
     sport = 'NBA' if sport_type == 'nba' else 'FIFA'
-    system_prompt = builder.build(sport, 'DAILY', context, language)
+    system_prompt = builder.build(sport, 'DAILY', context)
 
-    # 用户提示也根据语言调整
-    if language == "zh":
-        user_prompt = f"请分析比赛：{home_team} vs {away_team}。现在提供你的分析。"
-    else:
-        user_prompt = f"Analyze the match: {home_team} vs {away_team}. Provide your analysis now."
+    user_prompt = f"Analyze the match: {home_team} vs {away_team}. Provide your analysis now."
 
-    return _call_llm_with_fallback(system_prompt, user_prompt)
+    # Call LLM (using multi-provider architecture)
+    time.sleep(1)  # Rate limit protection
+    return llm_client.generate_analysis(system_prompt, user_prompt)
 
 
-def _call_llm_with_fallback(system_prompt: str, user_prompt: str) -> Optional[str]:
-    """
-    调用 LLM，带 fallback 机制
-    """
-    # 尝试主要模型 (Gemini Flash)
-    try:
-        time.sleep(1)  # 避免速率限制
-        result = _call_llm(PRIMARY_MODEL, system_prompt, user_prompt)
-        if result:
-            print(f"   ✅ Gemini Flash 报告生成成功")
-            return result
-    except Exception as e:
-        print(f"   ⚠️ Primary model error: {str(e)[:60]}...")
-
-    # Fallback: Llama 3.2
-    print(f"   🔄 Switching to Fallback (Llama 3.2)...")
-    try:
-        time.sleep(1)
-        result = _call_llm(FALLBACK_MODEL, system_prompt, user_prompt)
-        if result:
-            print(f"   ✅ Llama 3.2 报告生成成功")
-            return result
-    except Exception as e:
-        print(f"   ❌ Fallback model error: {str(e)[:60]}...")
-
-    return None
-
-
-def _call_llm(model: str, system_prompt: str, user_prompt: str) -> Optional[str]:
-    """
-    调用 LLM API
-    """
-    completion = _client.chat.completions.create(
-        extra_headers={"HTTP-Referer": YOUR_SITE_URL, "X-Title": APP_NAME},
-        model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0.7,
-        max_tokens=600,
-    )
-    content = completion.choices[0].message.content
-
-    # 清洗思维链标记
-    if content and "<think>" in content:
-        parts = content.split("</think>")
-        if len(parts) > 1:
-            content = parts[-1].strip()
-
-    return content.replace("```markdown", "").replace("```", "").strip() if content else None
-
-
-# 使用示例
+# Test examples
 if __name__ == "__main__":
     # 测试 NBA 冠军分析
     print("\n" + "="*60)

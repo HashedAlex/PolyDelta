@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { CalculatorModal, CalculatorData } from './CalculatorModal'
 import { OddsChart } from './OddsChart'
-import { useLanguage } from '@/contexts/LanguageContext'
 import { getLocalizedTeamName } from '@/utils/teamNames'
 
 // Generate URL-friendly slug from team name
@@ -73,21 +72,18 @@ export function ArbitrageCard({
   liquidity,
 }: ArbitrageCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
-  const { language } = useLanguage()
 
-  // 翻译文本
   const txt = {
-    valueBet: language === 'zh' ? '价值投注' : 'Value Bet',
-    evDiff: language === 'zh' ? '期望值差' : 'EV Diff',
-    liquidity: language === 'zh' ? '深度' : 'Liquidity',
-    betOnPoly: language === 'zh' ? '在 Polymarket 下注' : 'Bet on Polymarket',
-    viewOnPoly: language === 'zh' ? '查看 Polymarket' : 'View on Polymarket',
-    noPolyData: language === 'zh' ? '暂无 Polymarket 数据' : 'No Polymarket Data',
-    analysis: language === 'zh' ? 'AI 分析' : 'Analysis & Chat',
+    valueBet: 'Value Bet',
+    evDiff: 'EV Diff',
+    liquidity: 'Liquidity',
+    betOnPoly: 'Bet on Polymarket',
+    viewOnPoly: 'View on Polymarket',
+    noPolyData: 'No Polymarket Data',
+    analysis: 'Analysis & Chat',
   }
 
-  // 本地化球队名称
-  const localTeamName = getLocalizedTeamName(teamName, language, sportType)
+  const localTeamName = getLocalizedTeamName(teamName)
 
   // Normalize probability helper (defined early for calculatorData)
   const normalizeProb = (value: number | null): number | null => {

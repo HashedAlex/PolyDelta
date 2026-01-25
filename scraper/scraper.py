@@ -70,9 +70,7 @@ def generate_ai_report(match_data, existing_analysis=None, existing_timestamp=No
     # 计算 EV
     max_ev = calculate_match_ev(home_odds, away_odds, poly_home, poly_away)
 
-    # 触发条件: EV > 2%
-    if max_ev < 0.02:
-        return "No significant arbitrage opportunity detected yet.", datetime.utcnow().isoformat()
+    # EV 门槛已移除 - 所有比赛都生成 AI 分析
 
     # 频次控制: 4小时内的报告直接复用 (但跳过占位文本)
     if existing_timestamp and existing_analysis:
@@ -1545,7 +1543,7 @@ def save_daily_matches(matches):
                 existing_timestamp=existing_timestamp
             )
 
-            # 统计 AI 报告生成情况
+            # 统计生成/复用数量
             if existing_analysis and ai_analysis == existing_analysis:
                 ai_reused_count += 1
             elif ai_analysis and "No significant" not in ai_analysis:
@@ -1856,10 +1854,11 @@ def save_to_database(all_data):
                     pass
 
             # ============================================
-            # 步骤 4: 调用 AI 生成报告 (高 EV 且未复用)
+            # 步骤 4: 调用 AI 生成报告 (概率 >= 1% 且未复用)
             # 使用 SportsPromptBuilder - NBA 用 Gauntlet Logic, FIFA 用 Bracket Logic
+            # EV 门槛已移除，由 generate_championship_analysis 内部的 <1% 概率过滤控制
             # ============================================
-            if not skip_ai and ev >= 0.05:  # 冠军盘口 EV >= 5% 才生成
+            if not skip_ai:  # 只要未复用就尝试生成（<1% 概率会被内部过滤）
                 try:
                     new_report = generate_championship_analysis(
                         team_name=team_name,
@@ -1874,8 +1873,6 @@ def save_to_database(all_data):
                         ai_generated_count += 1
                 except Exception as e:
                     print(f"  [AI] 生成失败 ({team_name}): {e}")
-            elif not skip_ai:
-                ai_skipped_count += 1
 
             cursor.execute(insert_sql, (
                 record["sport_type"],

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { CalculatorModal, CalculatorData } from './CalculatorModal'
 import { OddsChart } from './OddsChart'
-import { useLanguage } from '@/contexts/LanguageContext'
 import { getLocalizedTeamName } from '@/utils/teamNames'
 
 interface MatchCardProps {
@@ -56,7 +55,7 @@ function LiquidityBadge({ liquidity }: { liquidity: number | null | undefined })
   }
 }
 
-function formatMatchTime(date: Date, lang: string = 'en'): string {
+function formatMatchTime(date: Date): string {
   const now = new Date()
   const matchDate = new Date(date)
 
@@ -65,7 +64,6 @@ function formatMatchTime(date: Date, lang: string = 'en'): string {
   tomorrow.setDate(tomorrow.getDate() + 1)
   const isTomorrow = matchDate.toDateString() === tomorrow.toDateString()
 
-  // 使用固定 locale 避免 hydration mismatch
   const timeStr = matchDate.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
@@ -73,11 +71,11 @@ function formatMatchTime(date: Date, lang: string = 'en'): string {
   })
 
   if (isToday) {
-    return lang === 'zh' ? `今天 ${timeStr}` : `Today ${timeStr}`
+    return `Today ${timeStr}`
   } else if (isTomorrow) {
-    return lang === 'zh' ? `明天 ${timeStr}` : `Tomorrow ${timeStr}`
+    return `Tomorrow ${timeStr}`
   } else {
-    const dateStr = matchDate.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+    const dateStr = matchDate.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
     })
@@ -106,33 +104,23 @@ export function MatchCard({
   liquidityAway,
 }: MatchCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
-  const { language } = useLanguage()
 
-  // 翻译文本
   const txt = {
-    arbitrage: language === 'zh' ? '套利' : 'Arbitrage',
-    team: language === 'zh' ? '球队' : 'Team',
-    tradOdds: language === 'zh' ? '传统赔率' : 'Trad Odds',
-    ev: language === 'zh' ? '期望值' : 'EV',
-    liquidity: language === 'zh' ? '深度' : 'Liquidity',
-    betOnPoly: language === 'zh' ? '在 Polymarket 下注' : 'Bet on Polymarket',
-    analysis: language === 'zh' ? 'AI 分析' : 'Analysis & Chat',
-    polyNotAvailable: language === 'zh' ? 'Polymarket 暂未上线' : 'Polymarket not available yet',
+    arbitrage: 'Arbitrage',
+    team: 'Team',
+    tradOdds: 'Trad Odds',
+    ev: 'EV',
+    liquidity: 'Liquidity',
+    betOnPoly: 'Bet on Polymarket',
+    analysis: 'Analysis & Chat',
+    polyNotAvailable: 'Polymarket not available yet',
   }
 
   const homeEV = calculateEV(web2HomeOdds, polyHomePrice)
   const awayEV = calculateEV(web2AwayOdds, polyAwayPrice)
 
-  // 本地化球队名称
-  const localHomeTeam = getLocalizedTeamName(homeTeam, language, 'nba')
-  const localAwayTeam = getLocalizedTeamName(awayTeam, language, 'nba')
-
-  // Calculate min liquidity for card dimming
-  const minLiquidity = Math.min(
-    liquidityHome ?? Infinity,
-    liquidityAway ?? Infinity
-  )
-  const isIlliquid = minLiquidity < 200 && minLiquidity !== Infinity
+  const localHomeTeam = getLocalizedTeamName(homeTeam)
+  const localAwayTeam = getLocalizedTeamName(awayTeam)
 
   // Calculator data
   const calculatorData: CalculatorData = {
@@ -160,12 +148,12 @@ export function MatchCard({
   const hasPoly = polyHomePrice != null || polyAwayPrice != null
 
   return (
-    <div className={`bg-[#161b22] rounded-lg p-4 border ${borderColor} hover:border-[#58a6ff] transition-colors ${isIlliquid ? 'opacity-60' : ''}`}>
+    <div className={`bg-[#161b22] rounded-lg p-4 border ${borderColor} hover:border-[#58a6ff] transition-colors`}>
       {/* Header - 比赛时间 */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs text-[#8b949e] bg-[#21262d] px-2 py-1 rounded flex items-center gap-1">
           <span>🌍</span>
-          <span>{formatMatchTime(commenceTime, language)}</span>
+          <span>{formatMatchTime(commenceTime)}</span>
         </span>
         {hasArbitrage && (
           <span className="text-xs text-[#3fb950] bg-[#3fb950]/10 px-2 py-1 rounded font-medium">
@@ -218,7 +206,7 @@ export function MatchCard({
         {/* Home Team Row */}
         <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={localHomeTeam}>
-            {language === 'zh' ? localHomeTeam : homeTeam.split(' ').pop()}
+            {homeTeam.split(' ').pop()}
           </div>
           <div className="text-center text-[#e6edf3]">
             {web2HomeOdds ? `${(web2HomeOdds * 100).toFixed(1)}%` : '-'}
@@ -241,7 +229,7 @@ export function MatchCard({
         {/* Away Team Row */}
         <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={localAwayTeam}>
-            {language === 'zh' ? localAwayTeam : awayTeam.split(' ').pop()}
+            {awayTeam.split(' ').pop()}
           </div>
           <div className="text-center text-[#e6edf3]">
             {web2AwayOdds ? `${(web2AwayOdds * 100).toFixed(1)}%` : '-'}
