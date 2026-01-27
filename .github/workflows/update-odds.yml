@@ -37,4 +37,4 @@ name: Update Odds & AI Analysis
                                                                                                              
         - name: Log completion                                                                               
           run: |                                                                                             
-            echo "✅ Scraper completed at $(date)"  
+            echo "Scraper completed at $(date)" 
