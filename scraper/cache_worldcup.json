@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-23T23:51:44.136773",
+  "timestamp": "2026-01-27T16:21:02.785155",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-01-23T15:50:04Z",
+          "last_update": "2026-01-27T08:17:38Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:50:04Z",
+              "last_update": "2026-01-27T08:17:38Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -137,10 +137,6 @@
                 },
                 {
                   "name": "Bolivia",
-                  "price": 251.0
-                },
-                {
-                  "name": "Turkey",
                   "price": 251.0
                 },
                 {
@@ -274,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-01-23T15:47:39Z",
+          "last_update": "2026-01-27T08:20:42Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:47:39Z",
+              "last_update": "2026-01-27T08:20:42Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -539,11 +535,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-01-23T15:48:15Z",
+          "last_update": "2026-01-27T08:18:34Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:48:15Z",
+              "last_update": "2026-01-27T08:18:34Z",
               "outcomes": [
                 {
                   "name": "South Africa",
@@ -567,7 +563,7 @@
                 },
                 {
                   "name": "Argentina",
-                  "price": 9.8
+                  "price": 9.6
                 },
                 {
                   "name": "Portugal",
@@ -579,7 +575,7 @@
                 },
                 {
                   "name": "Netherlands",
-                  "price": 28.0
+                  "price": 29.0
                 },
                 {
                   "name": "Norway",
@@ -599,11 +595,15 @@
                 },
                 {
                   "name": "USA",
-                  "price": 80.0
+                  "price": 75.0
                 },
                 {
                   "name": "Morocco",
-                  "price": 80.0
+                  "price": 75.0
+                },
+                {
+                  "name": "Uruguay",
+                  "price": 95.0
                 },
                 {
                   "name": "Mexico",
@@ -614,12 +614,8 @@
                   "price": 100.0
                 },
                 {
-                  "name": "Uruguay",
-                  "price": 100.0
-                },
-                {
                   "name": "Japan",
-                  "price": 110.0
+                  "price": 100.0
                 },
                 {
                   "name": "Senegal",
@@ -631,7 +627,7 @@
                 },
                 {
                   "name": "Croatia",
-                  "price": 130.0
+                  "price": 140.0
                 },
                 {
                   "name": "Denmark",
@@ -639,23 +635,23 @@
                 },
                 {
                   "name": "Turkey",
-                  "price": 190.0
-                },
-                {
-                  "name": "Australia",
                   "price": 200.0
                 },
                 {
+                  "name": "Australia",
+                  "price": 210.0
+                },
+                {
                   "name": "Scotland",
-                  "price": 220.0
+                  "price": 230.0
                 },
                 {
                   "name": "Paraguay",
-                  "price": 310.0
+                  "price": 250.0
                 },
                 {
                   "name": "Canada",
-                  "price": 310.0
+                  "price": 290.0
                 },
                 {
                   "name": "Egypt",
@@ -671,27 +667,27 @@
                 },
                 {
                   "name": "South Korea",
-                  "price": 380.0
+                  "price": 400.0
                 },
                 {
                   "name": "Republic of Ireland",
                   "price": 420.0
                 },
                 {
+                  "name": "Ghana",
+                  "price": 510.0
+                },
+                {
                   "name": "Australia",
                   "price": 580.0
                 },
                 {
-                  "name": "Ghana",
-                  "price": 590.0
-                },
-                {
                   "name": "Wales",
-                  "price": 600.0
+                  "price": 610.0
                 },
                 {
                   "name": "Algeria",
-                  "price": 630.0
+                  "price": 690.0
                 },
                 {
                   "name": "Poland",
@@ -805,7 +801,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-01-23T15:48:15Z",
+              "last_update": "2026-01-27T08:18:34Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -820,11 +816,11 @@
                   "price": 9.6
                 },
                 {
-                  "name": "Brazil",
-                  "price": 10.0
+                  "name": "Argentina",
+                  "price": 9.8
                 },
                 {
-                  "name": "Argentina",
+                  "name": "Brazil",
                   "price": 10.0
                 },
                 {
@@ -833,11 +829,11 @@
                 },
                 {
                   "name": "Germany",
-                  "price": 16.0
+                  "price": 16.5
                 },
                 {
                   "name": "Netherlands",
-                  "price": 29.0
+                  "price": 30.0
                 },
                 {
                   "name": "Norway",
@@ -845,7 +841,7 @@
                 },
                 {
                   "name": "Italy",
-                  "price": 46.0
+                  "price": 48.0
                 },
                 {
                   "name": "Belgium",
@@ -857,19 +853,19 @@
                 },
                 {
                   "name": "USA",
-                  "price": 85.0
+                  "price": 80.0
                 },
                 {
                   "name": "Morocco",
                   "price": 85.0
                 },
                 {
-                  "name": "Mexico",
+                  "name": "Uruguay",
                   "price": 110.0
                 },
                 {
-                  "name": "Uruguay",
-                  "price": 110.0
+                  "name": "Mexico",
+                  "price": 120.0
                 },
                 {
                   "name": "Ecuador",
@@ -880,15 +876,15 @@
                   "price": 130.0
                 },
                 {
-                  "name": "Croatia",
+                  "name": "Senegal",
                   "price": 150.0
                 },
                 {
-                  "name": "Senegal",
-                  "price": 160.0
+                  "name": "Switzerland",
+                  "price": 170.0
                 },
                 {
-                  "name": "Switzerland",
+                  "name": "Croatia",
                   "price": 170.0
                 },
                 {
@@ -897,11 +893,11 @@
                 },
                 {
                   "name": "Scotland",
-                  "price": 280.0
+                  "price": 260.0
                 },
                 {
                   "name": "Canada",
-                  "price": 380.0
+                  "price": 340.0
                 },
                 {
                   "name": "Paraguay",
@@ -910,6 +906,10 @@
                 {
                   "name": "Australia",
                   "price": 530.0
+                },
+                {
+                  "name": "Egypt",
+                  "price": 550.0
                 },
                 {
                   "name": "Ivory Coast",
@@ -925,15 +925,11 @@
                 },
                 {
                   "name": "Republic of Ireland",
-                  "price": 700.0
+                  "price": 780.0
                 },
                 {
                   "name": "Ghana",
                   "price": 900.0
-                },
-                {
-                  "name": "Egypt",
-                  "price": 920.0
                 },
                 {
                   "name": "South Korea",
@@ -966,11 +962,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-01-23T15:50:03Z",
+          "last_update": "2026-01-27T08:17:53Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:50:03Z",
+              "last_update": "2026-01-27T08:17:53Z",
               "outcomes": [
                 {
                   "name": "South Africa",
@@ -994,7 +990,7 @@
                 },
                 {
                   "name": "Argentina",
-                  "price": 9.8
+                  "price": 9.6
                 },
                 {
                   "name": "Portugal",
@@ -1006,7 +1002,7 @@
                 },
                 {
                   "name": "Netherlands",
-                  "price": 28.0
+                  "price": 29.0
                 },
                 {
                   "name": "Norway",
@@ -1026,11 +1022,15 @@
                 },
                 {
                   "name": "USA",
-                  "price": 80.0
+                  "price": 75.0
                 },
                 {
                   "name": "Morocco",
-                  "price": 80.0
+                  "price": 75.0
+                },
+                {
+                  "name": "Uruguay",
+                  "price": 90.0
                 },
                 {
                   "name": "Mexico",
@@ -1041,12 +1041,8 @@
                   "price": 100.0
                 },
                 {
-                  "name": "Uruguay",
-                  "price": 100.0
-                },
-                {
                   "name": "Japan",
-                  "price": 110.0
+                  "price": 100.0
                 },
                 {
                   "name": "Senegal",
@@ -1058,31 +1054,31 @@
                 },
                 {
                   "name": "Croatia",
-                  "price": 130.0
+                  "price": 140.0
                 },
                 {
                   "name": "Denmark",
                   "price": 180.0
                 },
                 {
-                  "name": "Turkey",
-                  "price": 190.0
-                },
-                {
                   "name": "Australia",
                   "price": 200.0
                 },
                 {
+                  "name": "Turkey",
+                  "price": 200.0
+                },
+                {
                   "name": "Scotland",
-                  "price": 220.0
+                  "price": 230.0
                 },
                 {
                   "name": "Paraguay",
-                  "price": 310.0
+                  "price": 250.0
                 },
                 {
                   "name": "Canada",
-                  "price": 310.0
+                  "price": 290.0
                 },
                 {
                   "name": "Egypt",
@@ -1102,7 +1098,7 @@
                 },
                 {
                   "name": "South Korea",
-                  "price": 380.0
+                  "price": 400.0
                 },
                 {
                   "name": "Ghana",
@@ -1114,11 +1110,11 @@
                 },
                 {
                   "name": "Wales",
-                  "price": 600.0
+                  "price": 610.0
                 },
                 {
                   "name": "Algeria",
-                  "price": 630.0
+                  "price": 620.0
                 },
                 {
                   "name": "Iran",
@@ -1232,7 +1228,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-01-23T15:50:03Z",
+              "last_update": "2026-01-27T08:17:53Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1247,11 +1243,11 @@
                   "price": 9.6
                 },
                 {
-                  "name": "Brazil",
-                  "price": 10.0
+                  "name": "Argentina",
+                  "price": 9.8
                 },
                 {
-                  "name": "Argentina",
+                  "name": "Brazil",
                   "price": 10.0
                 },
                 {
@@ -1260,11 +1256,11 @@
                 },
                 {
                   "name": "Germany",
-                  "price": 16.0
+                  "price": 16.5
                 },
                 {
                   "name": "Netherlands",
-                  "price": 29.0
+                  "price": 30.0
                 },
                 {
                   "name": "Norway",
@@ -1272,7 +1268,7 @@
                 },
                 {
                   "name": "Italy",
-                  "price": 46.0
+                  "price": 48.0
                 },
                 {
                   "name": "Belgium",
@@ -1284,7 +1280,7 @@
                 },
                 {
                   "name": "USA",
-                  "price": 85.0
+                  "price": 80.0
                 },
                 {
                   "name": "Morocco",
@@ -1292,11 +1288,11 @@
                 },
                 {
                   "name": "Mexico",
-                  "price": 110.0
+                  "price": 120.0
                 },
                 {
                   "name": "Uruguay",
-                  "price": 110.0
+                  "price": 120.0
                 },
                 {
                   "name": "Ecuador",
@@ -1307,12 +1303,16 @@
                   "price": 130.0
                 },
                 {
-                  "name": "Croatia",
+                  "name": "Senegal",
                   "price": 150.0
                 },
                 {
-                  "name": "Senegal",
-                  "price": 160.0
+                  "name": "Switzerland",
+                  "price": 170.0
+                },
+                {
+                  "name": "Croatia",
+                  "price": 170.0
                 },
                 {
                   "name": "Turkey",
@@ -1320,19 +1320,23 @@
                 },
                 {
                   "name": "Scotland",
-                  "price": 280.0
+                  "price": 260.0
                 },
                 {
                   "name": "Canada",
-                  "price": 380.0
+                  "price": 340.0
                 },
                 {
-                  "name": "Switzerland",
-                  "price": 480.0
+                  "name": "Paraguay",
+                  "price": 510.0
                 },
                 {
                   "name": "Australia",
                   "price": 530.0
+                },
+                {
+                  "name": "Egypt",
+                  "price": 600.0
                 },
                 {
                   "name": "Denmark",
@@ -1343,12 +1347,8 @@
                   "price": 650.0
                 },
                 {
-                  "name": "Paraguay",
-                  "price": 660.0
-                },
-                {
                   "name": "Republic of Ireland",
-                  "price": 700.0
+                  "price": 780.0
                 },
                 {
                   "name": "Ivory Coast",
@@ -1357,10 +1357,6 @@
                 {
                   "name": "Ghana",
                   "price": 900.0
-                },
-                {
-                  "name": "Egypt",
-                  "price": 920.0
                 },
                 {
                   "name": "South Korea",
@@ -1393,11 +1389,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-01-23T15:49:28Z",
+          "last_update": "2026-01-27T08:01:27Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:49:28Z",
+              "last_update": "2026-01-27T08:01:27Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1662,11 +1658,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-01-23T15:50:21Z",
+          "last_update": "2026-01-27T08:20:59Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-23T15:50:21Z",
+              "last_update": "2026-01-27T08:20:59Z",
               "outcomes": [
                 {
                   "name": "Spain",

@@ -1765,7 +1765,7 @@ def save_odds_history_daily(cursor, match_id, sport_type,
 def save_to_database(all_data):
     """
     将所有赛事数据写入 PostgreSQL 数据库
-    包含 AI 分析报告生成 (使用 OpenRouter DeepSeek R1 + Gemini Flash)
+    包含 AI 分析报告生成 (使用 OpenRouter)
     """
     print("\n" + "=" * 60)
     print("[入库] 正在写入数据库...")
