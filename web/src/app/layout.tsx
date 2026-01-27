@@ -12,6 +12,10 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "PolyDelta | Crypto Prediction Arbitrage",
   description: "Track real-time odds discrepancies between Polymarket and traditional bookmakers.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
