@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { PremiumLock } from './PremiumLock'
 
 // Calculator data type (compatible with MatchCard and ArbitrageCard)
 export interface CalculatorData {
@@ -739,41 +740,43 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 })()}
               </div>
 
-              {/* Arbitrage Results */}
-              {arbitrageResult ? (
-                <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  <div className="text-sm font-medium text-[#e6edf3] mb-2">{txt.recommendedAlloc}</div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#d29922]">
-                      {type === 'match' && arbitrageResult.web2Team
-                        ? `Bet ${arbitrageResult.web2Team} (${data.sourceBookmaker || 'Trad Bookie'}):`
-                        : `Bet on ${data.sourceBookmaker || 'Trad Bookie'}:`}
-                    </span>
-                    <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betWeb2.toFixed(2)}</span>
+              {/* Arbitrage Results - Wrapped with PremiumLock */}
+              <PremiumLock ctaText="Sign in to view Arbitrage Results">
+                {arbitrageResult ? (
+                  <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
+                    <div className="text-sm font-medium text-[#e6edf3] mb-2">{txt.recommendedAlloc}</div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
+                      <span className="text-sm text-[#d29922]">
+                        {type === 'match' && arbitrageResult.web2Team
+                          ? `Bet ${arbitrageResult.web2Team} (${data.sourceBookmaker || 'Trad Bookie'}):`
+                          : `Bet on ${data.sourceBookmaker || 'Trad Bookie'}:`}
+                      </span>
+                      <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betWeb2.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
+                      <span className="text-sm text-[#58a6ff]">
+                        {type === 'match' && arbitrageResult.polyTeam
+                          ? `Bet ${arbitrageResult.polyTeam} (Polymarket):`
+                          : `Bet on Polymarket:`}
+                      </span>
+                      <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betPoly.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-sm text-[#8b949e]">{txt.guaranteedProfit}:</span>
+                      <span className={`font-mono font-bold text-lg ${arbitrageResult.guaranteedProfit >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                        ${arbitrageResult.guaranteedProfit.toFixed(2)} ({arbitrageResult.roi > 0 ? '+' : ''}{arbitrageResult.roi.toFixed(2)}%)
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-[#6e7681] mt-2 text-center">
+                      {txt.calcNote}
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#30363d]">
-                    <span className="text-sm text-[#58a6ff]">
-                      {type === 'match' && arbitrageResult.polyTeam
-                        ? `Bet ${arbitrageResult.polyTeam} (Polymarket):`
-                        : `Bet on Polymarket:`}
-                    </span>
-                    <span className="font-mono font-bold text-[#e6edf3]">${arbitrageResult.betPoly.toFixed(2)}</span>
+                ) : (
+                  <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
+                    {txt.insufficientArb}
                   </div>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-sm text-[#8b949e]">{txt.guaranteedProfit}:</span>
-                    <span className={`font-mono font-bold text-lg ${arbitrageResult.guaranteedProfit >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                      ${arbitrageResult.guaranteedProfit.toFixed(2)} ({arbitrageResult.roi > 0 ? '+' : ''}{arbitrageResult.roi.toFixed(2)}%)
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-[#6e7681] mt-2 text-center">
-                    {txt.calcNote}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  {txt.insufficientArb}
-                </div>
-              )}
+                )}
+              </PremiumLock>
             </>
           )}
 
@@ -921,68 +924,70 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 </div>
               </div>
 
-              {/* Results Card */}
-              {kellyResult ? (
-                <div className="bg-[#0d1117]/50 rounded-lg p-4 border border-[#30363d]/50">
-                  {/* Buy Signal */}
-                  {kellyResult.signal === 'buy' && (
-                    <>
-                      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-[#3fb950]/20 p-2 rounded-full">
-                            <span className="text-xl">📈</span>
+              {/* Results Card - Wrapped with PremiumLock */}
+              <PremiumLock ctaText="Sign in to view Kelly Suggestions">
+                {kellyResult ? (
+                  <div className="bg-[#0d1117]/50 rounded-lg p-4 border border-[#30363d]/50">
+                    {/* Buy Signal */}
+                    {kellyResult.signal === 'buy' && (
+                      <>
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-[#3fb950]/20 p-2 rounded-full">
+                              <span className="text-xl">📈</span>
+                            </div>
+                            <div>
+                              <p className="text-sm text-[#8b949e]">
+                                {txt.suggestedPos} ({kellyResult.stakePercent.toFixed(1)}%)
+                                {kellyResult.isCapped && <span className="text-[#d29922] ml-1">{txt.capped}</span>}
+                              </p>
+                              <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
+                                ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm text-[#8b949e]">
-                              {txt.suggestedPos} ({kellyResult.stakePercent.toFixed(1)}%)
-                              {kellyResult.isCapped && <span className="text-[#d29922] ml-1">{txt.capped}</span>}
-                            </p>
-                            <p className="text-2xl font-bold text-[#3fb950] tracking-tight font-mono">
-                              ${kellyResult.recommendedStake.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          <div className="text-right border-l border-[#30363d] pl-4">
+                            <p className="text-xs text-[#6e7681]">{txt.edge}</p>
+                            <p className="text-lg font-mono text-[#3fb950]">
+                              +{kellyResult.edge.toFixed(2)}%
                             </p>
                           </div>
                         </div>
-                        <div className="text-right border-l border-[#30363d] pl-4">
-                          <p className="text-xs text-[#6e7681]">{txt.edge}</p>
-                          <p className="text-lg font-mono text-[#3fb950]">
-                            +{kellyResult.edge.toFixed(2)}%
+                        {/* Details Row */}
+                        <div className="mt-3 pt-3 border-t border-[#30363d]/50 grid grid-cols-2 gap-4 text-xs">
+                          <div>
+                            <span className="text-[#6e7681]">{txt.effectiveOdds}: </span>
+                            <span className="text-[#e6edf3] font-mono">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[#6e7681]">{txt.rawKelly}: </span>
+                            <span className="text-[#e6edf3] font-mono">{kellyResult.rawKellyPercent.toFixed(1)}%</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Negative EV / Loss Signal */}
+                    {(kellyResult.signal === 'negative_ev' || kellyResult.signal === 'loss') && (
+                      <div className="flex items-center gap-3 text-[#f85149]">
+                        <span className="text-2xl">⚠️</span>
+                        <div>
+                          <p className="font-bold">{txt.dontBet}</p>
+                          <p className="text-xs text-[#f85149]/70">
+                            {kellyResult.signal === 'loss'
+                              ? txt.negativeOdds
+                              : txt.negativeEv}
                           </p>
                         </div>
                       </div>
-                      {/* Details Row */}
-                      <div className="mt-3 pt-3 border-t border-[#30363d]/50 grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <span className="text-[#6e7681]">{txt.effectiveOdds}: </span>
-                          <span className="text-[#e6edf3] font-mono">{(kellyResult.effectiveNetOdds * 100).toFixed(2)}%</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[#6e7681]">{txt.rawKelly}: </span>
-                          <span className="text-[#e6edf3] font-mono">{kellyResult.rawKellyPercent.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Negative EV / Loss Signal */}
-                  {(kellyResult.signal === 'negative_ev' || kellyResult.signal === 'loss') && (
-                    <div className="flex items-center gap-3 text-[#f85149]">
-                      <span className="text-2xl">⚠️</span>
-                      <div>
-                        <p className="font-bold">{txt.dontBet}</p>
-                        <p className="text-xs text-[#f85149]/70">
-                          {kellyResult.signal === 'loss'
-                            ? txt.negativeOdds
-                            : txt.negativeEv}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  {txt.insufficientKelly}
-                </div>
-              )}
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
+                    {txt.insufficientKelly}
+                  </div>
+                )}
+              </PremiumLock>
 
               {/* Liquidity Warning */}
               {(() => {
@@ -1097,82 +1102,84 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 </div>
               </div>
 
-              {/* Net ROI Results */}
-              {netROIResult ? (
-                <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
-                  {/* Verdict Banner */}
-                  <div className={`text-center py-2 px-3 rounded-lg ${
-                    netROIResult.verdict.betterPlatform === 'Polymarket'
-                      ? 'bg-[#58a6ff]/20 text-[#58a6ff]'
-                      : 'bg-[#d29922]/20 text-[#d29922]'
-                  }`}>
-                    <span className="font-bold">{netROIResult.verdict.betterPlatform}</span>
-                    <span className="text-sm">{txt.isBetterBy}</span>
-                    <span className="font-bold">+{netROIResult.verdict.roiAdvantage.toFixed(2)}%</span>
-                  </div>
-
-                  {/* ROI Comparison */}
-                  <div className="grid grid-cols-2 gap-4 pt-2">
-                    <div className={`p-3 rounded-lg ${
-                      netROIResult.verdict.betterPlatform === 'Traditional'
-                        ? 'bg-[#d29922]/10 border border-[#d29922]/40'
-                        : 'bg-[#21262d]'
-                    }`}>
-                      <div className="text-xs text-[#d29922] mb-1">{data.sourceBookmaker || 'Trad Bookie'}</div>
-                      <div className={`text-xl font-mono font-bold ${
-                        netROIResult.trad.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
-                      }`}>
-                        {netROIResult.trad.netROI > 0 ? '+' : ''}{netROIResult.trad.netROI.toFixed(2)}%
-                      </div>
-                      <div className="text-xs text-[#8b949e]">
-                        ${netROIResult.trad.netProfit.toFixed(2)} {txt.profit}
-                      </div>
-                    </div>
-                    <div className={`p-3 rounded-lg ${
+              {/* Net ROI Results - Wrapped with PremiumLock */}
+              <PremiumLock ctaText="Sign in to view ROI Comparison">
+                {netROIResult ? (
+                  <div className="bg-[#0d1117] rounded-lg p-4 space-y-3">
+                    {/* Verdict Banner */}
+                    <div className={`text-center py-2 px-3 rounded-lg ${
                       netROIResult.verdict.betterPlatform === 'Polymarket'
-                        ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/40'
-                        : 'bg-[#21262d]'
+                        ? 'bg-[#58a6ff]/20 text-[#58a6ff]'
+                        : 'bg-[#d29922]/20 text-[#d29922]'
                     }`}>
-                      <div className="text-xs text-[#58a6ff] mb-1">Polymarket</div>
-                      <div className={`text-xl font-mono font-bold ${
-                        netROIResult.poly.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
-                      }`}>
-                        {netROIResult.poly.netROI > 0 ? '+' : ''}{netROIResult.poly.netROI.toFixed(2)}%
-                      </div>
-                      <div className="text-xs text-[#8b949e]">
-                        ${netROIResult.poly.netProfit.toFixed(2)} {txt.profit}
-                      </div>
+                      <span className="font-bold">{netROIResult.verdict.betterPlatform}</span>
+                      <span className="text-sm">{txt.isBetterBy}</span>
+                      <span className="font-bold">+{netROIResult.verdict.roiAdvantage.toFixed(2)}%</span>
                     </div>
-                  </div>
 
-                  {/* Hidden Costs Breakdown */}
-                  <div className="pt-2 border-t border-[#30363d]">
-                    <div className="text-xs text-[#8b949e] mb-2">{txt.hiddenCosts}</div>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-[#6e7681]">{txt.gasFee}:</span>
-                        <span className="text-[#f85149]">-${netROIResult.poly.details.gasDeducted.toFixed(2)}</span>
+                    {/* ROI Comparison */}
+                    <div className="grid grid-cols-2 gap-4 pt-2">
+                      <div className={`p-3 rounded-lg ${
+                        netROIResult.verdict.betterPlatform === 'Traditional'
+                          ? 'bg-[#d29922]/10 border border-[#d29922]/40'
+                          : 'bg-[#21262d]'
+                      }`}>
+                        <div className="text-xs text-[#d29922] mb-1">{data.sourceBookmaker || 'Trad Bookie'}</div>
+                        <div className={`text-xl font-mono font-bold ${
+                          netROIResult.trad.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                        }`}>
+                          {netROIResult.trad.netROI > 0 ? '+' : ''}{netROIResult.trad.netROI.toFixed(2)}%
+                        </div>
+                        <div className="text-xs text-[#8b949e]">
+                          ${netROIResult.trad.netProfit.toFixed(2)} {txt.profit}
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#6e7681]">{txt.exchangeFee} ({netROIResult.poly.details.feeRateApplied}):</span>
-                        <span className="text-[#f85149]">-${netROIResult.poly.details.exchangeFeeAmt.toFixed(4)}</span>
+                      <div className={`p-3 rounded-lg ${
+                        netROIResult.verdict.betterPlatform === 'Polymarket'
+                          ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/40'
+                          : 'bg-[#21262d]'
+                      }`}>
+                        <div className="text-xs text-[#58a6ff] mb-1">Polymarket</div>
+                        <div className={`text-xl font-mono font-bold ${
+                          netROIResult.poly.netROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                        }`}>
+                          {netROIResult.poly.netROI > 0 ? '+' : ''}{netROIResult.poly.netROI.toFixed(2)}%
+                        </div>
+                        <div className="text-xs text-[#8b949e]">
+                          ${netROIResult.poly.netProfit.toFixed(2)} {txt.profit}
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#6e7681]">{txt.effectivePrice}:</span>
-                        <span className="text-[#e6edf3]">${netROIResult.poly.details.effectivePrice.toFixed(4)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#6e7681]">{txt.sharesBought}:</span>
-                        <span className="text-[#e6edf3]">{netROIResult.poly.shares.toFixed(2)}</span>
+                    </div>
+
+                    {/* Hidden Costs Breakdown */}
+                    <div className="pt-2 border-t border-[#30363d]">
+                      <div className="text-xs text-[#8b949e] mb-2">{txt.hiddenCosts}</div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-[#6e7681]">{txt.gasFee}:</span>
+                          <span className="text-[#f85149]">-${netROIResult.poly.details.gasDeducted.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6e7681]">{txt.exchangeFee} ({netROIResult.poly.details.feeRateApplied}):</span>
+                          <span className="text-[#f85149]">-${netROIResult.poly.details.exchangeFeeAmt.toFixed(4)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6e7681]">{txt.effectivePrice}:</span>
+                          <span className="text-[#e6edf3]">${netROIResult.poly.details.effectivePrice.toFixed(4)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6e7681]">{txt.sharesBought}:</span>
+                          <span className="text-[#e6edf3]">{netROIResult.poly.shares.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
-                  {txt.insufficientRoi}
-                </div>
-              )}
+                ) : (
+                  <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
+                    {txt.insufficientRoi}
+                  </div>
+                )}
+              </PremiumLock>
             </>
           )}
         </div>

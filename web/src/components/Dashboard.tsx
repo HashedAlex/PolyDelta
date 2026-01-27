@@ -137,9 +137,9 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
   return (
     <main className="min-h-screen p-6">
-      {/* Warning Banner */}
+      {/* Warning Banner - inline width */}
       {showBanner && (
-        <div className="mb-4 -mt-2 bg-[#d29922]/20 border border-[#d29922]/40 rounded-lg px-4 py-3 flex items-center justify-between">
+        <div className="mb-4 -mt-2 bg-[#d29922]/20 border border-[#d29922]/40 rounded-lg px-4 py-3 flex items-center gap-3 w-fit">
           <div className="flex items-center gap-2 text-sm text-[#d29922]">
             <span>⚠️</span>
             <span>{bannerText}</span>

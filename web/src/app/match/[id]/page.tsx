@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 // Link removed - using router.push for navigation
 import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
+import { PremiumLock } from '@/components/PremiumLock'
 
 interface MatchData {
   matchId: string
@@ -974,88 +975,92 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="px-6 py-5 space-y-4 bg-[#161b22]/50">
-                  {/* Mode Badge - Different for Championship vs Daily */}
-                  {match.isChampionship ? (
-                    // Championship: Show Undervalued/Fair/Overvalued
-                    <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                        strategy_card.status === 'Accumulate' ? 'bg-[#3fb950] text-black' :
-                        strategy_card.status === 'Sell' ? 'bg-[#f85149] text-white' :
-                        'bg-[#d29922] text-black'
-                      }`}>
-                        {strategy_card.status === 'Accumulate' ? '📈 Undervalued' :
-                         strategy_card.status === 'Sell' ? '📉 Overvalued' :
-                         '➡️ Fair Value'}
-                      </span>
-                      {kelly_suggestion?.edge && Math.abs(kelly_suggestion.edge) > 0 && (
-                        <span className={`text-sm font-mono ${kelly_suggestion.edge > 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                          {kelly_suggestion.edge > 0 ? '+' : ''}{kelly_suggestion.edge}% vs Trad
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    // Daily Match: Show Arbitrage/Value Bet/No Edge
-                    kelly_suggestion && (
-                      <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${getModeColor(kelly_suggestion.mode)}`}>
-                          {kelly_suggestion.mode}
-                        </span>
-                        {kelly_suggestion.edge && kelly_suggestion.edge > 0 && (
-                          <span className="text-sm font-mono text-[#3fb950]">
-                            +{kelly_suggestion.edge}% Edge
+                {/* Content - Wrapped with PremiumLock */}
+                <div className="px-6 py-5 bg-[#161b22]/50">
+                  <PremiumLock ctaText="Sign in to view Strategy Details">
+                    <div className="space-y-4">
+                      {/* Mode Badge - Different for Championship vs Daily */}
+                      {match.isChampionship ? (
+                        // Championship: Show Undervalued/Fair/Overvalued
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                            strategy_card.status === 'Accumulate' ? 'bg-[#3fb950] text-black' :
+                            strategy_card.status === 'Sell' ? 'bg-[#f85149] text-white' :
+                            'bg-[#d29922] text-black'
+                          }`}>
+                            {strategy_card.status === 'Accumulate' ? '📈 Undervalued' :
+                             strategy_card.status === 'Sell' ? '📉 Overvalued' :
+                             '➡️ Fair Value'}
                           </span>
-                        )}
-                      </div>
-                    )
-                  )}
-
-                  {/* Headline */}
-                  <div>
-                    <h3 className="text-lg font-bold text-[#e6edf3]">{strategy_card.headline}</h3>
-                  </div>
-
-                  {/* Analysis */}
-                  <div>
-                    <p className="text-sm text-[#8b949e] leading-relaxed">{strategy_card.analysis}</p>
-                  </div>
-
-                  {/* Kelly Advice */}
-                  <div className={`flex items-start gap-2 rounded-lg px-4 py-3 ${
-                    kelly_suggestion?.mode === 'Arbitrage (Risk-Free)' ? 'bg-[#3fb950]/10 border border-[#3fb950]/30' :
-                    kelly_suggestion?.mode === 'Value Bet (+EV)' ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/30' :
-                    'bg-[#21262d]'
-                  }`}>
-                    <span>🎯</span>
-                    <div>
-                      <span className="text-xs text-[#6e7681]">{txt.kellyAdvice}</span>
-                      <p className={`text-sm font-medium ${
-                        kelly_suggestion?.mode !== 'No Edge' ? 'text-[#3fb950]' : 'text-[#e6edf3]'
-                      }`}>{strategy_card.kelly_advice}</p>
-                      {kelly_suggestion && (
-                        <p className="text-xs text-[#8b949e] mt-1">
-                          {txt.action}: <span className="font-medium">{kelly_suggestion.suggestion}</span>
-                        </p>
+                          {kelly_suggestion?.edge && Math.abs(kelly_suggestion.edge) > 0 && (
+                            <span className={`text-sm font-mono ${kelly_suggestion.edge > 0 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                              {kelly_suggestion.edge > 0 ? '+' : ''}{kelly_suggestion.edge}% vs Trad
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        // Daily Match: Show Arbitrage/Value Bet/No Edge
+                        kelly_suggestion && (
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${getModeColor(kelly_suggestion.mode)}`}>
+                              {kelly_suggestion.mode}
+                            </span>
+                            {kelly_suggestion.edge && kelly_suggestion.edge > 0 && (
+                              <span className="text-sm font-mono text-[#3fb950]">
+                                +{kelly_suggestion.edge}% Edge
+                              </span>
+                            )}
+                          </div>
+                        )
                       )}
-                    </div>
-                  </div>
 
-                  {/* Hedging Tip - Championship Only */}
-                  {strategy_card.hedging_tip && (
-                    <div className="flex items-start gap-2 bg-[#58a6ff]/10 border border-[#58a6ff]/30 rounded-lg px-4 py-3">
-                      <span>💡</span>
+                      {/* Headline */}
                       <div>
-                        <span className="text-xs text-[#6e7681]">{txt.exitStrategy}</span>
-                        <p className="text-sm text-[#58a6ff] font-medium">{strategy_card.hedging_tip}</p>
+                        <h3 className="text-lg font-bold text-[#e6edf3]">{strategy_card.headline}</h3>
+                      </div>
+
+                      {/* Analysis */}
+                      <div>
+                        <p className="text-sm text-[#8b949e] leading-relaxed">{strategy_card.analysis}</p>
+                      </div>
+
+                      {/* Kelly Advice */}
+                      <div className={`flex items-start gap-2 rounded-lg px-4 py-3 ${
+                        kelly_suggestion?.mode === 'Arbitrage (Risk-Free)' ? 'bg-[#3fb950]/10 border border-[#3fb950]/30' :
+                        kelly_suggestion?.mode === 'Value Bet (+EV)' ? 'bg-[#58a6ff]/10 border border-[#58a6ff]/30' :
+                        'bg-[#21262d]'
+                      }`}>
+                        <span>🎯</span>
+                        <div>
+                          <span className="text-xs text-[#6e7681]">{txt.kellyAdvice}</span>
+                          <p className={`text-sm font-medium ${
+                            kelly_suggestion?.mode !== 'No Edge' ? 'text-[#3fb950]' : 'text-[#e6edf3]'
+                          }`}>{strategy_card.kelly_advice}</p>
+                          {kelly_suggestion && (
+                            <p className="text-xs text-[#8b949e] mt-1">
+                              {txt.action}: <span className="font-medium">{kelly_suggestion.suggestion}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Hedging Tip - Championship Only */}
+                      {strategy_card.hedging_tip && (
+                        <div className="flex items-start gap-2 bg-[#58a6ff]/10 border border-[#58a6ff]/30 rounded-lg px-4 py-3">
+                          <span>💡</span>
+                          <div>
+                            <span className="text-xs text-[#6e7681]">{txt.exitStrategy}</span>
+                            <p className="text-sm text-[#58a6ff] font-medium">{strategy_card.hedging_tip}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Risk Footer */}
+                      <div className="text-xs text-[#d29922] bg-[#d29922]/10 px-4 py-2 rounded-lg">
+                        {strategy_card.risk_text}
                       </div>
                     </div>
-                  )}
-
-                  {/* Risk Footer */}
-                  <div className="text-xs text-[#d29922] bg-[#d29922]/10 px-4 py-2 rounded-lg">
-                    {strategy_card.risk_text}
-                  </div>
+                  </PremiumLock>
                 </div>
 
                 {/* Timestamp */}
@@ -1099,56 +1104,58 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                     </div>
                   </div>
 
-                  {/* Key Insights */}
-                  {news_card.pillars && news_card.pillars.length > 0 && (
-                    <div className="space-y-3">
-                      <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">{txt.analysisBreakdown}</h4>
-                      {news_card.pillars.map((pillar, index) => (
-                        <div
-                          key={index}
-                          className={`rounded-lg p-3 border ${
-                            pillar.sentiment === 'positive' ? 'bg-[#3fb950]/5 border-[#3fb950]/30' :
-                            pillar.sentiment === 'negative' ? 'bg-[#f85149]/5 border-[#f85149]/30' :
-                            'bg-[#21262d] border-[#30363d]'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span>{pillar.icon}</span>
-                            <span className="text-sm font-bold text-[#e6edf3]">{pillar.title}</span>
-                            <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
-                              pillar.sentiment === 'positive' ? 'bg-[#3fb950]/20 text-[#3fb950]' :
-                              pillar.sentiment === 'negative' ? 'bg-[#f85149]/20 text-[#f85149]' :
-                              'bg-[#6e7681]/20 text-[#8b949e]'
-                            }`}>
-                              {pillar.sentiment === 'positive' ? `✓ ${txt.favorable}` :
-                               pillar.sentiment === 'negative' ? `✗ ${txt.unfavorable}` : `— ${txt.neutral}`}
-                            </span>
+                  {/* Key Insights - Wrapped with PremiumLock */}
+                  <PremiumLock ctaText="Sign in to view Full Analysis">
+                    {news_card.pillars && news_card.pillars.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">{txt.analysisBreakdown}</h4>
+                        {news_card.pillars.map((pillar, index) => (
+                          <div
+                            key={index}
+                            className={`rounded-lg p-3 border ${
+                              pillar.sentiment === 'positive' ? 'bg-[#3fb950]/5 border-[#3fb950]/30' :
+                              pillar.sentiment === 'negative' ? 'bg-[#f85149]/5 border-[#f85149]/30' :
+                              'bg-[#21262d] border-[#30363d]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span>{pillar.icon}</span>
+                              <span className="text-sm font-bold text-[#e6edf3]">{pillar.title}</span>
+                              <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
+                                pillar.sentiment === 'positive' ? 'bg-[#3fb950]/20 text-[#3fb950]' :
+                                pillar.sentiment === 'negative' ? 'bg-[#f85149]/20 text-[#f85149]' :
+                                'bg-[#6e7681]/20 text-[#8b949e]'
+                              }`}>
+                                {pillar.sentiment === 'positive' ? `✓ ${txt.favorable}` :
+                                 pillar.sentiment === 'negative' ? `✗ ${txt.unfavorable}` : `— ${txt.neutral}`}
+                              </span>
+                            </div>
+                            <p className="text-sm text-[#8b949e] leading-relaxed">{pillar.content}</p>
                           </div>
-                          <p className="text-sm text-[#8b949e] leading-relaxed">{pillar.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Legacy Factors (fallback) */}
-                  {(!news_card.pillars || news_card.pillars.length === 0) && news_card.factors && (
-                    <div>
-                      <h4 className="text-xs text-[#6e7681] mb-2">{txt.keyFactors}</h4>
-                      <ul className="space-y-2">
-                        {news_card.factors.map((factor, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-[#8b949e]">
-                            <span className="text-[#58a6ff] mt-0.5">•</span>
-                            <span>{factor}</span>
-                          </li>
                         ))}
-                      </ul>
-                    </div>
-                  )}
+                      </div>
+                    )}
 
-                  {/* Disclaimer Footer */}
-                  <div className="text-xs text-[#6e7681] bg-[#21262d] px-4 py-2 rounded-lg">
-                    {news_card.news_footer}
-                  </div>
+                    {/* Legacy Factors (fallback) */}
+                    {(!news_card.pillars || news_card.pillars.length === 0) && news_card.factors && (
+                      <div>
+                        <h4 className="text-xs text-[#6e7681] mb-2">{txt.keyFactors}</h4>
+                        <ul className="space-y-2">
+                          {news_card.factors.map((factor, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm text-[#8b949e]">
+                              <span className="text-[#58a6ff] mt-0.5">•</span>
+                              <span>{factor}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Disclaimer Footer */}
+                    <div className="text-xs text-[#6e7681] bg-[#21262d] px-4 py-2 rounded-lg">
+                      {news_card.news_footer}
+                    </div>
+                  </PremiumLock>
                 </div>
               </section>
             </>
