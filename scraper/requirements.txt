@@ -8,3 +8,6 @@ python-Levenshtein>=0.27.0
 # Intelligence Service Dependencies
 feedparser>=6.0.0
 httpx>=0.25.0
+
+# LLM Provider Dependencies (OpenRouter via OpenAI SDK)
+openai>=1.0.0

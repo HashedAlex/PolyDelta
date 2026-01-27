@@ -35,7 +35,7 @@ interface StrategyCard {
   hedging_tip?: string  // Championship only: exit strategy suggestion
 }
 
-// 4-Pillar Analysis Model
+// Key Insights Analysis Model
 interface PillarAnalysis {
   icon: string
   title: string
@@ -47,7 +47,7 @@ interface NewsCard {
   prediction: string
   confidence: 'High' | 'Medium' | 'Low'  // >75%, 55-75%, <55%
   confidence_pct: number
-  pillars: PillarAnalysis[]  // 4-Pillar Model
+  pillars: PillarAnalysis[]  // Key Insights (2-3 max)
   factors: string[]  // Legacy support
   news_footer: string
 }
@@ -415,7 +415,7 @@ function parseAIAnalysis(
           `Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`,
           `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`
         ],
-        news_footer: '🚫 4-Pillar analysis based on public data. AI cannot predict random sports events.'
+        news_footer: '🚫 AI analysis based on public data. AI cannot predict random sports events.'
       },
       kelly_suggestion: kellySuggestion
     }
@@ -567,7 +567,7 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
     action: 'Action',
     exitStrategy: 'Exit Strategy',
     updated: 'Updated',
-    aiPrediction: 'AI Prediction (4-Pillar Model)',
+    aiPrediction: 'AI Analysis',
     prediction: 'Prediction',
     analysisBreakdown: 'Analysis Breakdown',
     favorable: 'Favorable',
@@ -817,16 +817,89 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
           </section>
         )}
 
-        {/* Championship Info Card - Only show for championship */}
+        {/* Championship Odds Card - Only show for championship */}
         {match.isChampionship && (
           <section className="bg-[#161b22] rounded-xl border border-[#30363d] p-6">
-            <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2 mb-4">
-              <span>🏆</span>
-              <span>{txt.championshipOdds}</span>
-            </h2>
-            <p className="text-[#8b949e] text-sm">
-              {txt.viewChampionshipOdds}
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
+                <span>🏆</span>
+                <span>{txt.championshipOdds}</span>
+              </h2>
+              <button
+                onClick={() => setShowCalculator(true)}
+                className="px-4 py-2 bg-[#238636] hover:bg-[#2ea043] text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+              >
+                <span>🧮</span>
+                <span>{txt.openCalculator}</span>
+              </button>
+            </div>
+
+            {/* Odds Display */}
+            <div className="bg-[#0d1117] rounded-lg p-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                {/* Traditional Bookmaker */}
+                <div>
+                  <div className="text-xs text-[#8b949e] mb-1">
+                    {match.sourceBookmaker ? (
+                      match.sourceUrl ? (
+                        <a href={match.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#d29922] hover:underline">
+                          {match.sourceBookmaker}
+                        </a>
+                      ) : (
+                        <span className="text-[#d29922]">{match.sourceBookmaker}</span>
+                      )
+                    ) : (
+                      'Trad Odds'
+                    )}
+                  </div>
+                  <div className="text-2xl font-mono font-bold text-[#d29922]">
+                    {match.web2HomeOdds ? `${(match.web2HomeOdds * 100).toFixed(1)}%` : '-'}
+                  </div>
+                </div>
+
+                {/* Polymarket */}
+                <div>
+                  <div className="text-xs text-[#8b949e] mb-1">
+                    {match.polymarketUrl ? (
+                      <a href={match.polymarketUrl} target="_blank" rel="noopener noreferrer" className="text-[#58a6ff] hover:underline">
+                        Polymarket
+                      </a>
+                    ) : (
+                      'Polymarket'
+                    )}
+                  </div>
+                  <div className="text-2xl font-mono font-bold text-[#58a6ff]">
+                    {match.polyHomePrice ? `${(match.polyHomePrice * 100).toFixed(1)}%` : '-'}
+                  </div>
+                </div>
+
+                {/* EV */}
+                <div>
+                  <div className="text-xs text-[#8b949e] mb-1">EV Diff</div>
+                  <div className={`text-2xl font-mono font-bold ${
+                    homeEV && homeEV > 0 ? 'text-[#3fb950]' :
+                    homeEV && homeEV < 0 ? 'text-[#f85149]' :
+                    'text-[#8b949e]'
+                  }`}>
+                    {homeEV ? `${homeEV > 0 ? '+' : ''}${homeEV.toFixed(1)}%` : '-'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Value indicator */}
+              {homeEV && Math.abs(homeEV) >= 5 && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-center text-sm font-medium ${
+                  homeEV > 0
+                    ? 'bg-[#3fb950]/10 text-[#3fb950] border border-[#3fb950]/30'
+                    : 'bg-[#f85149]/10 text-[#f85149] border border-[#f85149]/30'
+                }`}>
+                  {homeEV > 0
+                    ? `📈 Polymarket undervalued by ${homeEV.toFixed(1)}% - Potential value bet`
+                    : `📉 Polymarket overvalued by ${Math.abs(homeEV).toFixed(1)}% - Consider selling`
+                  }
+                </div>
+              )}
+            </div>
           </section>
         )}
 
@@ -994,7 +1067,7 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                 )}
               </section>
 
-              {/* Card 3: News Card (4-Pillar Analysis) */}
+              {/* Card 3: News Card (AI Analysis) */}
               <section className="bg-[#161b22] rounded-xl border border-[#30363d] overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-[#30363d]">
@@ -1026,7 +1099,7 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                     </div>
                   </div>
 
-                  {/* 4 Pillars */}
+                  {/* Key Insights */}
                   {news_card.pillars && news_card.pillars.length > 0 && (
                     <div className="space-y-3">
                       <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">{txt.analysisBreakdown}</h4>

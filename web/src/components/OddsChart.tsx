@@ -16,6 +16,7 @@ interface HistoryDataPoint {
   web2: number | null
   poly: number | null
   time: string
+  timeLabel?: string
 }
 
 interface OddsChartProps {
@@ -23,6 +24,22 @@ interface OddsChartProps {
   eventType: 'championship' | 'daily'
   sportType: string
   teamName?: string
+}
+
+// Aggregate data by day - take the last value of each day
+function aggregateByDay(data: HistoryDataPoint[]): HistoryDataPoint[] {
+  const dayMap = new Map<string, HistoryDataPoint>()
+
+  for (const point of data) {
+    const date = new Date(point.time)
+    const dayKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+    // Keep the latest value for each day
+    dayMap.set(dayKey, point)
+  }
+
+  return Array.from(dayMap.values()).sort((a, b) =>
+    new Date(a.time).getTime() - new Date(b.time).getTime()
+  )
 }
 
 export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChartProps) {
@@ -53,9 +70,12 @@ export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChart
 
       const result = await response.json()
 
-      if (result.success && result.data) {
-        // 格式化时间显示
-        const formattedData = result.data.map((d: HistoryDataPoint) => ({
+      if (result.success && result.data && result.data.length > 0) {
+        // Aggregate by day for cleaner display
+        const aggregated = aggregateByDay(result.data)
+
+        // Format time display (date only, no hours)
+        const formattedData = aggregated.map((d: HistoryDataPoint) => ({
           ...d,
           timeLabel: formatTime(d.time)
         }))
@@ -71,14 +91,12 @@ export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChart
     }
   }
 
+  // Format as date only (e.g., "Jan 20")
   const formatTime = (isoString: string) => {
     const date = new Date(isoString)
     return date.toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
+      day: 'numeric'
     })
   }
 
@@ -123,12 +141,12 @@ export function OddsChart({ eventId, eventType, sportType, teamName }: OddsChart
                     interval="preserveStartEnd"
                   />
                   <YAxis
-                    domain={[0, 100]}
+                    domain={['auto', 'auto']}
                     tick={{ fill: '#8b949e', fontSize: 10 }}
                     axisLine={{ stroke: '#30363d' }}
                     tickLine={{ stroke: '#30363d' }}
                     tickFormatter={(value) => `${value}%`}
-                    width={40}
+                    width={45}
                   />
                   <Tooltip
                     contentStyle={{

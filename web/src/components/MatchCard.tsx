@@ -293,7 +293,7 @@ export function MatchCard({
       {/* History Chart (Home Team) */}
       {matchId && (
         <OddsChart
-          eventId={`${matchId}_home`}
+          eventId={matchId}
           eventType="daily"
           sportType="nba"
           teamName={`${homeTeam} (Home)`}

@@ -29,18 +29,28 @@ export async function GET(
         recorded_at: 'asc'
       },
       select: {
+        // Championship fields
         web2_odds: true,
         polymarket_price: true,
+        // Daily match fields
+        web2_home_odds: true,
+        poly_home_price: true,
         recorded_at: true
       }
     })
 
-    // 格式化返回数据
-    const formattedHistory = history.map(h => ({
-      web2: h.web2_odds ? Math.round(h.web2_odds * 10000) / 100 : null, // 转为百分比
-      poly: h.polymarket_price ? Math.round(h.polymarket_price * 10000) / 100 : null,
-      time: h.recorded_at.toISOString()
-    }))
+    // 格式化返回数据 - 根据 eventType 选择正确的字段
+    const formattedHistory = history.map(h => {
+      // Daily matches use home odds, championship uses single odds
+      const web2Value = eventType === 'daily' ? h.web2_home_odds : h.web2_odds
+      const polyValue = eventType === 'daily' ? h.poly_home_price : h.polymarket_price
+
+      return {
+        web2: web2Value ? Math.round(web2Value * 10000) / 100 : null, // 转为百分比
+        poly: polyValue ? Math.round(polyValue * 10000) / 100 : null,
+        time: h.recorded_at.toISOString()
+      }
+    })
 
     return NextResponse.json({
       success: true,
