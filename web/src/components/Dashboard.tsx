@@ -52,8 +52,9 @@ interface DashboardProps {
 
 // 一级导航类型
 type SportType = 'worldcup' | 'nba'
-// 二级导航类型 (NBA only)
+// 二级导航类型
 type NbaSubTab = 'daily' | 'championship'
+type FifaSubTab = 'championship' // 将来可添加: 'group_winners' | 'daily'
 
 /**
  * 获取比赛的优先级分数（用于排序）
@@ -96,6 +97,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   const sub = searchParams.get('sub')
   const activeSport: SportType = tab === 'nba' ? 'nba' : 'worldcup'
   const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
+  const fifaSubTab: FifaSubTab = 'championship' // 目前只有championship，将来可扩展
 
   // Only local UI state uses useState
   const [hideLowOdds, setHideLowOdds] = useState(true)
@@ -108,12 +110,16 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
     if (sport === 'nba') {
       router.push('/?tab=nba&sub=championship', { scroll: false })
     } else {
-      router.push('/?tab=worldcup', { scroll: false })
+      router.push('/?tab=worldcup&sub=championship', { scroll: false })
     }
   }
 
   const setNbaSubTab = (subTab: NbaSubTab) => {
     router.push(`/?tab=nba&sub=${subTab}`, { scroll: false })
+  }
+
+  const setFifaSubTab = (subTab: FifaSubTab) => {
+    router.push(`/?tab=worldcup&sub=${subTab}`, { scroll: false })
   }
 
   // 冠军盘口数据过滤
@@ -287,9 +293,40 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         </div>
       )}
 
-      {/* Hide < 1% Toggle for World Cup */}
+      {/* 二级导航 - FIFA Sub-tabs */}
       {activeSport === 'worldcup' && (
         <div className="flex items-center gap-4 mb-6">
+          <div className="flex gap-2 p-1 bg-[#0d1117] rounded-lg">
+            <button
+              onClick={() => setFifaSubTab('championship')}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                transition-all duration-200
+                ${fifaSubTab === 'championship'
+                  ? 'bg-[#3fb950] text-black'
+                  : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                }
+              `}
+            >
+              <span>🏆</span>
+              <span>Championship</span>
+              <span className={`px-1.5 py-0.5 rounded text-xs ${fifaSubTab === 'championship' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
+                {worldCupMarkets.length}
+              </span>
+            </button>
+            {/* 将来可在此添加更多sub-tabs:
+            <button onClick={() => setFifaSubTab('group_winners')}>
+              <span>📊</span>
+              <span>Group Winners</span>
+            </button>
+            <button onClick={() => setFifaSubTab('daily')}>
+              <span>📅</span>
+              <span>Daily Matches</span>
+            </button>
+            */}
+          </div>
+
+          {/* Hide < 1% Toggle */}
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <div className="relative">
               <input
@@ -306,12 +343,12 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         </div>
       )}
 
-      {/* ========== World Cup Content ========== */}
-      {activeSport === 'worldcup' && (
+      {/* ========== FIFA Championship Content ========== */}
+      {activeSport === 'worldcup' && fifaSubTab === 'championship' && (
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">⚽</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">FIFA World Cup 2026</h2>
+            <span className="text-2xl">🏆</span>
+            <h2 className="text-xl font-bold text-[#e6edf3]">FIFA World Cup 2026 - Championship</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {hideLowOdds && filteredWorldCupMarkets.length !== worldCupMarkets.length
                 ? `${filteredWorldCupMarkets.length} / ${worldCupMarkets.length} teams`
@@ -338,11 +375,25 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              No World Cup data available
+              No World Cup championship data available
             </div>
           )}
         </section>
       )}
+
+      {/* 将来可在此添加其他FIFA sub-tabs的内容:
+      {activeSport === 'worldcup' && fifaSubTab === 'group_winners' && (
+        <section>
+          Group Winners content here...
+        </section>
+      )}
+
+      {activeSport === 'worldcup' && fifaSubTab === 'daily' && (
+        <section>
+          Daily matches content here...
+        </section>
+      )}
+      */}
 
       {/* ========== NBA Daily Matches Content ========== */}
       {activeSport === 'nba' && nbaSubTab === 'daily' && (

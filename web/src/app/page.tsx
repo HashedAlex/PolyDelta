@@ -12,8 +12,11 @@ function calculateEV(web2Odds: number | null, polyPrice: number | null): number 
 }
 
 export default async function Page() {
-  // 从数据库获取冠军盘口数据
+  // 从数据库获取冠军盘口数据（仅 championship 类型）
   const allData = await prisma.marketOdds.findMany({
+    where: {
+      prop_type: 'championship',
+    },
     orderBy: [
       { sport_type: 'asc' },
       { web2_odds: 'desc' },

@@ -22,10 +22,13 @@ model MarketOdds {
   ai_analysis        String?
   analysis_timestamp DateTime? @db.Timestamp(6)
   liquidity_usdc     Float?
+  prop_type          String?   @default("championship") @db.VarChar(50)
+  event_id           String?   @db.VarChar(50)
 
   @@index([sport_type, team_name], map: "idx_sport_team")
   @@index([sport_type], map: "idx_sport_type")
   @@index([team_name], map: "idx_team_name")
+  @@index([prop_type], map: "idx_prop_type")
   @@map("market_odds")
 }
 

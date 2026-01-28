@@ -849,6 +849,92 @@ def fetch_polymarket_data(sport_type):
         return {}
 
 
+def fetch_fifa_qualification_markets():
+    """
+    从 Polymarket 获取 FIFA World Cup 2026 出线预测市场
+    Event ID: 26313 - "2026 FIFA World Cup: Which countries qualify?"
+    返回: {country_name: {"price": float, "url": str, "liquidity": float}}
+    """
+    print(f"\n[Polymarket] 正在获取 FIFA World Cup 2026 出线预测...")
+
+    EVENT_ID = "26313"
+    url = f"https://gamma-api.polymarket.com/events/{EVENT_ID}"
+
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        event = response.json()
+
+        markets = event.get("markets", [])
+        result = {}
+
+        # 匹配模式: "Will [Country] qualify for the 2026 FIFA World Cup?"
+        pattern = re.compile(r"Will (.+?) qualify for the \d{4} FIFA World Cup", re.IGNORECASE)
+
+        for market in markets:
+            question = market.get("question", "")
+            match = pattern.search(question)
+
+            if match:
+                country_name = match.group(1).strip()
+
+                # 获取 outcomes 和 prices
+                outcomes = market.get("outcomes", [])
+                outcome_prices = market.get("outcomePrices", [])
+
+                # 处理 JSON 字符串格式
+                if isinstance(outcomes, str):
+                    try:
+                        outcomes = json.loads(outcomes)
+                    except:
+                        outcomes = []
+                if isinstance(outcome_prices, str):
+                    try:
+                        outcome_prices = json.loads(outcome_prices)
+                    except:
+                        outcome_prices = []
+
+                # 找到 Yes 选项的价格（出线概率）
+                yes_price = None
+                for i, outcome in enumerate(outcomes):
+                    if outcome.lower() == "yes" and i < len(outcome_prices):
+                        try:
+                            yes_price = float(outcome_prices[i])
+                        except (ValueError, TypeError):
+                            pass
+                        break
+
+                if yes_price is not None:
+                    # 获取流动性数据
+                    liquidity = None
+                    token_map = get_market_token_ids(market)
+                    yes_token_id = token_map.get("yes")
+                    if yes_token_id:
+                        liquidity = fetch_polymarket_liquidity(yes_token_id, yes_price, side="buy")
+
+                    # 生成市场 URL
+                    slug = market.get("slug", market.get("id", ""))
+                    market_url = f"https://polymarket.com/market/{slug}"
+
+                    # 标准化国家名称
+                    standard_name = standardize_name(country_name, "poly")
+                    if not standard_name:
+                        standard_name = country_name  # 如果不在映射中，使用原名
+
+                    result[standard_name] = {
+                        "price": round(yes_price, 4),
+                        "url": market_url,
+                        "liquidity": liquidity
+                    }
+
+        print(f"[Polymarket] 获取到 {len(result)} 个国家的出线预测数据")
+        return result
+
+    except requests.exceptions.RequestException as e:
+        print(f"[Polymarket] 出线预测 API 请求失败: {e}")
+        return {}
+
+
 # ============================================
 # Kalshi 数据抓取 - 已禁用 (网络限制)
 # ============================================
@@ -1148,13 +1234,16 @@ def fetch_nba_matches_polymarket():
                 except:
                     pass
 
-            # 获取市场详情（价格）- 只找 H2H 市场（两队名作为选项）
+            # 获取市场详情（价格）- 优先找主市场 (Moneyline)，避免匹配到 Spread
             event_markets = event.get("markets", [])
 
             team1_price = None
             team2_price = None
+            best_match = None  # 存储最佳匹配的市场
 
+            # 第一遍：寻找主市场 (Question 格式: "Team1 vs. Team2")
             for market in event_markets:
+                question = market.get("question", "")
                 outcomes = market.get("outcomes", [])
                 outcome_prices = market.get("outcomePrices", [])
 
@@ -1175,10 +1264,13 @@ def fetch_nba_matches_polymarket():
                 if any(o in ["Yes", "No", "Over", "Under"] for o in outcomes):
                     continue
 
-                # 尝试匹配两个选项为两支队伍
-                matched_team1 = None
-                matched_team2 = None
+                # 跳过 Spread 和 Over/Under 市场
+                question_lower = question.lower()
+                if "spread" in question_lower or "o/u" in question_lower:
+                    continue
 
+                # 尝试匹配两个选项为两支队伍
+                matched_prices = {}
                 for i, outcome in enumerate(outcomes):
                     if i >= len(outcome_prices):
                         continue
@@ -1188,16 +1280,24 @@ def fetch_nba_matches_polymarket():
                         continue
 
                     outcome_team, _ = fuzzy_match_team(outcome)
-                    if outcome_team == std_team1:
-                        team1_price = price
-                        matched_team1 = True
-                    elif outcome_team == std_team2:
-                        team2_price = price
-                        matched_team2 = True
+                    if outcome_team in [std_team1, std_team2]:
+                        matched_prices[outcome_team] = price
 
-                # 如果成功匹配到两队价格，跳出循环
-                if matched_team1 and matched_team2:
-                    break
+                # 如果成功匹配到两队价格
+                if len(matched_prices) == 2:
+                    # 优先选择 Question 格式为 "Team vs. Team" 的主市场
+                    is_main_market = "vs." in question or "vs " in question.lower()
+
+                    if is_main_market or best_match is None:
+                        best_match = matched_prices
+                        # 找到主市场就停止
+                        if is_main_market:
+                            break
+
+            # 使用最佳匹配
+            if best_match:
+                team1_price = best_match.get(std_team1)
+                team2_price = best_match.get(std_team2)
 
             # 过滤已结束的比赛 (价格接近 100%/0%)
             if team1_price is not None and team2_price is not None:
@@ -1221,13 +1321,26 @@ def fetch_nba_matches_polymarket():
                     if end_time <= existing["end_time"]:
                         continue  # 现有的更新，跳过
 
-            # 获取 Token IDs 用于流动性查询
+            # 获取 Token IDs 用于流动性查询 - 只从主市场获取
             token_ids = {}
             for market in event_markets:
-                token_map = get_market_token_ids(market)
-                if token_map:
-                    token_ids = token_map
-                    break
+                question = market.get("question", "")
+                outcomes = market.get("outcomes", [])
+
+                if isinstance(outcomes, str):
+                    try:
+                        outcomes = json.loads(outcomes)
+                    except:
+                        continue
+
+                # 确保是主市场：包含 "vs." 且没有 Spread/O/U/Player
+                if "vs." in question and len(outcomes) == 2:
+                    question_lower = question.lower()
+                    if not any(kw in question_lower for kw in ["spread", "o/u", "1h", "points", "assists", "rebounds"]):
+                        token_map = get_market_token_ids(market)
+                        if token_map:
+                            token_ids = token_map
+                            break
 
             unique_matches[match_key] = {
                 "team1": std_team1,
@@ -1243,9 +1356,10 @@ def fetch_nba_matches_polymarket():
 
         matches = list(unique_matches.values())
 
-        # 获取流动性数据 (批量处理，限制请求数量)
+        # 获取流动性数据 (批量处理)
         print(f"[Polymarket] 正在获取流动性数据...")
-        for m in matches[:20]:  # 限制前 20 场以避免过多 API 请求
+        # 获取所有今日比赛的流动性（不限制数量，因为流动性数据对用户很重要）
+        for m in matches:
             token_ids = m.get("token_ids", {})
             team1_price = m.get("team1_price")
             team2_price = m.get("team2_price")
@@ -1797,14 +1911,14 @@ def save_to_database(all_data):
         # 清空现有数据
         cursor.execute("TRUNCATE TABLE market_odds RESTART IDENTITY;")
 
-        # 插入新数据（包含 AI 分析字段和流动性）
+        # 插入新数据（包含 AI 分析字段、流动性、prop_type 和 event_id）
         insert_sql = """
         INSERT INTO market_odds
             (sport_type, team_name, web2_odds, source_bookmaker, source_url,
              polymarket_price, polymarket_url, kalshi_price, kalshi_url,
-             liquidity_usdc, ai_analysis, analysis_timestamp, last_updated)
+             liquidity_usdc, ai_analysis, analysis_timestamp, prop_type, event_id, last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
         ai_generated_count = 0
@@ -1886,7 +2000,9 @@ def save_to_database(all_data):
                 record["kalshi_url"],
                 record.get("liquidity_usdc"),
                 ai_analysis,
-                analysis_timestamp
+                analysis_timestamp,
+                record.get("prop_type", "championship"),
+                record.get("event_id")
             ))
             # 保存历史记录 - 智能去重 (含流动性和 EV)
             if save_odds_history_championship(
@@ -1953,6 +2069,82 @@ def save_to_database(all_data):
         return False
 
 
+def save_fifa_qualification_markets():
+    """
+    获取并保存 FIFA World Cup 2026 出线预测市场
+    """
+    print("\n" + "=" * 60)
+    print("[FIFA Props] 正在处理出线预测市场...")
+    print("=" * 60)
+
+    # 获取出线预测数据
+    qualification_data = fetch_fifa_qualification_markets()
+
+    if not qualification_data:
+        print("[FIFA Props] 未获取到出线预测数据")
+        return 0
+
+    if not DATABASE_URL:
+        print("[FIFA Props] 错误: DATABASE_URL 未设置")
+        return 0
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor()
+
+        # 插入出线预测数据
+        insert_sql = """
+        INSERT INTO market_odds
+            (sport_type, team_name, polymarket_price, polymarket_url,
+             liquidity_usdc, prop_type, event_id, last_updated)
+        VALUES
+            (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+        """
+
+        saved_count = 0
+        for country, data in qualification_data.items():
+            cursor.execute(insert_sql, (
+                "world_cup",  # sport_type
+                country,      # team_name
+                data["price"],
+                data["url"],
+                data.get("liquidity"),
+                "qualification",  # prop_type
+                "26313"  # event_id for FIFA qualification event
+            ))
+            saved_count += 1
+
+        conn.commit()
+        print(f"[FIFA Props] 成功保存 {saved_count} 个国家的出线预测数据")
+
+        # 显示预览
+        cursor.execute("""
+            SELECT team_name, polymarket_price, liquidity_usdc
+            FROM market_odds
+            WHERE prop_type = 'qualification'
+            ORDER BY polymarket_price DESC
+            LIMIT 10
+        """)
+
+        print("\n出线概率 Top 10:")
+        print("-" * 60)
+        print(f"{'国家':<25} {'出线概率':<15} {'流动性 (USDC)':<15}")
+        print("-" * 60)
+        for row in cursor.fetchall():
+            prob = f"{row[1]:.1%}" if row[1] else "N/A"
+            liq = f"${row[2]:.0f}" if row[2] else "N/A"
+            print(f"{row[0]:<25} {prob:<15} {liq:<15}")
+        print("-" * 60)
+
+        cursor.close()
+        conn.close()
+        return saved_count
+
+    except psycopg2.Error as e:
+        print(f"[FIFA Props] 数据库错误: {e}")
+        return 0
+
+
 # ============================================
 # 主函数
 # ============================================
@@ -2000,6 +2192,9 @@ def main():
     # 5. 统一入库 (冠军盘口)
     save_to_database(all_data)
 
+    # 5.5. 获取 FIFA 出线预测市场 (Props)
+    fifa_qualification_count = save_fifa_qualification_markets()
+
     # 6. 获取每日比赛 (H2H)
     daily_matches = fetch_and_save_nba_matches()
 
@@ -2011,6 +2206,8 @@ def main():
     for sport, s in stats.items():
         print(f"  {sport}: Web2={s['web2']}, Poly={s['poly']}, 合并={s['merged']}")
     print(f"  总计: {len(all_data)} 条记录")
+    print(f"\n[FIFA Props]")
+    print(f"  出线预测: {fifa_qualification_count} 个国家")
     print(f"\n[每日比赛 H2H]")
     print(f"  NBA: {len(daily_matches)} 场比赛")
     matched = sum(1 for m in daily_matches if m.get("poly_home_price"))
