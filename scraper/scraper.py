@@ -2190,8 +2190,10 @@ def fetch_soccer_matches_polymarket(sport_type):
                 "url": poly_url,
             })
 
-            print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} "
-                  f"({home_price*100:.1f}% / {draw_price*100 if draw_price else 0:.1f}% / {away_price*100:.1f}%)")
+            home_pct = f"{home_price*100:.1f}%" if home_price else "-"
+            draw_pct = f"{draw_price*100:.1f}%" if draw_price else "-"
+            away_pct = f"{away_price*100:.1f}%" if away_price else "-"
+            print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} ({home_pct} / {draw_pct} / {away_pct})")
 
         print(f"[Polymarket] 获取到 {len(matches)} 场 {sport_type.upper()} 比赛市场")
         return matches
