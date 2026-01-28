@@ -546,13 +546,32 @@ def process_web2_data(data):
         display_name = BOOKMAKER_DISPLAY_NAMES.get(bookmaker_key, best["title"])
 
         team_data[team] = {
-            "odds": round(avg_prob, 4),  # 使用平均胜率
+            "odds": avg_prob,  # 临时存储原始概率，稍后去抽水
             "bookmaker": display_name,
             "bookmaker_key": bookmaker_key,
             "bookmaker_url": bookmaker_url,
         }
 
-    print(f"[Web2] 获取到 {len(team_data)} 支队伍的数据")
+    # ============================================
+    # De-vig: 去除博彩公司抽水 (Multiplicative Method)
+    # 原理: 所有队伍的隐含概率总和 > 100%，超出部分就是 vig
+    # 方法: 将每个队伍的概率除以总和，使其归一化为 100%
+    # ============================================
+    if team_data:
+        total_implied_prob = sum(t["odds"] for t in team_data.values())
+        vig_percentage = (total_implied_prob - 1) * 100  # 转为百分比显示
+
+        print(f"[Web2] 原始隐含概率总和: {total_implied_prob:.4f} (抽水: {vig_percentage:.1f}%)")
+
+        # 归一化去抽水
+        for team in team_data:
+            raw_prob = team_data[team]["odds"]
+            devigged_prob = raw_prob / total_implied_prob
+            team_data[team]["odds"] = round(devigged_prob, 4)
+
+        print(f"[Web2] 去抽水后概率总和: {sum(t['odds'] for t in team_data.values()):.4f}")
+
+    print(f"[Web2] 获取到 {len(team_data)} 支队伍的数据 (已去抽水)")
     return team_data
 
 
@@ -1139,6 +1158,12 @@ def fetch_nba_matches_web2():
                 avg_away = sum(o["prob"] for o in away_odds_list) / len(away_odds_list)
                 best_bk = home_odds_list[0]
 
+            # De-vig: 去除博彩公司抽水 (Multiplicative Method)
+            # 对于 H2H，home + away 概率总和应为 100%
+            total_prob = avg_home + avg_away
+            devigged_home = avg_home / total_prob
+            devigged_away = avg_away / total_prob
+
             bookmaker_url = BOOKMAKER_URLS.get(best_bk["key"], "")
             display_name = BOOKMAKER_DISPLAY_NAMES.get(best_bk["key"], best_bk["title"])
 
@@ -1147,8 +1172,8 @@ def fetch_nba_matches_web2():
                 "home_team": home_team,
                 "away_team": away_team,
                 "commence_time": datetime.fromisoformat(commence_time.replace("Z", "+00:00")),
-                "home_odds": round(avg_home, 4),
-                "away_odds": round(avg_away, 4),
+                "home_odds": round(devigged_home, 4),
+                "away_odds": round(devigged_away, 4),
                 "bookmaker": display_name,
                 "bookmaker_url": bookmaker_url,
             })

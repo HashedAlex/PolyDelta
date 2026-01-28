@@ -31,7 +31,7 @@ interface CalculatorModalProps {
   type: 'match' | 'championship'
 }
 
-type CalculatorMode = 'arbitrage' | 'kelly' | 'roi'
+type CalculatorMode = 'arbitrage' | 'kelly' | 'roi' | 'hedge'
 type KellyRiskMode = 'conservative' | 'aggressive'  // 1/4 Kelly vs 1/2 Kelly
 type FeeType = 'taker' | 'maker'
 
@@ -81,6 +81,22 @@ interface NetROIResult {
     betterPlatform: 'Polymarket' | 'Traditional'
     roiAdvantage: number
   }
+}
+
+// Hedge (Cash Out / Free Roll) 计算结果
+interface HedgeResult {
+  sharesOwned: number           // 持有份额
+  currentValue: number          // 当前市值
+  // Scenario A: Break Even / Free Roll
+  sharesToSell: number          // 保本需卖出份额
+  remainingShares: number       // 剩余免费份额
+  freeRollValue: number         // 免费份额当前价值
+  // Scenario B: Full Cash Out
+  fullCashOutProceeds: number   // 全部卖出收入
+  fullCashOutProfit: number     // 全部卖出利润
+  fullCashOutROI: number        // 全部卖出 ROI
+  // Status
+  canFreeRoll: boolean          // 是否可以 Free Roll (当前价格 > 入场价格)
 }
 
 export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModalProps) {
@@ -144,6 +160,25 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     basedOn: 'Based on',
     withMaxCap: 'Kelly with 20% max cap',
     fees: 'Fees: 2% Taker + $0.05 Gas',
+    // Hedge mode
+    hedge: 'Hedge',
+    cashOut: 'Cash Out',
+    avgEntryPrice: 'Avg Entry Price (%)',
+    currentPrice: 'Current Market Price (%)',
+    sharesOwned: 'Shares Owned',
+    currentValue: 'Current Value',
+    strategy1: 'Strategy 1: Recover Principal',
+    strategy2: 'Strategy 2: Take Full Profit',
+    freeRoll: 'Free Roll',
+    sellShares: 'Sell',
+    sharesToRecover: 'shares to recover',
+    keepShares: 'Keep',
+    sharesAsFreeRoll: 'shares as Free Roll',
+    freeRollValue: 'Free Roll Value',
+    sellAllFor: 'Sell ALL for',
+    profitLabel: 'profit',
+    priceNotIncreased: 'Price has not increased enough to Free Roll',
+    insufficientHedge: 'Enter entry price and current price to calculate',
   }
 
   const [mode, setMode] = useState<CalculatorMode>('arbitrage')
@@ -155,6 +190,10 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
   const [roiInvestment, setRoiInvestment] = useState(1000)
   const [gasCost, setGasCost] = useState(0.05)
   const [feeType, setFeeType] = useState<FeeType>('taker')
+
+  // Hedge 模式状态 (使用字符串避免前导零问题)
+  const [hedgeEntryPrice, setHedgeEntryPrice] = useState('15')  // 入场价格 (%)
+  const [hedgeCurrentPrice, setHedgeCurrentPrice] = useState('40')  // 当前价格 (%)
 
   // For match type, which team to calculate
   const [selectedTeam, setSelectedTeam] = useState<'home' | 'away'>('home')
@@ -175,6 +214,16 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
       setRoiInvestment(1000)
       setGasCost(0.05)
       setFeeType('taker')
+
+      // Set default hedge values from Polymarket price
+      const defaultPolyPrice = type === 'championship'
+        ? normalizeOdds(data.polymarketPrice)
+        : normalizeOdds(data.polyHomePrice)
+      if (defaultPolyPrice > 0) {
+        setHedgeCurrentPrice(String(Math.round(defaultPolyPrice * 1000) / 10))
+        // Assume entry was lower (e.g., half the current price for demo)
+        setHedgeEntryPrice(String(Math.max(1, Math.round(defaultPolyPrice * 50))))
+      }
 
       // Set default win probability from Web2 odds (if available)
       const defaultWeb2Odds = type === 'championship'
@@ -499,9 +548,62 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
     }
   }
 
+  // === Hedge (Cash Out / Free Roll) 计算 ===
+  const calculateHedge = (): HedgeResult | null => {
+    const entryPriceNum = parseFloat(hedgeEntryPrice) || 0
+    const currentPriceNum = parseFloat(hedgeCurrentPrice) || 0
+
+    if (entryPriceNum <= 0 || currentPriceNum <= 0 || roiInvestment <= 0) return null
+
+    const entryPriceDecimal = entryPriceNum / 100
+    const currentPriceDecimal = currentPriceNum / 100
+    const investment = roiInvestment
+    const gas = gasCost
+    const feeRate = feeType === 'taker' ? 0.02 : 0.00
+
+    // Step 1: Calculate Net Prices (after fees)
+    const netEntryPrice = entryPriceDecimal * (1 + feeRate)  // Cost more due to entry fee
+    const netExitPrice = currentPriceDecimal * (1 - feeRate)  // Get less due to exit fee
+
+    // Step 2: Calculate Position
+    const capitalAfterGas = investment - gas
+    if (capitalAfterGas <= 0) return null
+    const sharesOwned = capitalAfterGas / netEntryPrice
+
+    // Current market value of position
+    const currentValue = sharesOwned * currentPriceDecimal
+
+    // Step 3: Scenario A - Break Even / Free Roll
+    // How many shares to sell to recover original investment
+    const sharesToSell = investment / netExitPrice
+    const remainingShares = sharesOwned - sharesToSell
+    const freeRollValue = remainingShares * currentPriceDecimal
+
+    // Can only free roll if we have enough shares
+    const canFreeRoll = remainingShares > 0
+
+    // Step 4: Scenario B - Full Cash Out
+    const fullCashOutProceeds = (sharesOwned * netExitPrice) - gas
+    const fullCashOutProfit = fullCashOutProceeds - investment
+    const fullCashOutROI = (fullCashOutProfit / investment) * 100
+
+    return {
+      sharesOwned: Math.round(sharesOwned * 100) / 100,
+      currentValue: Math.round(currentValue * 100) / 100,
+      sharesToSell: Math.round(sharesToSell * 100) / 100,
+      remainingShares: Math.round(remainingShares * 100) / 100,
+      freeRollValue: Math.round(freeRollValue * 100) / 100,
+      fullCashOutProceeds: Math.round(fullCashOutProceeds * 100) / 100,
+      fullCashOutProfit: Math.round(fullCashOutProfit * 100) / 100,
+      fullCashOutROI: Math.round(fullCashOutROI * 100) / 100,
+      canFreeRoll
+    }
+  }
+
   const arbitrageResult = calculateArbitrage()
   const kellyResult = calculateKelly()
   const netROIResult = calculateNetROI()
+  const hedgeResult = calculateHedge()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -574,6 +676,20 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
               </span>
               <span className="text-[10px] opacity-80 font-normal">{txt.valueBet}</span>
             </button>
+            <button
+              onClick={() => setMode('hedge')}
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-2 rounded-lg transition-all ${
+                mode === 'hedge'
+                  ? 'bg-[#a371f7] text-white'
+                  : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+              }`}
+            >
+              <span className="text-sm font-bold flex items-center gap-1">
+                <span>🛡️</span>
+                <span>{txt.hedge}</span>
+              </span>
+              <span className="text-[10px] opacity-80 font-normal">{txt.cashOut}</span>
+            </button>
           </div>
         ) : (
           <div className="flex p-2 gap-2 border-b border-[#30363d]">
@@ -601,9 +717,23 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
             >
               <span className="text-base font-bold flex items-center gap-1.5">
                 <span>🎯</span>
-                <span>{txt.kellyCriterion}</span>
+                <span>{txt.kelly}</span>
               </span>
               <span className="text-xs opacity-80 font-normal">{txt.valueBet}</span>
+            </button>
+            <button
+              onClick={() => setMode('hedge')}
+              className={`flex-1 flex flex-col items-center justify-center h-14 py-3 px-3 rounded-lg transition-all ${
+                mode === 'hedge'
+                  ? 'bg-[#a371f7] text-white'
+                  : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+              }`}
+            >
+              <span className="text-base font-bold flex items-center gap-1.5">
+                <span>🛡️</span>
+                <span>{txt.hedge}</span>
+              </span>
+              <span className="text-xs opacity-80 font-normal">{txt.cashOut}</span>
             </button>
           </div>
         )}
@@ -1181,6 +1311,203 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
                 )}
               </PremiumLock>
             </>
+          )}
+
+          {/* Hedge Mode */}
+          {mode === 'hedge' && (
+            <div className="space-y-4">
+              {/* Position Info Header */}
+              <div className="bg-[#0d1117] rounded-lg p-3">
+                <div className="text-xs text-[#8b949e] mb-2">Position - {teamName}</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-[#a371f7]">Entry Price</div>
+                    <div className="text-lg font-mono text-[#e6edf3]">{parseFloat(hedgeEntryPrice) || 0}%</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-[#3fb950]">Current Price</div>
+                    <div className="text-lg font-mono text-[#e6edf3]">{parseFloat(hedgeCurrentPrice) || 0}%</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Input Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Entry Price Input */}
+                <div>
+                  <label className="block text-xs text-[#8b949e] mb-2">{txt.avgEntryPrice}</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={hedgeEntryPrice}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      // Allow empty, numbers, and decimal point
+                      if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                        setHedgeEntryPrice(val)
+                      }
+                    }}
+                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#a371f7] focus:outline-none"
+                    placeholder="15"
+                  />
+                </div>
+
+                {/* Current Price Input */}
+                <div>
+                  <label className="block text-xs text-[#8b949e] mb-2">{txt.currentPrice}</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={hedgeCurrentPrice}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                        setHedgeCurrentPrice(val)
+                      }
+                    }}
+                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#a371f7] focus:outline-none"
+                    placeholder="40"
+                  />
+                </div>
+              </div>
+
+              {/* Investment Input */}
+              <div>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.investment}</label>
+                <input
+                  type="number"
+                  value={roiInvestment}
+                  onChange={(e) => setRoiInvestment(Number(e.target.value) || 0)}
+                  className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:border-[#a371f7] focus:outline-none"
+                  min={0}
+                />
+              </div>
+
+              {/* Fee Type Toggle */}
+              <div>
+                <label className="block text-xs text-[#8b949e] mb-2">{txt.orderType}</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setFeeType('taker')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      feeType === 'taker'
+                        ? 'bg-[#f85149] text-white'
+                        : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    {txt.taker}
+                  </button>
+                  <button
+                    onClick={() => setFeeType('maker')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      feeType === 'maker'
+                        ? 'bg-[#3fb950] text-black'
+                        : 'bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    {txt.maker}
+                  </button>
+                </div>
+              </div>
+
+              {/* Hedge Results */}
+              <PremiumLock ctaText="Sign in to view Hedge Strategies">
+                {hedgeResult ? (
+                  <div className="space-y-3">
+                    {/* Position Summary */}
+                    <div className="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-[#8b949e]">{txt.sharesOwned}:</span>
+                        <span className="font-mono font-bold text-[#e6edf3]">{hedgeResult.sharesOwned.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-sm text-[#8b949e]">{txt.currentValue}:</span>
+                        <span className="font-mono font-bold text-[#3fb950]">${hedgeResult.currentValue.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Strategy 1: Free Roll */}
+                    <div className={`rounded-lg p-4 border ${
+                      hedgeResult.canFreeRoll
+                        ? 'bg-[#a371f7]/10 border-[#a371f7]/40'
+                        : 'bg-[#21262d] border-[#30363d]'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-lg">🎰</span>
+                        <h4 className="font-bold text-[#e6edf3]">{txt.strategy1}</h4>
+                      </div>
+
+                      {hedgeResult.canFreeRoll ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-[#f85149]">{txt.sellShares}</span>
+                            <span className="font-mono font-bold text-[#e6edf3] bg-[#21262d] px-2 py-0.5 rounded">
+                              {hedgeResult.sharesToSell.toFixed(2)}
+                            </span>
+                            <span className="text-[#8b949e]">{txt.sharesToRecover} ${roiInvestment}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-[#3fb950]">{txt.keepShares}</span>
+                            <span className="font-mono font-bold text-[#3fb950] bg-[#3fb950]/10 px-2 py-0.5 rounded">
+                              {hedgeResult.remainingShares.toFixed(2)}
+                            </span>
+                            <span className="text-[#8b949e]">{txt.sharesAsFreeRoll}</span>
+                          </div>
+                          <div className="mt-3 pt-3 border-t border-[#30363d]/50">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-[#8b949e]">{txt.freeRollValue}:</span>
+                              <span className="font-mono font-bold text-[#a371f7]">${hedgeResult.freeRollValue.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-[#f85149] flex items-center gap-2">
+                          <span>⚠️</span>
+                          <span>{txt.priceNotIncreased}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Strategy 2: Full Cash Out */}
+                    <div className={`rounded-lg p-4 border ${
+                      hedgeResult.fullCashOutProfit > 0
+                        ? 'bg-[#3fb950]/10 border-[#3fb950]/40'
+                        : 'bg-[#21262d] border-[#30363d]'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-lg">💰</span>
+                        <h4 className="font-bold text-[#e6edf3]">{txt.strategy2}</h4>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-sm text-[#8b949e]">
+                          {txt.sellAllFor}{' '}
+                          <span className={`font-mono font-bold ${
+                            hedgeResult.fullCashOutProfit >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                          }`}>
+                            ${Math.abs(hedgeResult.fullCashOutProfit).toFixed(2)}
+                          </span>
+                          {' '}{hedgeResult.fullCashOutProfit >= 0 ? txt.profitLabel : 'loss'}
+                          {' '}
+                          <span className={`font-mono ${
+                            hedgeResult.fullCashOutROI >= 0 ? 'text-[#3fb950]' : 'text-[#f85149]'
+                          }`}>
+                            ({hedgeResult.fullCashOutROI > 0 ? '+' : ''}{hedgeResult.fullCashOutROI.toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-[#30363d]/50 text-xs text-[#6e7681]">
+                          Total Proceeds: ${hedgeResult.fullCashOutProceeds.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-[#0d1117] rounded-lg p-4 text-center text-[#8b949e]">
+                    {txt.insufficientHedge}
+                  </div>
+                )}
+              </PremiumLock>
+            </div>
           )}
         </div>
 
