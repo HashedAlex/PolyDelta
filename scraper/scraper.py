@@ -529,22 +529,57 @@ SOCCER_TEAM_ALIASES = {
 # ============================================
 SOCCER_TEAM_MAPPING = {
     # EPL Teams - The Odds API Name : Polymarket Name
+    # Note: Polymarket uses "Team FC" format, we map to clean names
     "Wolverhampton Wanderers": "Wolves",
+    "Wolverhampton Wanderers FC": "Wolves",
     "Brighton and Hove Albion": "Brighton",
-    "Leeds United": "Leeds United FC",
+    "Brighton and Hove Albion FC": "Brighton",
+    "Brighton & Hove Albion FC": "Brighton",
+    "Leeds United": "Leeds United",
+    "Leeds United FC": "Leeds United",
     "West Ham United": "West Ham",
-    "Manchester United": "Man Utd",
-    "Manchester City": "Man City",
+    "West Ham United FC": "West Ham",
+    "Manchester United": "Manchester United",
+    "Manchester United FC": "Manchester United",
+    "Manchester City": "Manchester City",
+    "Manchester City FC": "Manchester City",
     "Newcastle United": "Newcastle",
+    "Newcastle United FC": "Newcastle",
     "Tottenham Hotspur": "Tottenham",
-    "Nottingham Forest": "Nottm Forest",
-    "Sheffield United": "Sheffield Utd",
+    "Tottenham Hotspur FC": "Tottenham",
+    "Nottingham Forest": "Nottingham Forest",
+    "Nottingham Forest FC": "Nottingham Forest",
+    "Sheffield United": "Sheffield United",
+    "Sheffield United FC": "Sheffield United",
     "Leicester City": "Leicester",
+    "Leicester City FC": "Leicester",
     "AFC Bournemouth": "Bournemouth",
+    "Bournemouth FC": "Bournemouth",
     "Ipswich Town": "Ipswich",
+    "Ipswich Town FC": "Ipswich",
+    "Arsenal": "Arsenal",
+    "Arsenal FC": "Arsenal",
+    "Chelsea": "Chelsea",
+    "Chelsea FC": "Chelsea",
+    "Liverpool": "Liverpool",
+    "Liverpool FC": "Liverpool",
+    "Everton": "Everton",
+    "Everton FC": "Everton",
+    "Aston Villa": "Aston Villa",
+    "Aston Villa FC": "Aston Villa",
+    "Crystal Palace": "Crystal Palace",
+    "Crystal Palace FC": "Crystal Palace",
+    "Fulham": "Fulham",
+    "Fulham FC": "Fulham",
+    "Brentford": "Brentford",
+    "Brentford FC": "Brentford",
+    "Southampton": "Southampton",
+    "Southampton FC": "Southampton",
     # UCL Teams
     "Paris Saint Germain": "PSG",
+    "Paris Saint-Germain FC": "PSG",
     "Bayern Munich": "Bayern",
+    "FC Bayern Munich": "Bayern",
     "Borussia Dortmund": "Dortmund",
     "RB Leipzig": "Leipzig",
     "Atletico Madrid": "Atletico",
@@ -566,7 +601,8 @@ def normalize_team_for_matching(name):
     """
     Normalize a team name for matching.
     1. First try strict dictionary mapping
-    2. Return original name if no mapping exists
+    2. Strip FC/AFC suffix and try again
+    3. Return cleaned name if no mapping exists
     """
     name_stripped = name.strip()
 
@@ -574,11 +610,19 @@ def normalize_team_for_matching(name):
     if name_stripped in SOCCER_TEAM_MAPPING:
         return SOCCER_TEAM_MAPPING[name_stripped]
 
+    # Strip FC/AFC/CF suffix and try again
+    name_clean = re.sub(r'\s*(FC|AFC|CF)$', '', name_stripped, flags=re.IGNORECASE).strip()
+    if name_clean in SOCCER_TEAM_MAPPING:
+        return SOCCER_TEAM_MAPPING[name_clean]
+
     # Check if it's already a Polymarket name
     if name_stripped in SOCCER_TEAM_MAPPING_REVERSE:
         return name_stripped  # Already in Polymarket format
 
-    return name_stripped
+    if name_clean in SOCCER_TEAM_MAPPING_REVERSE:
+        return name_clean
+
+    return name_clean  # Return cleaned version without FC suffix
 
 
 def fuzzy_match_soccer_team(name, threshold=75):
@@ -2136,7 +2180,11 @@ def fetch_soccer_matches_web2(sport_key, sport_name):
 def fetch_soccer_matches_polymarket(sport_type):
     """
     从 Polymarket 获取足球每日比赛数据
-    注意: Polymarket 的足球市场可能有 Home/Draw/Away 三个选项
+
+    Polymarket 足球市场结构 (3个独立的 Yes/No 市场):
+    - "Will [Team1] win on [date]?" → Yes price = Team1 win probability
+    - "Will [Team2] win on [date]?" → Yes price = Team2 win probability
+    - "Will [Team1] vs. [Team2] end in a draw?" → Yes price = Draw probability
     """
     tag_map = {
         "epl": "premier-league",
@@ -2147,7 +2195,7 @@ def fetch_soccer_matches_polymarket(sport_type):
     print(f"\n[Polymarket] 正在获取 {sport_type.upper()} 每日比赛数据...")
 
     try:
-        url = f"https://gamma-api.polymarket.com/events?tag_slug={tag_slug}&active=true&closed=false"
+        url = f"https://gamma-api.polymarket.com/events?tag_slug={tag_slug}&active=true&closed=false&limit=100"
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         events = response.json()
@@ -2155,6 +2203,10 @@ def fetch_soccer_matches_polymarket(sport_type):
         matches = []
         now = datetime.utcnow()
         vs_pattern = re.compile(r"^(.+?)\s+(?:vs\.?|v)\s+(.+?)$", re.IGNORECASE)
+
+        # 用于解析 "Will [Team] win" 问题的正则
+        team_win_pattern = re.compile(r"Will\s+(.+?)\s+win\s+on", re.IGNORECASE)
+        draw_pattern = re.compile(r"end in a draw", re.IGNORECASE)
 
         for event in events:
             title = event.get("title", "")
@@ -2172,14 +2224,9 @@ def fetch_soccer_matches_polymarket(sport_type):
             team1_raw = match.group(1).strip()
             team2_raw = match.group(2).strip()
 
-            # 模糊匹配队伍名
-            std_team1, score1 = fuzzy_match_soccer_team(team1_raw)
-            std_team2, score2 = fuzzy_match_soccer_team(team2_raw)
-
-            if not std_team1 or not std_team2:
-                # 如果匹配失败，使用原始名称
-                std_team1 = team1_raw
-                std_team2 = team2_raw
+            # 去除 "FC" 后缀进行更好的匹配
+            team1_clean = re.sub(r'\s*(FC|AFC|CF)$', '', team1_raw, flags=re.IGNORECASE).strip()
+            team2_clean = re.sub(r'\s*(FC|AFC|CF)$', '', team2_raw, flags=re.IGNORECASE).strip()
 
             # 解析结束时间
             end_time = None
@@ -2191,7 +2238,7 @@ def fetch_soccer_matches_polymarket(sport_type):
                 except:
                     pass
 
-            # 获取市场详情 - 寻找 3-way 市场 (Home/Draw/Away)
+            # 获取市场详情 - Polymarket 使用 3 个独立的 Yes/No 市场
             event_markets = event.get("markets", [])
 
             home_price = None
@@ -2200,9 +2247,10 @@ def fetch_soccer_matches_polymarket(sport_type):
             home_liq = None
             draw_liq = None
             away_liq = None
-            poly_url = None
+            poly_url = f"https://polymarket.com/event/{event.get('slug', '')}"
 
             for market in event_markets:
+                question = market.get("question", "")
                 outcomes = market.get("outcomes", [])
                 outcome_prices = market.get("outcomePrices", [])
 
@@ -2217,37 +2265,39 @@ def fetch_soccer_matches_polymarket(sport_type):
                     except:
                         outcome_prices = []
 
-                # 3-way 市场应该有 3 个选项
-                if len(outcomes) == 3:
-                    for i, outcome in enumerate(outcomes):
-                        outcome_lower = outcome.lower()
-                        price = float(outcome_prices[i]) if i < len(outcome_prices) else None
-
-                        if outcome_lower == "draw":
-                            draw_price = price
-                        elif std_team1 and (outcome_lower == std_team1.lower() or fuzzy_match_soccer_team(outcome)[0] == std_team1):
-                            home_price = price
-                        elif std_team2 and (outcome_lower == std_team2.lower() or fuzzy_match_soccer_team(outcome)[0] == std_team2):
-                            away_price = price
-
-                    if home_price and draw_price and away_price:
-                        poly_url = f"https://polymarket.com/event/{event.get('slug', '')}"
+                # 找到 "Yes" 的价格 (通常是第一个 outcome)
+                yes_price = None
+                yes_liq = None
+                for i, outcome in enumerate(outcomes):
+                    if outcome.lower() == "yes":
+                        yes_price = float(outcome_prices[i]) if i < len(outcome_prices) else None
+                        # 获取流动性 (如果有)
                         break
 
-                # 也支持 2-way 市场 (仅 Home/Away)
-                elif len(outcomes) == 2:
-                    for i, outcome in enumerate(outcomes):
-                        price = float(outcome_prices[i]) if i < len(outcome_prices) else None
-                        outcome_team, _ = fuzzy_match_soccer_team(outcome)
+                if yes_price is None:
+                    continue
 
-                        if outcome_team == std_team1:
-                            home_price = price
-                        elif outcome_team == std_team2:
-                            away_price = price
+                # 检查是否是 "Draw" 市场
+                if draw_pattern.search(question):
+                    draw_price = yes_price
+                    continue
 
-                    if home_price and away_price:
-                        poly_url = f"https://polymarket.com/event/{event.get('slug', '')}"
-                        break
+                # 检查是否是 "Will [Team] win" 市场
+                team_match = team_win_pattern.search(question)
+                if team_match:
+                    team_in_question = team_match.group(1).strip()
+                    team_in_question_clean = re.sub(r'\s*(FC|AFC|CF)$', '', team_in_question, flags=re.IGNORECASE).strip()
+
+                    # 匹配 Team1 (Home)
+                    if (team_in_question_clean.lower() == team1_clean.lower() or
+                        team_in_question.lower() == team1_raw.lower() or
+                        fuzz.ratio(team_in_question_clean.lower(), team1_clean.lower()) > 85):
+                        home_price = yes_price
+                    # 匹配 Team2 (Away)
+                    elif (team_in_question_clean.lower() == team2_clean.lower() or
+                          team_in_question.lower() == team2_raw.lower() or
+                          fuzz.ratio(team_in_question_clean.lower(), team2_clean.lower()) > 85):
+                        away_price = yes_price
 
             # 过滤已结束的比赛
             if home_price is not None and (home_price > 0.95 or home_price < 0.05):
@@ -2258,9 +2308,10 @@ def fetch_soccer_matches_polymarket(sport_type):
             if home_price is None and away_price is None:
                 continue
 
+            # 使用原始队名（带FC后缀），便于后续匹配
             matches.append({
-                "home_team": std_team1,
-                "away_team": std_team2,
+                "home_team": team1_raw,
+                "away_team": team2_raw,
                 "home_price": home_price,
                 "draw_price": draw_price,
                 "away_price": away_price,
@@ -2273,7 +2324,7 @@ def fetch_soccer_matches_polymarket(sport_type):
             home_pct = f"{home_price*100:.1f}%" if home_price else "-"
             draw_pct = f"{draw_price*100:.1f}%" if draw_price else "-"
             away_pct = f"{away_price*100:.1f}%" if away_price else "-"
-            print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} ({home_pct} / {draw_pct} / {away_pct})")
+            print(f"[Polymarket] 找到比赛: {team1_raw} vs {team2_raw} ({home_pct} / {draw_pct} / {away_pct})")
 
         print(f"[Polymarket] 获取到 {len(matches)} 场 {sport_type.upper()} 比赛市场")
         return matches
