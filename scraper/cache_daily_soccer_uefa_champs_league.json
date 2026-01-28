@@ -1,0 +1,205 @@
+{
+  "matches": [
+    {
+      "match_id": "c3660e36f59975281119b7c3da4a9a87",
+      "home_team": "AS Monaco",
+      "away_team": "Juventus",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.2138,
+      "draw_odds": 0.2553,
+      "away_odds": 0.531,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "3997cbf44d3ef54fd2b738e9c61df00e",
+      "home_team": "Ajax",
+      "away_team": "Olympiakos Piraeus",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.311,
+      "draw_odds": 0.2656,
+      "away_odds": 0.4234,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "d1084b9f2949dcdc9e9564abf5f823c1",
+      "home_team": "Arsenal",
+      "away_team": "FC Kairat",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.9314,
+      "draw_odds": 0.0486,
+      "away_odds": 0.02,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "0a6a1dc09cdbed89899ee507d5fbb795",
+      "home_team": "Union Saint-Gilloise",
+      "away_team": "Atalanta BC",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.2738,
+      "draw_odds": 0.2603,
+      "away_odds": 0.4659,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "f4d2871895a9432d9dcca63fad7ae655",
+      "home_team": "Athletic Bilbao",
+      "away_team": "Sporting Lisbon",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.3474,
+      "draw_odds": 0.2855,
+      "away_odds": 0.3671,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "39a05e6a7c03877e3c8cbb4a1a5b9169",
+      "home_team": "Atl\u00e9tico Madrid",
+      "away_team": "Bod\u00f8/Glimt",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.7455,
+      "draw_odds": 0.1455,
+      "away_odds": 0.109,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "21e49e8594e50ae59dcd6dcd38c1ebea",
+      "home_team": "Barcelona",
+      "away_team": "FC Copenhagen",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.8523,
+      "draw_odds": 0.0942,
+      "away_odds": 0.0535,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "beb2c8d4053546009d449c1590e0bcbb",
+      "home_team": "Bayer Leverkusen",
+      "away_team": "Villarreal",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.5638,
+      "draw_odds": 0.232,
+      "away_odds": 0.2042,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "93a3fb9e77b9843c0c8e7d085d9d8961",
+      "home_team": "PSV Eindhoven",
+      "away_team": "Bayern Munich",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.1777,
+      "draw_odds": 0.2015,
+      "away_odds": 0.6208,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "e68f3fb26191b9d860687f8937518629",
+      "home_team": "Benfica",
+      "away_team": "Real Madrid",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.247,
+      "draw_odds": 0.2358,
+      "away_odds": 0.5172,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "52803a14696ebd5bafd852e59b225983",
+      "home_team": "Borussia Dortmund",
+      "away_team": "Inter Milan",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.311,
+      "draw_odds": 0.2758,
+      "away_odds": 0.4131,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "f5c2b278f3e8948ab82ae05aee55a28a",
+      "home_team": "Napoli",
+      "away_team": "Chelsea",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.2675,
+      "draw_odds": 0.2727,
+      "away_odds": 0.4598,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "6716331a13feac7c001236adc0c6ecc6",
+      "home_team": "Club Brugge",
+      "away_team": "Marseille",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.37,
+      "draw_odds": 0.2605,
+      "away_odds": 0.3695,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "7554d0f2fd54095e188c58b5e67cc7f1",
+      "home_team": "Eintracht Frankfurt",
+      "away_team": "Tottenham Hotspur",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.2081,
+      "draw_odds": 0.2398,
+      "away_odds": 0.5521,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "87a879297db9d8165ccc22cf4e9a88c2",
+      "home_team": "Manchester City",
+      "away_team": "Galatasaray",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.7775,
+      "draw_odds": 0.132,
+      "away_odds": 0.0905,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "d8b132358986ab307ecf089fc83270f2",
+      "home_team": "Liverpool",
+      "away_team": "Qaraba\u011f FK",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.8616,
+      "draw_odds": 0.0896,
+      "away_odds": 0.0488,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "359aedd23aabfe468935257a73efe56b",
+      "home_team": "Paris Saint Germain",
+      "away_team": "Newcastle United",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.5937,
+      "draw_odds": 0.2068,
+      "away_odds": 0.1995,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "afc8b6e7f72ca59d301391879b7139b1",
+      "home_team": "Pafos FC",
+      "away_team": "Slavia Praha",
+      "commence_time": "2026-01-28T20:00:00+00:00",
+      "home_odds": 0.3106,
+      "draw_odds": 0.2715,
+      "away_odds": 0.4179,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    }
+  ],
+  "cached_at": "2026-01-29T00:15:11.728460",
+  "sport_key": "soccer_uefa_champs_league",
+  "sport_name": "UEFA Champions League"
+}

@@ -92,7 +92,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
   // Read tab state directly from URL (not useState)
   const tab = searchParams.get('tab')
   const sub = searchParams.get('sub')
-  const activeSport: SportType = tab === 'nba' ? 'nba' : tab === 'soccer' ? 'soccer' : 'worldcup'
+  const activeSport: SportType = tab === 'worldcup' ? 'worldcup' : tab === 'soccer' ? 'soccer' : 'nba'
   const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
   const fifaSubTab: FifaSubTab = 'championship' // 目前只有championship，将来可扩展
   const soccerSubTab: SoccerSubTab = sub === 'ucl' ? 'ucl' : 'epl'
@@ -194,24 +194,6 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
       <div className="flex items-center gap-4 mb-4">
         <div className="flex gap-1 sm:gap-2 p-1 bg-[#161b22] rounded-lg">
           <button
-            onClick={() => setActiveSport('worldcup')}
-            className={`
-              flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
-              transition-all duration-200
-              ${activeSport === 'worldcup'
-                ? 'bg-[#3fb950] text-black'
-                : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
-              }
-            `}
-          >
-            <span>⚽</span>
-            <span className="hidden sm:inline">FIFA World Cup</span>
-            <span className="sm:hidden">FIFA</span>
-            <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'worldcup' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
-              {worldCupMarkets.length}
-            </span>
-          </button>
-          <button
             onClick={() => setActiveSport('nba')}
             className={`
               flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
@@ -246,6 +228,24 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               {eplMatches.length + uclMatches.length}
             </span>
           </button>
+          <button
+            onClick={() => setActiveSport('worldcup')}
+            className={`
+              flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
+              transition-all duration-200
+              ${activeSport === 'worldcup'
+                ? 'bg-[#3fb950] text-black'
+                : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+              }
+            `}
+          >
+            <span>🏆</span>
+            <span className="hidden sm:inline">FIFA World Cup</span>
+            <span className="sm:hidden">FIFA</span>
+            <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'worldcup' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
+              {worldCupMarkets.length}
+            </span>
+          </button>
         </div>
       </div>
 
@@ -265,7 +265,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               `}
             >
               <span>📅</span>
-              <span>Daily Matches</span>
+              <span>Daily Games</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${nbaSubTab === 'daily' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
                 {dailyMatches.length}
               </span>
@@ -282,7 +282,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               `}
             >
               <span>🏆</span>
-              <span>Championship</span>
+              <span>Winner</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${nbaSubTab === 'championship' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
                 {nbaMarkets.length}
               </span>
@@ -324,7 +324,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               `}
             >
               <span>🏆</span>
-              <span>Championship</span>
+              <span>Winner</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${fifaSubTab === 'championship' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
                 {worldCupMarkets.length}
               </span>
@@ -336,7 +336,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
             </button>
             <button onClick={() => setFifaSubTab('daily')}>
               <span>📅</span>
-              <span>Daily Matches</span>
+              <span>Daily Games</span>
             </button>
             */}
           </div>
@@ -374,7 +374,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               `}
             >
               <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
-              <span>Premier League</span>
+              <span>EPL</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
                 {eplMatches.length}
               </span>
@@ -391,7 +391,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               `}
             >
               <span>⭐</span>
-              <span>Champions League</span>
+              <span>UCL</span>
               <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'ucl' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
                 {uclMatches.length}
               </span>
@@ -427,7 +427,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">📅</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Daily Matches</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Daily Games</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {dailyMatches.length} games
             </span>
@@ -477,7 +477,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">Premier League Matches</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">EPL Matches</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {eplMatches.length} games
             </span>
@@ -510,7 +510,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              <p>No Premier League matches scheduled.</p>
+              <p>No EPL matches scheduled.</p>
               <p className="text-sm mt-2">Check back later for upcoming matches.</p>
             </div>
           )}
@@ -522,7 +522,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">⭐</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">Champions League Matches</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">UCL Matches</h2>
             <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
               {uclMatches.length} games
             </span>
@@ -555,7 +555,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
             </div>
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
-              <p>No Champions League matches scheduled.</p>
+              <p>No UCL matches scheduled.</p>
               <p className="text-sm mt-2">Check back later for upcoming matches.</p>
             </div>
           )}

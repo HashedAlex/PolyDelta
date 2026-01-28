@@ -85,7 +85,7 @@ export function NBAMarketTable({ markets, hideLowOdds }: NBAMarketTableProps) {
         <div className="flex items-center gap-3">
           <span className="text-2xl">🏆</span>
           <div>
-            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Championship 2025</h2>
+            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Winner 2026</h2>
             <p className="text-sm text-[#8b949e]">
               Total Liquidity: <span className="text-[#3fb950] font-medium">{formatVolume(totalVolume)}</span>
             </p>
@@ -226,7 +226,7 @@ export function NBAMarketTable({ markets, hideLowOdds }: NBAMarketTableProps) {
         </div>
       ) : (
         <div className="text-center py-12 text-[#8b949e]">
-          No NBA Championship data available
+          No NBA Winner data available
         </div>
       )}
 

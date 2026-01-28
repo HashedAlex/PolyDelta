@@ -302,7 +302,7 @@ DAILY_SPORTS_CONFIG = {
     },
     "ucl": {
         "name": "UEFA Champions League",
-        "web2_key": "soccer_uefa_champions_league",
+        "web2_key": "soccer_uefa_champs_league",
         "market": "h2h",  # 3-way: Home/Draw/Away
         "is_3way": True,
     },
@@ -575,7 +575,7 @@ SOCCER_TEAM_MAPPING = {
     "Brentford FC": "Brentford",
     "Southampton": "Southampton",
     "Southampton FC": "Southampton",
-    # UCL Teams
+    # UCL Teams - Standard mappings
     "Paris Saint Germain": "PSG",
     "Paris Saint-Germain FC": "PSG",
     "Bayern Munich": "Bayern",
@@ -583,6 +583,7 @@ SOCCER_TEAM_MAPPING = {
     "Borussia Dortmund": "Dortmund",
     "RB Leipzig": "Leipzig",
     "Atletico Madrid": "Atletico",
+    "Club Atlético De Madrid": "Atletico",
     "Inter Milan": "Inter",
     "AC Milan": "Milan",
     "Red Bull Salzburg": "Salzburg",
@@ -591,6 +592,51 @@ SOCCER_TEAM_MAPPING = {
     "Bayer Leverkusen": "Leverkusen",
     "VfB Stuttgart": "Stuttgart",
     "Sporting CP": "Sporting",
+    "Sporting Lisbon": "Sporting",
+    # UCL Teams - With Polymarket ticker prefixes (e.g., "ATM Club Atlético De Madrid")
+    "FK Bodø/Glimt": "Bodo Glimt",
+    "Bodo/Glimt": "Bodo Glimt",
+    "Qairat FK": "Kairat Almaty",
+    "FC Kairat": "Kairat Almaty",
+    "Real Madrid": "Real Madrid",
+    "Real Madrid CF": "Real Madrid",
+    "FC Barcelona": "Barcelona",
+    "Juventus": "Juventus",
+    "Juventus FC": "Juventus",
+    "Benfica": "Benfica",
+    "SL Benfica": "Benfica",
+    "Feyenoord": "Feyenoord",
+    "Feyenoord Rotterdam": "Feyenoord",
+    "Club Brugge": "Club Brugge",
+    "Club Brugge KV": "Club Brugge",
+    "Lille": "Lille",
+    "Lille OSC": "Lille",
+    "Celtic": "Celtic",
+    "Celtic FC": "Celtic",
+    "Monaco": "Monaco",
+    "AS Monaco": "Monaco",
+    "Atalanta": "Atalanta",
+    "Atalanta BC": "Atalanta",
+    "Aston Villa": "Aston Villa",
+    "Girona": "Girona",
+    "Girona FC": "Girona",
+    "Stuttgart": "Stuttgart",
+    "Dinamo Zagreb": "Dinamo Zagreb",
+    "GNK Dinamo Zagreb": "Dinamo Zagreb",
+    "Slovan Bratislava": "Slovan Bratislava",
+    "SK Slovan Bratislava": "Slovan Bratislava",
+    "Sturm Graz": "Sturm Graz",
+    "SK Sturm Graz": "Sturm Graz",
+    "Bologna": "Bologna",
+    "Bologna FC": "Bologna",
+    "Sparta Praha": "Sparta Prague",
+    "Sparta Prague": "Sparta Prague",
+    "AC Sparta Praha": "Sparta Prague",
+    "Young Boys": "Young Boys",
+    "BSC Young Boys": "Young Boys",
+    "Crvena Zvezda": "Red Star Belgrade",
+    "Red Star Belgrade": "Red Star Belgrade",
+    "FK Crvena Zvezda": "Red Star Belgrade",
 }
 
 # Reverse mapping: Polymarket Name -> The Odds API Name
@@ -600,29 +646,39 @@ SOCCER_TEAM_MAPPING_REVERSE = {v: k for k, v in SOCCER_TEAM_MAPPING.items()}
 def normalize_team_for_matching(name):
     """
     Normalize a team name for matching.
-    1. First try strict dictionary mapping
-    2. Strip FC/AFC suffix and try again
-    3. Return cleaned name if no mapping exists
+    1. Strip ticker prefixes (e.g., "ATM ", "BOG1 ")
+    2. First try strict dictionary mapping
+    3. Strip FC/AFC suffix and try again
+    4. Return cleaned name if no mapping exists
     """
     name_stripped = name.strip()
 
-    # Check if it's a The Odds API name that needs mapping to Polymarket
-    if name_stripped in SOCCER_TEAM_MAPPING:
-        return SOCCER_TEAM_MAPPING[name_stripped]
+    # Strip Polymarket ticker prefix (e.g., "ATM Club Atlético" -> "Club Atlético")
+    # Pattern: 2-4 uppercase letters + optional digit + space at start
+    name_no_ticker = re.sub(r'^[A-Z]{2,4}\d?\s+', '', name_stripped).strip()
+
+    # Try all variants: original, without ticker, without FC suffix
+    variants = [name_stripped, name_no_ticker]
+
+    for variant in variants:
+        # Check if it's a The Odds API name that needs mapping to Polymarket
+        if variant in SOCCER_TEAM_MAPPING:
+            return SOCCER_TEAM_MAPPING[variant]
 
     # Strip FC/AFC/CF suffix and try again
     name_clean = re.sub(r'\s*(FC|AFC|CF)$', '', name_stripped, flags=re.IGNORECASE).strip()
-    if name_clean in SOCCER_TEAM_MAPPING:
-        return SOCCER_TEAM_MAPPING[name_clean]
+    name_no_ticker_clean = re.sub(r'\s*(FC|AFC|CF)$', '', name_no_ticker, flags=re.IGNORECASE).strip()
 
-    # Check if it's already a Polymarket name
-    if name_stripped in SOCCER_TEAM_MAPPING_REVERSE:
-        return name_stripped  # Already in Polymarket format
+    for variant in [name_clean, name_no_ticker_clean]:
+        if variant in SOCCER_TEAM_MAPPING:
+            return SOCCER_TEAM_MAPPING[variant]
 
-    if name_clean in SOCCER_TEAM_MAPPING_REVERSE:
-        return name_clean
+    # Check if it's already a Polymarket name (reverse lookup)
+    for variant in [name_stripped, name_no_ticker, name_clean, name_no_ticker_clean]:
+        if variant in SOCCER_TEAM_MAPPING_REVERSE:
+            return variant  # Already in Polymarket format
 
-    return name_clean  # Return cleaned version without FC suffix
+    return name_no_ticker_clean  # Return cleaned version without ticker and FC suffix
 
 
 def fuzzy_match_soccer_team(name, threshold=75):
@@ -2240,7 +2296,7 @@ def fetch_soccer_matches_polymarket(sport_type):
     """
     tag_map = {
         "epl": "premier-league",
-        "ucl": "champions-league",
+        "ucl": "ucl",
     }
     tag_slug = tag_map.get(sport_type, "soccer")
 
@@ -2360,10 +2416,11 @@ def fetch_soccer_matches_polymarket(sport_type):
                         away_price = yes_price
                         away_liq = market_liq
 
-            # 过滤已结束的比赛
-            if home_price is not None and (home_price > 0.95 or home_price < 0.05):
+            # 过滤已结束的比赛 - 只有当某队价格接近 99% 时才跳过
+            # 有些比赛是真实的悬殊对决（如强队 vs 弱队，Arsenal 95% vs Qairat 1.5%）
+            if home_price is not None and home_price > 0.99:
                 continue
-            if away_price is not None and (away_price > 0.95 or away_price < 0.05):
+            if away_price is not None and away_price > 0.99:
                 continue
 
             if home_price is None and away_price is None:
@@ -2380,6 +2437,7 @@ def fetch_soccer_matches_polymarket(sport_type):
                 "draw_liq": draw_liq,
                 "away_liq": away_liq,
                 "url": poly_url,
+                "end_time": end_time,  # 比赛结束时间
             })
 
             home_pct = f"{home_price*100:.1f}%" if home_price else "-"
@@ -2516,14 +2574,14 @@ def match_soccer_games(web2_matches, poly_matches):
         # 创建 Polymarket-only 记录
         match_id = f"poly_soccer_{idx}"
 
-        # 使用当前时间 + 7 天作为默认比赛时间 (Polymarket 比赛通常在近期)
-        default_time = datetime.utcnow() + timedelta(days=7)
+        # 使用 Polymarket 的 end_time 作为比赛时间，如果没有则用当前时间
+        match_time = pm.get("end_time") or datetime.utcnow()
 
         merged.append({
             "match_id": match_id,
             "home_team": home_clean,
             "away_team": away_clean,
-            "commence_time": default_time,
+            "commence_time": match_time,
             "web2_home_odds": None,
             "web2_away_odds": None,
             "web2_draw_odds": None,
@@ -2878,6 +2936,26 @@ def save_to_database(all_data):
         history_saved = 0
         history_skipped = 0
 
+        # ============================================
+        # 步骤 1.5: 预计算 FIFA 和 NBA 排名 (仅前5名和 Value Bet 生成 AI)
+        # 排名按 Polymarket 价格降序 (与 UI 显示一致)
+        # ============================================
+        # FIFA 排名
+        fifa_rankings = {}
+        fifa_records = [r for r in all_data if r.get("sport_type") == "world_cup" and r.get("prop_type", "championship") == "championship"]
+        fifa_records_sorted = sorted(fifa_records, key=lambda x: x.get("polymarket_price") or 0, reverse=True)
+        for rank, record in enumerate(fifa_records_sorted, 1):
+            fifa_rankings[record["team_name"]] = rank
+        print(f"[入库] FIFA 排名计算完成, 共 {len(fifa_rankings)} 支队伍")
+
+        # NBA 排名
+        nba_rankings = {}
+        nba_records = [r for r in all_data if r.get("sport_type") == "nba" and r.get("prop_type", "championship") == "championship"]
+        nba_records_sorted = sorted(nba_records, key=lambda x: x.get("polymarket_price") or 0, reverse=True)
+        for rank, record in enumerate(nba_records_sorted, 1):
+            nba_rankings[record["team_name"]] = rank
+        print(f"[入库] NBA 排名计算完成, 共 {len(nba_rankings)} 支队伍")
+
         for record in all_data:
             team_name = record["team_name"]
             web2_odds = record["web2_odds"]
@@ -2921,9 +2999,26 @@ def save_to_database(all_data):
             # ============================================
             # 步骤 4: 调用 AI 生成报告 (概率 >= 1% 且未复用)
             # 使用 SportsPromptBuilder - NBA 用 Gauntlet Logic, FIFA 用 Bracket Logic
-            # EV 门槛已移除，由 generate_championship_analysis 内部的 <1% 概率过滤控制
+            # FIFA 和 NBA 仅为前5名或 Value Bet (EV > 0) 生成 AI 报告
             # ============================================
-            if not skip_ai:  # 只要未复用就尝试生成（<1% 概率会被内部过滤）
+            should_generate_ai = not skip_ai
+            is_value_bet = ev > 0  # Polymarket 定价低于 Web2 赔率
+
+            # FIFA 限制: 仅前5名或 Value Bet
+            if record.get("sport_type") == "world_cup" and record.get("prop_type", "championship") == "championship":
+                fifa_rank = fifa_rankings.get(team_name, 999)
+                if fifa_rank > 5 and not is_value_bet:
+                    should_generate_ai = False
+                    ai_skipped_count += 1
+
+            # NBA 限制: 仅前5名或 Value Bet
+            if record.get("sport_type") == "nba" and record.get("prop_type", "championship") == "championship":
+                nba_rank = nba_rankings.get(team_name, 999)
+                if nba_rank > 5 and not is_value_bet:
+                    should_generate_ai = False
+                    ai_skipped_count += 1
+
+            if should_generate_ai:
                 try:
                     new_report = generate_championship_analysis(
                         team_name=team_name,

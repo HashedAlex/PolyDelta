@@ -9,7 +9,7 @@ function getChampionshipMockData(sportType: string, teamSlug: string) {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 
-  const sportLabel = sportType === 'nba' ? 'NBA Championship' : 'FIFA World Cup 2026'
+  const sportLabel = sportType === 'nba' ? 'NBA Winner 2026' : 'FIFA World Cup 2026'
   const sportEmoji = sportType === 'nba' ? '🏀' : '⚽'
 
   return {
