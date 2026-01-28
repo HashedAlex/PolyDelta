@@ -1,19 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware } from '@clerk/nextjs/server'
 
-// Define public routes that don't require authentication
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/api/(.*)',
-  '/match/(.*)',
-])
-
-export default clerkMiddleware(async (auth, request) => {
-  // Allow public access to all routes for now
-  // The protection is handled at component level via PremiumLock
-  if (!isPublicRoute(request)) {
-    // Future: can add route-level protection here
-  }
-})
+// Use default clerkMiddleware - all routes are public
+// Protection is handled at component level via PremiumLock
+export default clerkMiddleware()
 
 export const config = {
   matcher: [
