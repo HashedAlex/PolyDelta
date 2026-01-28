@@ -162,7 +162,7 @@ function getStatusColor(status: string): string {
   return 'bg-[#6e7681] text-white'
 }
 
-export function AnalysisModal({ isOpen, onClose, team, sportType }: AnalysisModalProps) {
+export function AnalysisModal({ isOpen, onClose, team, sportType: _sportType }: AnalysisModalProps) {
   const [activeTab, setActiveTab] = useState<'analysis' | 'calculator'>('analysis')
   const [showCalculator, setShowCalculator] = useState(false)
 

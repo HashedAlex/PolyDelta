@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { ArbitrageCard } from './ArbitrageCard'
+// ArbitrageCard removed - now using table components
 import { MatchCard } from './MatchCard'
 import { FIFAMarketTable } from './FIFAMarketTable'
 import { NBAMarketTable } from './NBAMarketTable'
@@ -75,20 +75,6 @@ function getMatchPriority(match: DailyMatchItem): number {
   return 0                           // 都没有
 }
 
-/**
- * 冠军盘口排序：按胜率（polymarket_price）降序
- * - 热门球队（高胜率）排在前面
- * - 冷门球队（低胜率）排在后面
- */
-function sortChampionMarkets(markets: MarketItem[]): MarketItem[] {
-  return [...markets].sort((a, b) => {
-    // 按 polymarket 价格（胜率）降序排序
-    const aPrice = a.polymarket_price ?? 0
-    const bPrice = b.polymarket_price ?? 0
-    return bPrice - aPrice
-  })
-}
-
 export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: DashboardProps) {
   // Use URL as the single source of truth for tab state
   const searchParams = useSearchParams()
@@ -123,20 +109,6 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   const setFifaSubTab = (subTab: FifaSubTab) => {
     router.push(`/?tab=worldcup&sub=${subTab}`, { scroll: false })
   }
-
-  // 冠军盘口数据过滤
-  const filterChampionMarkets = (markets: MarketItem[]) => {
-    return hideLowOdds
-      ? markets.filter(item => (item.polymarket_price || 0) >= 0.01)
-      : markets
-  }
-
-  const filteredWorldCupMarkets = filterChampionMarkets(worldCupMarkets)
-  const filteredNbaMarkets = filterChampionMarkets(nbaMarkets)
-
-  // 冠军盘口排序：双边齐全 + EV 高的排在前面
-  const sortedWorldCupMarkets = sortChampionMarkets(filteredWorldCupMarkets)
-  const sortedNbaMarkets = sortChampionMarkets(filteredNbaMarkets)
 
   // 每日比赛排序：优先显示双边齐全的套利机会
   const sortedDailyMatches = [...dailyMatches].sort(

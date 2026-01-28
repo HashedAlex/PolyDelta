@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { CalculatorModal, CalculatorData } from './CalculatorModal'
+import { CalculatorModal } from './CalculatorModal'
 
 // Generate URL-friendly slug from team name
 function generateTeamSlug(teamName: string): string {
