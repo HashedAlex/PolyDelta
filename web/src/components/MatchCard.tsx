@@ -13,13 +13,17 @@ interface MatchCardProps {
   commenceTime: Date
   web2HomeOdds: number | null
   web2AwayOdds: number | null
+  web2DrawOdds?: number | null  // Soccer 3-way
   polyHomePrice: number | null
   polyAwayPrice: number | null
+  polyDrawPrice?: number | null  // Soccer 3-way
   sourceBookmaker: string | null
   sourceUrl: string | null
   polymarketUrl: string | null
   liquidityHome?: number | null
   liquidityAway?: number | null
+  liquidityDraw?: number | null  // Soccer 3-way
+  sportType?: string  // 'nba' | 'epl' | 'ucl'
 }
 
 // Liquidity indicator component
@@ -95,13 +99,17 @@ export function MatchCard({
   commenceTime,
   web2HomeOdds,
   web2AwayOdds,
+  web2DrawOdds,
   polyHomePrice,
   polyAwayPrice,
+  polyDrawPrice,
   sourceBookmaker,
   sourceUrl,
   polymarketUrl,
   liquidityHome,
   liquidityAway,
+  liquidityDraw,
+  sportType = 'nba',
 }: MatchCardProps) {
   const [showCalculator, setShowCalculator] = useState(false)
 
@@ -114,10 +122,15 @@ export function MatchCard({
     betOnPoly: 'Bet on Polymarket',
     analysis: 'Analysis & Chat',
     polyNotAvailable: 'Polymarket not available yet',
+    draw: 'Draw',
   }
+
+  // Check if this is a soccer match (3-way)
+  const isSoccer = sportType === 'epl' || sportType === 'ucl'
 
   const homeEV = calculateEV(web2HomeOdds, polyHomePrice)
   const awayEV = calculateEV(web2AwayOdds, polyAwayPrice)
+  const drawEV = calculateEV(web2DrawOdds || null, polyDrawPrice || null)
 
   const localHomeTeam = getLocalizedTeamName(homeTeam)
   const localAwayTeam = getLocalizedTeamName(awayTeam)
@@ -138,7 +151,8 @@ export function MatchCard({
   // 找到最大的 EV 值
   const maxEV = Math.max(
     Math.abs(homeEV || 0),
-    Math.abs(awayEV || 0)
+    Math.abs(awayEV || 0),
+    Math.abs(drawEV || 0)
   )
 
   // 高亮颜色逻辑
@@ -248,6 +262,29 @@ export function MatchCard({
             <LiquidityBadge liquidity={liquidityAway} />
           </div>
         </div>
+
+        {/* Draw Row (Soccer only) */}
+        {isSoccer && (
+          <div className="grid grid-cols-5 gap-1 sm:gap-2 text-xs sm:text-sm py-1.5 border-t border-[#30363d]">
+            <div className="text-[#8b949e]">{txt.draw}</div>
+            <div className="text-center text-[#e6edf3]">
+              {web2DrawOdds ? `${(web2DrawOdds * 100).toFixed(1)}%` : '-'}
+            </div>
+            <div className="text-center text-[#e6edf3]">
+              {polyDrawPrice ? `${(polyDrawPrice * 100).toFixed(1)}%` : '-'}
+            </div>
+            <div className={`text-center font-medium ${
+              drawEV && drawEV > 0 ? 'text-[#3fb950]' :
+              drawEV && drawEV < 0 ? 'text-[#f85149]' :
+              'text-[#8b949e]'
+            }`}>
+              {drawEV ? `${drawEV > 0 ? '+' : ''}${drawEV.toFixed(1)}%` : '-'}
+            </div>
+            <div className="flex justify-center">
+              <LiquidityBadge liquidity={liquidityDraw} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
@@ -275,7 +312,7 @@ export function MatchCard({
       {/* AI Analysis Link */}
       {matchId && (
         <Link
-          href={`/match/${matchId}?from=nba-daily`}
+          href={`/match/${matchId}?from=${sportType}-daily`}
           className="mt-2 flex items-center justify-center gap-2 py-2 px-3 bg-[#1f6feb]/20 hover:bg-[#1f6feb]/30 text-[#58a6ff] text-sm font-medium rounded-md transition-colors border border-[#1f6feb]/40"
         >
           <span>🤖</span>
@@ -295,7 +332,7 @@ export function MatchCard({
         <OddsChart
           eventId={matchId}
           eventType="daily"
-          sportType="nba"
+          sportType={sportType}
           teamName={`${homeTeam} (Home)`}
         />
       )}

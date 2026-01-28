@@ -41,16 +41,19 @@ model DailyMatch {
   commence_time      DateTime  @db.Timestamp(6)
   web2_home_odds     Float?
   web2_away_odds     Float?
+  web2_draw_odds     Float?    // Soccer 3-way: Draw odds
   source_bookmaker   String?   @db.VarChar(50)
   source_url         String?
   poly_home_price    Float?
   poly_away_price    Float?
+  poly_draw_price    Float?    // Soccer 3-way: Draw price
   polymarket_url     String?
   last_updated       DateTime? @default(now()) @db.Timestamp(6)
   ai_analysis        String?
   analysis_timestamp DateTime? @db.Timestamp(6)
   liquidity_away     Float?
   liquidity_home     Float?
+  liquidity_draw     Float?    // Soccer 3-way: Draw liquidity
 
   @@unique([sport_type, match_id])
   @@index([sport_type], map: "idx_daily_sport")
@@ -71,13 +74,16 @@ model OddsHistory {
   // Daily Matches 主客场赔率
   web2_home_odds   Float?
   web2_away_odds   Float?
+  web2_draw_odds   Float?   // Soccer 3-way: Draw odds
   poly_home_price  Float?
   poly_away_price  Float?
+  poly_draw_price  Float?   // Soccer 3-way: Draw price
 
   // 流动性深度
   liquidity_usdc   Float?   // Championship 流动性
   liquidity_home   Float?   // Daily 主队流动性
   liquidity_away   Float?   // Daily 客队流动性
+  liquidity_draw   Float?   // Daily 平局流动性 (Soccer)
 
   // 计算指标
   ev               Float?   // EV 差值

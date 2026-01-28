@@ -285,6 +285,30 @@ SPORTS_CONFIG = {
 }
 
 # ============================================
+# 每日比赛配置 (Daily Matches)
+# ============================================
+DAILY_SPORTS_CONFIG = {
+    "nba": {
+        "name": "NBA",
+        "web2_key": "basketball_nba",
+        "market": "h2h",  # 2-way: Home/Away
+        "is_3way": False,
+    },
+    "epl": {
+        "name": "English Premier League",
+        "web2_key": "soccer_epl",
+        "market": "h2h",  # 3-way: Home/Draw/Away
+        "is_3way": True,
+    },
+    "ucl": {
+        "name": "UEFA Champions League",
+        "web2_key": "soccer_uefa_champions_league",
+        "market": "h2h",  # 3-way: Home/Draw/Away
+        "is_3way": True,
+    },
+}
+
+# ============================================
 # 名称映射字典 - 多赛事支持
 # ============================================
 MAPPING = {
@@ -309,6 +333,45 @@ MAPPING = {
     "Leicester": {"web2": "Leicester City", "poly": "Leicester"},
     "Ipswich": {"web2": "Ipswich Town", "poly": "Ipswich"},
     "Southampton": {"web2": "Southampton", "poly": "Southampton"},
+
+    # ========== UEFA Champions League 球队 ==========
+    "Real Madrid": {"web2": "Real Madrid", "poly": "Real Madrid"},
+    "Barcelona": {"web2": "Barcelona", "poly": "Barcelona"},
+    "Bayern Munich": {"web2": "Bayern Munich", "poly": "Bayern Munich"},
+    "Paris Saint-Germain": {"web2": "Paris Saint Germain", "poly": "PSG"},
+    "Juventus": {"web2": "Juventus", "poly": "Juventus"},
+    "AC Milan": {"web2": "AC Milan", "poly": "AC Milan"},
+    "Inter Milan": {"web2": "Inter Milan", "poly": "Inter Milan"},
+    "Atletico Madrid": {"web2": "Atletico Madrid", "poly": "Atletico Madrid"},
+    "Borussia Dortmund": {"web2": "Borussia Dortmund", "poly": "Dortmund"},
+    "RB Leipzig": {"web2": "RB Leipzig", "poly": "Leipzig"},
+    "Benfica": {"web2": "Benfica", "poly": "Benfica"},
+    "Porto": {"web2": "FC Porto", "poly": "Porto"},
+    "Ajax": {"web2": "Ajax", "poly": "Ajax"},
+    "Napoli": {"web2": "Napoli", "poly": "Napoli"},
+    "Sevilla": {"web2": "Sevilla", "poly": "Sevilla"},
+    "Sporting CP": {"web2": "Sporting CP", "poly": "Sporting"},
+    "Celtic": {"web2": "Celtic", "poly": "Celtic"},
+    "PSV": {"web2": "PSV Eindhoven", "poly": "PSV"},
+    "Feyenoord": {"web2": "Feyenoord", "poly": "Feyenoord"},
+    "Club Brugge": {"web2": "Club Brugge", "poly": "Club Brugge"},
+    "Red Bull Salzburg": {"web2": "Red Bull Salzburg", "poly": "Salzburg"},
+    "Shakhtar Donetsk": {"web2": "Shakhtar Donetsk", "poly": "Shakhtar"},
+    "Dinamo Zagreb": {"web2": "Dinamo Zagreb", "poly": "Dinamo Zagreb"},
+    "Young Boys": {"web2": "Young Boys", "poly": "Young Boys"},
+    "Galatasaray": {"web2": "Galatasaray", "poly": "Galatasaray"},
+    "Lazio": {"web2": "Lazio", "poly": "Lazio"},
+    "Atalanta": {"web2": "Atalanta", "poly": "Atalanta"},
+    "Monaco": {"web2": "Monaco", "poly": "Monaco"},
+    "Lille": {"web2": "Lille", "poly": "Lille"},
+    "Bayer Leverkusen": {"web2": "Bayer Leverkusen", "poly": "Leverkusen"},
+    "Stuttgart": {"web2": "VfB Stuttgart", "poly": "Stuttgart"},
+    "Girona": {"web2": "Girona", "poly": "Girona"},
+    "Bologna": {"web2": "Bologna", "poly": "Bologna"},
+    "Brest": {"web2": "Stade Brestois 29", "poly": "Brest"},
+    "Sparta Prague": {"web2": "Sparta Prague", "poly": "Sparta Prague"},
+    "Sturm Graz": {"web2": "Sturm Graz", "poly": "Sturm Graz"},
+    "Slovan Bratislava": {"web2": "Slovan Bratislava", "poly": "Slovan Bratislava"},
 
     # ========== NBA 球队 ==========
     "Boston Celtics": {"web2": "Boston Celtics", "poly": "Boston Celtics"},
@@ -402,6 +465,108 @@ NBA_TEAM_ALIASES = {
     "New Orleans Pelicans": ["pelicans", "new orleans"],
     "San Antonio Spurs": ["spurs", "san antonio"],
 }
+
+# ============================================
+# Soccer 队伍简称映射 (用于模糊匹配)
+# ============================================
+SOCCER_TEAM_ALIASES = {
+    # EPL Teams
+    "Arsenal": ["arsenal", "gunners"],
+    "Manchester City": ["man city", "city", "manchester city"],
+    "Liverpool": ["liverpool", "reds"],
+    "Chelsea": ["chelsea", "blues"],
+    "Manchester United": ["man utd", "man united", "manchester united", "united"],
+    "Tottenham Hotspur": ["tottenham", "spurs", "tottenham hotspur"],
+    "Newcastle United": ["newcastle", "magpies", "newcastle united"],
+    "Aston Villa": ["aston villa", "villa"],
+    "Brighton and Hove Albion": ["brighton", "brighton hove albion", "seagulls"],
+    "West Ham United": ["west ham", "hammers", "west ham united"],
+    "Fulham": ["fulham", "cottagers"],
+    "Brentford": ["brentford", "bees"],
+    "Crystal Palace": ["crystal palace", "palace", "eagles"],
+    "Everton": ["everton", "toffees"],
+    "Nottingham Forest": ["nottingham forest", "forest", "nott'm forest"],
+    "AFC Bournemouth": ["bournemouth", "afc bournemouth", "cherries"],
+    "Wolverhampton Wanderers": ["wolves", "wolverhampton", "wolverhampton wanderers"],
+    "Leicester City": ["leicester", "foxes", "leicester city"],
+    "Ipswich Town": ["ipswich", "ipswich town", "tractor boys"],
+    "Southampton": ["southampton", "saints"],
+    # UCL Teams
+    "Real Madrid": ["real madrid", "real", "los blancos"],
+    "Barcelona": ["barcelona", "barca", "fcb"],
+    "Bayern Munich": ["bayern", "bayern munich", "bayern munchen"],
+    "Paris Saint Germain": ["psg", "paris", "paris saint-germain", "paris sg"],
+    "Juventus": ["juventus", "juve"],
+    "AC Milan": ["ac milan", "milan"],
+    "Inter Milan": ["inter", "inter milan", "internazionale"],
+    "Atletico Madrid": ["atletico", "atletico madrid", "atleti"],
+    "Borussia Dortmund": ["dortmund", "bvb", "borussia dortmund"],
+    "RB Leipzig": ["leipzig", "rb leipzig"],
+    "Benfica": ["benfica", "sl benfica"],
+    "FC Porto": ["porto", "fc porto"],
+    "Ajax": ["ajax", "afc ajax"],
+    "Napoli": ["napoli", "ssc napoli"],
+    "Sevilla": ["sevilla", "sevilla fc"],
+    "Sporting CP": ["sporting", "sporting cp", "sporting lisbon"],
+    "Celtic": ["celtic", "celtic fc"],
+    "PSV Eindhoven": ["psv", "psv eindhoven"],
+    "Feyenoord": ["feyenoord"],
+    "Club Brugge": ["club brugge", "brugge"],
+    "Red Bull Salzburg": ["salzburg", "rb salzburg", "red bull salzburg"],
+    "Shakhtar Donetsk": ["shakhtar", "shakhtar donetsk"],
+    "Galatasaray": ["galatasaray", "gala"],
+    "Lazio": ["lazio", "ss lazio"],
+    "Atalanta": ["atalanta"],
+    "Monaco": ["monaco", "as monaco"],
+    "Lille": ["lille", "losc", "losc lille"],
+    "Bayer Leverkusen": ["leverkusen", "bayer leverkusen"],
+    "VfB Stuttgart": ["stuttgart", "vfb stuttgart"],
+}
+
+
+def fuzzy_match_soccer_team(name, threshold=75):
+    """
+    使用模糊匹配找到最匹配的足球队伍
+    返回: (标准队名, 匹配分数) 或 (None, 0)
+    """
+    name_lower = name.lower().strip()
+
+    # 先尝试精确匹配
+    for team, aliases in SOCCER_TEAM_ALIASES.items():
+        if name_lower == team.lower():
+            return team, 100
+        for alias in aliases:
+            if name_lower == alias.lower():
+                return team, 100
+
+    # 模糊匹配
+    best_match = None
+    best_score = 0
+
+    for team, aliases in SOCCER_TEAM_ALIASES.items():
+        # 匹配标准队名
+        score = fuzz.ratio(name_lower, team.lower())
+        if score > best_score:
+            best_score = score
+            best_match = team
+
+        # 匹配别名
+        for alias in aliases:
+            score = fuzz.ratio(name_lower, alias.lower())
+            if score > best_score:
+                best_score = score
+                best_match = team
+
+            # 部分匹配（队名包含别名）
+            if alias.lower() in name_lower or name_lower in alias.lower():
+                score = 90
+                if score > best_score:
+                    best_score = score
+                    best_match = team
+
+    if best_score >= threshold:
+        return best_match, best_score
+    return None, 0
 
 
 def standardize_name(name, platform):
@@ -1742,6 +1907,444 @@ def save_daily_matches(matches):
         return False
 
 
+# ============================================
+# Soccer Daily Matches - 足球每日比赛 (3-way: Home/Draw/Away)
+# ============================================
+
+def fetch_soccer_matches_web2(sport_key, sport_name):
+    """
+    从 TheOddsAPI 获取足球每日比赛 (3-way H2H) 数据
+    返回: [
+        {
+            "match_id": str,
+            "home_team": str,
+            "away_team": str,
+            "commence_time": datetime,
+            "home_odds": float,   # 去抽水后隐含胜率
+            "draw_odds": float,   # 平局隐含胜率
+            "away_odds": float,
+            "bookmaker": str,
+            "bookmaker_url": str,
+        },
+        ...
+    ]
+    """
+    print(f"\n[Web2] 正在获取 {sport_name} 每日比赛 (3-way H2H) 数据...")
+
+    if not ODDS_API_KEY or ODDS_API_KEY == "你的_TheOddsAPI_Key":
+        print("[Web2] 警告: ODDS_API_KEY 未设置")
+        return []
+
+    url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds"
+    params = {
+        "apiKey": ODDS_API_KEY,
+        "regions": "us,uk,eu",
+        "markets": "h2h",
+        "oddsFormat": "decimal",
+        "dateFormat": "iso",
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=30)
+
+        if response.status_code == 404:
+            print(f"[Web2] {sport_name} 比赛暂无数据")
+            return []
+
+        response.raise_for_status()
+        events = response.json()
+
+        matches = []
+        PREFERRED_BOOKMAKERS = {"pinnacle", "bet365", "williamhill", "unibet", "betfair_ex_eu"}
+
+        for event in events:
+            match_id = event.get("id")
+            home_team = event.get("home_team")
+            away_team = event.get("away_team")
+            commence_time = event.get("commence_time")
+
+            if not all([match_id, home_team, away_team, commence_time]):
+                continue
+
+            # 收集所有 bookmaker 的赔率
+            home_odds_list = []
+            draw_odds_list = []
+            away_odds_list = []
+
+            for bookmaker in event.get("bookmakers", []):
+                bk_key = bookmaker.get("key", "")
+                bk_title = bookmaker.get("title", bk_key)
+
+                for market in bookmaker.get("markets", []):
+                    if market.get("key") != "h2h":
+                        continue
+
+                    outcomes = market.get("outcomes", [])
+                    home_price = None
+                    draw_price = None
+                    away_price = None
+
+                    for outcome in outcomes:
+                        name = outcome.get("name")
+                        price = outcome.get("price")
+                        if name == home_team:
+                            home_price = price
+                        elif name == away_team:
+                            away_price = price
+                        elif name.lower() == "draw":
+                            draw_price = price
+
+                    if home_price and draw_price and away_price:
+                        if home_price > 1 and draw_price > 1 and away_price > 1:
+                            home_prob = 1 / home_price
+                            draw_prob = 1 / draw_price
+                            away_prob = 1 / away_price
+
+                            home_odds_list.append({"prob": home_prob, "key": bk_key, "title": bk_title})
+                            draw_odds_list.append({"prob": draw_prob, "key": bk_key, "title": bk_title})
+                            away_odds_list.append({"prob": away_prob, "key": bk_key, "title": bk_title})
+
+            if not home_odds_list:
+                continue
+
+            # 优先使用主流 bookmaker 的平均值
+            preferred_home = [o for o in home_odds_list if o["key"] in PREFERRED_BOOKMAKERS]
+            preferred_draw = [o for o in draw_odds_list if o["key"] in PREFERRED_BOOKMAKERS]
+            preferred_away = [o for o in away_odds_list if o["key"] in PREFERRED_BOOKMAKERS]
+
+            if preferred_home:
+                avg_home = sum(o["prob"] for o in preferred_home) / len(preferred_home)
+                avg_draw = sum(o["prob"] for o in preferred_draw) / len(preferred_draw)
+                avg_away = sum(o["prob"] for o in preferred_away) / len(preferred_away)
+                best_bk = preferred_home[0]
+            else:
+                avg_home = sum(o["prob"] for o in home_odds_list) / len(home_odds_list)
+                avg_draw = sum(o["prob"] for o in draw_odds_list) / len(draw_odds_list)
+                avg_away = sum(o["prob"] for o in away_odds_list) / len(away_odds_list)
+                best_bk = home_odds_list[0]
+
+            # De-vig: 去除博彩公司抽水 (Multiplicative Method)
+            # 对于 3-way，home + draw + away 概率总和应为 100%
+            total_prob = avg_home + avg_draw + avg_away
+            devigged_home = avg_home / total_prob
+            devigged_draw = avg_draw / total_prob
+            devigged_away = avg_away / total_prob
+
+            bookmaker_url = BOOKMAKER_URLS.get(best_bk["key"], "")
+            display_name = BOOKMAKER_DISPLAY_NAMES.get(best_bk["key"], best_bk["title"])
+
+            matches.append({
+                "match_id": match_id,
+                "home_team": home_team,
+                "away_team": away_team,
+                "commence_time": datetime.fromisoformat(commence_time.replace("Z", "+00:00")),
+                "home_odds": round(devigged_home, 4),
+                "draw_odds": round(devigged_draw, 4),
+                "away_odds": round(devigged_away, 4),
+                "bookmaker": display_name,
+                "bookmaker_url": bookmaker_url,
+            })
+
+        print(f"[Web2] 获取到 {len(matches)} 场 {sport_name} 比赛")
+        return matches
+
+    except requests.exceptions.RequestException as e:
+        print(f"[Web2] API 请求失败: {e}")
+        return []
+
+
+def fetch_soccer_matches_polymarket(sport_type):
+    """
+    从 Polymarket 获取足球每日比赛数据
+    注意: Polymarket 的足球市场可能有 Home/Draw/Away 三个选项
+    """
+    tag_map = {
+        "epl": "premier-league",
+        "ucl": "champions-league",
+    }
+    tag_slug = tag_map.get(sport_type, "soccer")
+
+    print(f"\n[Polymarket] 正在获取 {sport_type.upper()} 每日比赛数据...")
+
+    try:
+        url = f"https://gamma-api.polymarket.com/events?tag_slug={tag_slug}&active=true&closed=false"
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        events = response.json()
+
+        matches = []
+        now = datetime.utcnow()
+        vs_pattern = re.compile(r"^(.+?)\s+(?:vs\.?|v)\s+(.+?)$", re.IGNORECASE)
+
+        for event in events:
+            title = event.get("title", "")
+            end_date_str = event.get("endDate")
+
+            # 跳过冠军预测等非每日比赛
+            if "winner" in title.lower() or "champion" in title.lower():
+                continue
+
+            # 尝试解析 "Team1 vs Team2" 格式
+            match = vs_pattern.match(title)
+            if not match:
+                continue
+
+            team1_raw = match.group(1).strip()
+            team2_raw = match.group(2).strip()
+
+            # 模糊匹配队伍名
+            std_team1, score1 = fuzzy_match_soccer_team(team1_raw)
+            std_team2, score2 = fuzzy_match_soccer_team(team2_raw)
+
+            if not std_team1 or not std_team2:
+                # 如果匹配失败，使用原始名称
+                std_team1 = team1_raw
+                std_team2 = team2_raw
+
+            # 解析结束时间
+            end_time = None
+            if end_date_str:
+                try:
+                    end_time = datetime.fromisoformat(end_date_str.replace("Z", "+00:00").replace("+00:00", ""))
+                    if end_time < now:
+                        continue
+                except:
+                    pass
+
+            # 获取市场详情 - 寻找 3-way 市场 (Home/Draw/Away)
+            event_markets = event.get("markets", [])
+
+            home_price = None
+            draw_price = None
+            away_price = None
+            home_liq = None
+            draw_liq = None
+            away_liq = None
+            poly_url = None
+
+            for market in event_markets:
+                outcomes = market.get("outcomes", [])
+                outcome_prices = market.get("outcomePrices", [])
+
+                if isinstance(outcomes, str):
+                    try:
+                        outcomes = json.loads(outcomes)
+                    except:
+                        outcomes = []
+                if isinstance(outcome_prices, str):
+                    try:
+                        outcome_prices = json.loads(outcome_prices)
+                    except:
+                        outcome_prices = []
+
+                # 3-way 市场应该有 3 个选项
+                if len(outcomes) == 3:
+                    for i, outcome in enumerate(outcomes):
+                        outcome_lower = outcome.lower()
+                        price = float(outcome_prices[i]) if i < len(outcome_prices) else None
+
+                        if outcome_lower == "draw":
+                            draw_price = price
+                        elif std_team1 and (outcome_lower == std_team1.lower() or fuzzy_match_soccer_team(outcome)[0] == std_team1):
+                            home_price = price
+                        elif std_team2 and (outcome_lower == std_team2.lower() or fuzzy_match_soccer_team(outcome)[0] == std_team2):
+                            away_price = price
+
+                    if home_price and draw_price and away_price:
+                        poly_url = f"https://polymarket.com/event/{event.get('slug', '')}"
+                        break
+
+                # 也支持 2-way 市场 (仅 Home/Away)
+                elif len(outcomes) == 2:
+                    for i, outcome in enumerate(outcomes):
+                        price = float(outcome_prices[i]) if i < len(outcome_prices) else None
+                        outcome_team, _ = fuzzy_match_soccer_team(outcome)
+
+                        if outcome_team == std_team1:
+                            home_price = price
+                        elif outcome_team == std_team2:
+                            away_price = price
+
+                    if home_price and away_price:
+                        poly_url = f"https://polymarket.com/event/{event.get('slug', '')}"
+                        break
+
+            # 过滤已结束的比赛
+            if home_price is not None and (home_price > 0.95 or home_price < 0.05):
+                continue
+            if away_price is not None and (away_price > 0.95 or away_price < 0.05):
+                continue
+
+            if home_price is None and away_price is None:
+                continue
+
+            matches.append({
+                "home_team": std_team1,
+                "away_team": std_team2,
+                "home_price": home_price,
+                "draw_price": draw_price,
+                "away_price": away_price,
+                "home_liq": home_liq,
+                "draw_liq": draw_liq,
+                "away_liq": away_liq,
+                "url": poly_url,
+            })
+
+            print(f"[Polymarket] 找到比赛: {std_team1} vs {std_team2} "
+                  f"({home_price*100:.1f}% / {draw_price*100 if draw_price else 0:.1f}% / {away_price*100:.1f}%)")
+
+        print(f"[Polymarket] 获取到 {len(matches)} 场 {sport_type.upper()} 比赛市场")
+        return matches
+
+    except Exception as e:
+        print(f"[Polymarket] 获取失败: {e}")
+        return []
+
+
+def match_soccer_games(web2_matches, poly_matches):
+    """
+    匹配 Web2 和 Polymarket 的足球比赛数据
+    """
+    print("\n[匹配] 正在匹配 Web2 和 Polymarket 的足球比赛...")
+
+    merged = []
+
+    for web2_match in web2_matches:
+        home_team = web2_match["home_team"]
+        away_team = web2_match["away_team"]
+
+        # 在 Polymarket 中寻找匹配
+        poly_match = None
+        for pm in poly_matches:
+            # 正向匹配
+            if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(home_team)[0] and
+                fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(away_team)[0]):
+                poly_match = pm
+                break
+            # 反向匹配
+            if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(away_team)[0] and
+                fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(home_team)[0]):
+                poly_match = {
+                    "home_team": pm["away_team"],
+                    "away_team": pm["home_team"],
+                    "home_price": pm["away_price"],
+                    "draw_price": pm["draw_price"],
+                    "away_price": pm["home_price"],
+                    "home_liq": pm.get("away_liq"),
+                    "draw_liq": pm.get("draw_liq"),
+                    "away_liq": pm.get("home_liq"),
+                    "url": pm.get("url"),
+                }
+                break
+
+        merged.append({
+            **web2_match,
+            "poly_home_price": poly_match["home_price"] if poly_match else None,
+            "poly_draw_price": poly_match["draw_price"] if poly_match else None,
+            "poly_away_price": poly_match["away_price"] if poly_match else None,
+            "polymarket_url": poly_match["url"] if poly_match else None,
+            "liquidity_home": poly_match.get("home_liq") if poly_match else None,
+            "liquidity_draw": poly_match.get("draw_liq") if poly_match else None,
+            "liquidity_away": poly_match.get("away_liq") if poly_match else None,
+        })
+
+        if poly_match:
+            print(f"[匹配] 成功: {home_team} vs {away_team}")
+
+    matched_count = sum(1 for m in merged if m.get("poly_home_price"))
+    print(f"[匹配] 完成: {len(merged)} 场比赛, 成功匹配 Polymarket: {matched_count} 场")
+    return merged
+
+
+def save_soccer_matches(matches, sport_type):
+    """
+    保存足球每日比赛到数据库 (支持 3-way)
+    """
+    if not matches:
+        print("[入库] 无足球比赛数据需要保存")
+        return False
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cursor = conn.cursor()
+
+        # 删除该赛事旧数据
+        cursor.execute("DELETE FROM daily_matches WHERE sport_type = %s", (sport_type,))
+
+        insert_sql = """
+        INSERT INTO daily_matches
+            (sport_type, match_id, home_team, away_team, commence_time,
+             web2_home_odds, web2_away_odds, web2_draw_odds,
+             source_bookmaker, source_url,
+             poly_home_price, poly_away_price, poly_draw_price,
+             polymarket_url,
+             liquidity_home, liquidity_away, liquidity_draw,
+             last_updated)
+        VALUES
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+        """
+
+        for match in matches:
+            cursor.execute(insert_sql, (
+                sport_type,
+                match["match_id"],
+                match["home_team"],
+                match["away_team"],
+                match["commence_time"],
+                match.get("home_odds"),
+                match.get("away_odds"),
+                match.get("draw_odds"),
+                match.get("bookmaker"),
+                match.get("bookmaker_url"),
+                match.get("poly_home_price"),
+                match.get("poly_away_price"),
+                match.get("poly_draw_price"),
+                match.get("polymarket_url"),
+                match.get("liquidity_home"),
+                match.get("liquidity_away"),
+                match.get("liquidity_draw"),
+            ))
+
+        conn.commit()
+        print(f"[入库] 成功保存 {len(matches)} 场 {sport_type.upper()} 比赛")
+
+        cursor.close()
+        conn.close()
+        return True
+
+    except psycopg2.Error as e:
+        print(f"[入库] 数据库错误: {e}")
+        return False
+
+
+def fetch_and_save_soccer_matches(sport_type):
+    """
+    主函数：获取并保存足球每日比赛数据 (EPL/UCL)
+    """
+    config = DAILY_SPORTS_CONFIG.get(sport_type)
+    if not config:
+        print(f"[Soccer] 未知赛事类型: {sport_type}")
+        return []
+
+    print("\n" + "=" * 60)
+    print(f"正在处理: {config['name']} 每日比赛 (3-way H2H)")
+    print("=" * 60)
+
+    # 1. 获取 Web2 数据
+    web2_matches = fetch_soccer_matches_web2(config["web2_key"], config["name"])
+
+    # 2. 获取 Polymarket 数据
+    poly_matches = fetch_soccer_matches_polymarket(sport_type)
+
+    # 3. 匹配并合并
+    merged = match_soccer_games(web2_matches, poly_matches)
+
+    # 4. 保存到数据库
+    save_soccer_matches(merged, sport_type)
+
+    return merged
+
+
 def fetch_and_save_nba_matches():
     """
     主函数：获取并保存 NBA 每日比赛数据
@@ -2178,9 +2781,9 @@ def main():
     print("=" * 60)
     print("PolyDelta - 多平台多赛事数据抓取脚本")
     print(f"运行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("支持赛事: World Cup, EPL, NBA")
+    print("支持赛事: World Cup, EPL, UCL, NBA")
     print("数据源: Web2 (TheOddsAPI), Polymarket")
-    print("功能: 冠军盘口 (Outrights) + 每日比赛 (H2H)")
+    print("功能: 冠军盘口 (Outrights) + 每日比赛 (H2H/3-way)")
     print("Kalshi: 已禁用 (网络限制)")
     print("=" * 60)
 
@@ -2221,7 +2824,11 @@ def main():
     fifa_qualification_count = save_fifa_qualification_markets()
 
     # 6. 获取每日比赛 (H2H)
-    daily_matches = fetch_and_save_nba_matches()
+    daily_matches_nba = fetch_and_save_nba_matches()
+
+    # 7. 获取足球每日比赛 (3-way H2H)
+    daily_matches_epl = fetch_and_save_soccer_matches("epl")
+    daily_matches_ucl = fetch_and_save_soccer_matches("ucl")
 
     # 最终统计
     print("\n" + "=" * 60)
@@ -2234,9 +2841,15 @@ def main():
     print(f"\n[FIFA Props]")
     print(f"  出线预测: {fifa_qualification_count} 个国家")
     print(f"\n[每日比赛 H2H]")
-    print(f"  NBA: {len(daily_matches)} 场比赛")
-    matched = sum(1 for m in daily_matches if m.get("poly_home_price"))
-    print(f"  Polymarket 匹配: {matched} 场")
+    print(f"  NBA: {len(daily_matches_nba)} 场比赛")
+    nba_matched = sum(1 for m in daily_matches_nba if m.get("poly_home_price"))
+    print(f"    Polymarket 匹配: {nba_matched} 场")
+    print(f"  EPL: {len(daily_matches_epl)} 场比赛")
+    epl_matched = sum(1 for m in daily_matches_epl if m.get("poly_home_price"))
+    print(f"    Polymarket 匹配: {epl_matched} 场")
+    print(f"  UCL: {len(daily_matches_ucl)} 场比赛")
+    ucl_matched = sum(1 for m in daily_matches_ucl if m.get("poly_home_price"))
+    print(f"    Polymarket 匹配: {ucl_matched} 场")
     print("=" * 60)
 
 
