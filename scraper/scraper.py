@@ -523,15 +523,95 @@ SOCCER_TEAM_ALIASES = {
     "VfB Stuttgart": ["stuttgart", "vfb stuttgart"],
 }
 
+# ============================================
+# Strict Dictionary Mapping: The Odds API -> Polymarket
+# (Applied BEFORE fuzzy matching for precise team name normalization)
+# ============================================
+SOCCER_TEAM_MAPPING = {
+    # EPL Teams - The Odds API Name : Polymarket Name
+    "Wolverhampton Wanderers": "Wolves",
+    "Brighton and Hove Albion": "Brighton",
+    "Leeds United": "Leeds United FC",
+    "West Ham United": "West Ham",
+    "Manchester United": "Man Utd",
+    "Manchester City": "Man City",
+    "Newcastle United": "Newcastle",
+    "Tottenham Hotspur": "Tottenham",
+    "Nottingham Forest": "Nottm Forest",
+    "Sheffield United": "Sheffield Utd",
+    "Leicester City": "Leicester",
+    "AFC Bournemouth": "Bournemouth",
+    "Ipswich Town": "Ipswich",
+    # UCL Teams
+    "Paris Saint Germain": "PSG",
+    "Bayern Munich": "Bayern",
+    "Borussia Dortmund": "Dortmund",
+    "RB Leipzig": "Leipzig",
+    "Atletico Madrid": "Atletico",
+    "Inter Milan": "Inter",
+    "AC Milan": "Milan",
+    "Red Bull Salzburg": "Salzburg",
+    "PSV Eindhoven": "PSV",
+    "Shakhtar Donetsk": "Shakhtar",
+    "Bayer Leverkusen": "Leverkusen",
+    "VfB Stuttgart": "Stuttgart",
+    "Sporting CP": "Sporting",
+}
+
+# Reverse mapping: Polymarket Name -> The Odds API Name
+SOCCER_TEAM_MAPPING_REVERSE = {v: k for k, v in SOCCER_TEAM_MAPPING.items()}
+
+
+def normalize_team_for_matching(name):
+    """
+    Normalize a team name for matching.
+    1. First try strict dictionary mapping
+    2. Return original name if no mapping exists
+    """
+    name_stripped = name.strip()
+
+    # Check if it's a The Odds API name that needs mapping to Polymarket
+    if name_stripped in SOCCER_TEAM_MAPPING:
+        return SOCCER_TEAM_MAPPING[name_stripped]
+
+    # Check if it's already a Polymarket name
+    if name_stripped in SOCCER_TEAM_MAPPING_REVERSE:
+        return name_stripped  # Already in Polymarket format
+
+    return name_stripped
+
 
 def fuzzy_match_soccer_team(name, threshold=75):
     """
     使用模糊匹配找到最匹配的足球队伍
     返回: (标准队名, 匹配分数) 或 (None, 0)
-    """
-    name_lower = name.lower().strip()
 
-    # 先尝试精确匹配
+    匹配顺序:
+    1. 严格字典映射 (The Odds API -> Polymarket)
+    2. 精确别名匹配
+    3. 模糊匹配
+    """
+    name_stripped = name.strip()
+    name_lower = name_stripped.lower()
+
+    # 1. 严格字典映射 - 优先级最高
+    if name_stripped in SOCCER_TEAM_MAPPING:
+        mapped_name = SOCCER_TEAM_MAPPING[name_stripped]
+        # 找到对应的标准队名
+        for team, aliases in SOCCER_TEAM_ALIASES.items():
+            if mapped_name.lower() in [a.lower() for a in aliases] or mapped_name.lower() == team.lower():
+                return team, 100
+        return name_stripped, 100  # 如果没找到别名，返回原始名称
+
+    # 反向映射检查 (Polymarket 名称 -> 标准名称)
+    if name_stripped in SOCCER_TEAM_MAPPING_REVERSE:
+        original_name = SOCCER_TEAM_MAPPING_REVERSE[name_stripped]
+        for team, aliases in SOCCER_TEAM_ALIASES.items():
+            if original_name.lower() == team.lower():
+                return team, 100
+        return original_name, 100
+
+    # 2. 精确别名匹配
     for team, aliases in SOCCER_TEAM_ALIASES.items():
         if name_lower == team.lower():
             return team, 100
@@ -2206,6 +2286,10 @@ def fetch_soccer_matches_polymarket(sport_type):
 def match_soccer_games(web2_matches, poly_matches):
     """
     匹配 Web2 和 Polymarket 的足球比赛数据
+
+    匹配策略:
+    1. 首先应用严格字典映射 (SOCCER_TEAM_MAPPING)
+    2. 然后使用模糊匹配作为后备
     """
     print("\n[匹配] 正在匹配 Web2 和 Polymarket 的足球比赛...")
 
@@ -2215,17 +2299,26 @@ def match_soccer_games(web2_matches, poly_matches):
         home_team = web2_match["home_team"]
         away_team = web2_match["away_team"]
 
+        # 先进行严格映射规范化
+        home_normalized = normalize_team_for_matching(home_team)
+        away_normalized = normalize_team_for_matching(away_team)
+
         # 在 Polymarket 中寻找匹配
         poly_match = None
         for pm in poly_matches:
-            # 正向匹配
-            if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(home_team)[0] and
-                fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(away_team)[0]):
+            pm_home = normalize_team_for_matching(pm["home_team"])
+            pm_away = normalize_team_for_matching(pm["away_team"])
+
+            # 正向匹配 - 先尝试严格映射后的名称
+            if (pm_home.lower() == home_normalized.lower() and
+                pm_away.lower() == away_normalized.lower()):
                 poly_match = pm
+                print(f"[匹配] 严格映射成功: {home_team} vs {away_team}")
                 break
-            # 反向匹配
-            if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(away_team)[0] and
-                fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(home_team)[0]):
+
+            # 反向匹配 - 先尝试严格映射后的名称
+            if (pm_home.lower() == away_normalized.lower() and
+                pm_away.lower() == home_normalized.lower()):
                 poly_match = {
                     "home_team": pm["away_team"],
                     "away_team": pm["home_team"],
@@ -2237,7 +2330,34 @@ def match_soccer_games(web2_matches, poly_matches):
                     "away_liq": pm.get("home_liq"),
                     "url": pm.get("url"),
                 }
+                print(f"[匹配] 严格映射成功 (反向): {home_team} vs {away_team}")
                 break
+
+        # 如果严格映射失败，尝试模糊匹配
+        if not poly_match:
+            for pm in poly_matches:
+                # 正向模糊匹配
+                if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(home_team)[0] and
+                    fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(away_team)[0]):
+                    poly_match = pm
+                    print(f"[匹配] 模糊匹配成功: {home_team} vs {away_team}")
+                    break
+                # 反向模糊匹配
+                if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(away_team)[0] and
+                    fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(home_team)[0]):
+                    poly_match = {
+                        "home_team": pm["away_team"],
+                        "away_team": pm["home_team"],
+                        "home_price": pm["away_price"],
+                        "draw_price": pm["draw_price"],
+                        "away_price": pm["home_price"],
+                        "home_liq": pm.get("away_liq"),
+                        "draw_liq": pm.get("draw_liq"),
+                        "away_liq": pm.get("home_liq"),
+                        "url": pm.get("url"),
+                    }
+                    print(f"[匹配] 模糊匹配成功 (反向): {home_team} vs {away_team}")
+                    break
 
         merged.append({
             **web2_match,
@@ -2249,9 +2369,6 @@ def match_soccer_games(web2_matches, poly_matches):
             "liquidity_draw": poly_match.get("draw_liq") if poly_match else None,
             "liquidity_away": poly_match.get("away_liq") if poly_match else None,
         })
-
-        if poly_match:
-            print(f"[匹配] 成功: {home_team} vs {away_team}")
 
     matched_count = sum(1 for m in merged if m.get("poly_home_price"))
     print(f"[匹配] 完成: {len(merged)} 场比赛, 成功匹配 Polymarket: {matched_count} 场")
