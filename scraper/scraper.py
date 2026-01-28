@@ -2038,6 +2038,7 @@ def save_daily_matches(matches):
 def fetch_soccer_matches_web2(sport_key, sport_name):
     """
     从 TheOddsAPI 获取足球每日比赛 (3-way H2H) 数据
+    支持缓存：API 失败时使用缓存数据
     返回: [
         {
             "match_id": str,
@@ -2055,9 +2056,50 @@ def fetch_soccer_matches_web2(sport_key, sport_name):
     """
     print(f"\n[Web2] 正在获取 {sport_name} 每日比赛 (3-way H2H) 数据...")
 
-    if not ODDS_API_KEY or ODDS_API_KEY == "你的_TheOddsAPI_Key":
-        print("[Web2] 警告: ODDS_API_KEY 未设置")
+    # 缓存文件路径
+    cache_file = os.path.join(CACHE_DIR, f"cache_daily_{sport_key}.json")
+
+    def load_from_cache():
+        """从缓存加载数据"""
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r') as f:
+                    cached = json.load(f)
+                # 转换 commence_time 字符串为 datetime
+                matches = []
+                for m in cached.get("matches", []):
+                    m["commence_time"] = datetime.fromisoformat(m["commence_time"])
+                    matches.append(m)
+                cache_time = cached.get("cached_at", "unknown")
+                print(f"[Web2] 使用缓存数据 (缓存时间: {cache_time})")
+                return matches
+            except Exception as e:
+                print(f"[Web2] 缓存加载失败: {e}")
         return []
+
+    def save_to_cache(matches):
+        """保存数据到缓存"""
+        try:
+            # 转换 datetime 为字符串
+            cache_data = []
+            for m in matches:
+                m_copy = m.copy()
+                m_copy["commence_time"] = m["commence_time"].isoformat()
+                cache_data.append(m_copy)
+            with open(cache_file, 'w') as f:
+                json.dump({
+                    "matches": cache_data,
+                    "cached_at": datetime.now().isoformat(),
+                    "sport_key": sport_key,
+                    "sport_name": sport_name,
+                }, f, indent=2)
+            print(f"[Web2] 数据已缓存到 {cache_file}")
+        except Exception as e:
+            print(f"[Web2] 缓存保存失败: {e}")
+
+    if not ODDS_API_KEY or ODDS_API_KEY == "你的_TheOddsAPI_Key":
+        print("[Web2] 警告: ODDS_API_KEY 未设置，尝试使用缓存...")
+        return load_from_cache()
 
     url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds"
     params = {
@@ -2072,8 +2114,12 @@ def fetch_soccer_matches_web2(sport_key, sport_name):
         response = requests.get(url, params=params, timeout=30)
 
         if response.status_code == 404:
-            print(f"[Web2] {sport_name} 比赛暂无数据")
-            return []
+            print(f"[Web2] {sport_name} 比赛暂无数据，尝试使用缓存...")
+            return load_from_cache()
+
+        if response.status_code == 401:
+            print(f"[Web2] API 配额已用尽，尝试使用缓存...")
+            return load_from_cache()
 
         response.raise_for_status()
         events = response.json()
@@ -2170,11 +2216,17 @@ def fetch_soccer_matches_web2(sport_key, sport_name):
             })
 
         print(f"[Web2] 获取到 {len(matches)} 场 {sport_name} 比赛")
+
+        # 保存到缓存
+        if matches:
+            save_to_cache(matches)
+
         return matches
 
     except requests.exceptions.RequestException as e:
         print(f"[Web2] API 请求失败: {e}")
-        return []
+        print("[Web2] 尝试使用缓存数据...")
+        return load_from_cache()
 
 
 def fetch_soccer_matches_polymarket(sport_type):

@@ -1,0 +1,227 @@
+{
+  "matches": [
+    {
+      "match_id": "e52dc0a3276ffe7c9d3630a81b4300ca",
+      "home_team": "Leeds United",
+      "away_team": "Arsenal",
+      "commence_time": "2026-01-31T15:00:00+00:00",
+      "home_odds": 0.1537,
+      "draw_odds": 0.225,
+      "away_odds": 0.6214,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "b3c2ff07a6d24ca61f13c268a535c317",
+      "home_team": "Wolverhampton Wanderers",
+      "away_team": "Bournemouth",
+      "commence_time": "2026-01-31T15:00:00+00:00",
+      "home_odds": 0.3088,
+      "draw_odds": 0.2686,
+      "away_odds": 0.4226,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "36820753efb36739a83c6e5e440827b2",
+      "home_team": "Brighton and Hove Albion",
+      "away_team": "Everton",
+      "commence_time": "2026-01-31T15:00:00+00:00",
+      "home_odds": 0.5076,
+      "draw_odds": 0.2631,
+      "away_odds": 0.2293,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "a3975ce7f6fd29bb83e7eadc3f7c1b3a",
+      "home_team": "Chelsea",
+      "away_team": "West Ham United",
+      "commence_time": "2026-01-31T17:30:00+00:00",
+      "home_odds": 0.6338,
+      "draw_odds": 0.2122,
+      "away_odds": 0.154,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "85b2c858725574961261f22c2b5b5d7e",
+      "home_team": "Liverpool",
+      "away_team": "Newcastle United",
+      "commence_time": "2026-01-31T20:00:00+00:00",
+      "home_odds": 0.5321,
+      "draw_odds": 0.2355,
+      "away_odds": 0.2324,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "9c612b05e7fc0b581b689380f7405f35",
+      "home_team": "Aston Villa",
+      "away_team": "Brentford",
+      "commence_time": "2026-02-01T14:00:00+00:00",
+      "home_odds": 0.4803,
+      "draw_odds": 0.2643,
+      "away_odds": 0.2554,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "d2436eec6993a6e21f00887163987e87",
+      "home_team": "Nottingham Forest",
+      "away_team": "Crystal Palace",
+      "commence_time": "2026-02-01T14:00:00+00:00",
+      "home_odds": 0.4793,
+      "draw_odds": 0.2739,
+      "away_odds": 0.2468,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "ded98b5baf6ff662af13282c2c6c7946",
+      "home_team": "Manchester United",
+      "away_team": "Fulham",
+      "commence_time": "2026-02-01T14:00:00+00:00",
+      "home_odds": 0.6024,
+      "draw_odds": 0.2148,
+      "away_odds": 0.1828,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "38a3cb5e295f55e274d589fc646cf2dd",
+      "home_team": "Tottenham Hotspur",
+      "away_team": "Manchester City",
+      "commence_time": "2026-02-01T16:30:00+00:00",
+      "home_odds": 0.2019,
+      "draw_odds": 0.2259,
+      "away_odds": 0.5722,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "5d2c6ee96eacb9c4bcac89213bcaf304",
+      "home_team": "Sunderland",
+      "away_team": "Burnley",
+      "commence_time": "2026-02-02T20:00:00+00:00",
+      "home_odds": 0.5464,
+      "draw_odds": 0.2659,
+      "away_odds": 0.1877,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "4ae3a1134fb1d10167c21bf10dff498f",
+      "home_team": "Leeds United",
+      "away_team": "Nottingham Forest",
+      "commence_time": "2026-02-06T20:00:00+00:00",
+      "home_odds": 0.4039,
+      "draw_odds": 0.2871,
+      "away_odds": 0.309,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "78f2e11f06a4662eb94d23b6c7319238",
+      "home_team": "Manchester United",
+      "away_team": "Tottenham Hotspur",
+      "commence_time": "2026-02-07T12:30:00+00:00",
+      "home_odds": 0.5655,
+      "draw_odds": 0.2295,
+      "away_odds": 0.2051,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "0232baa88f2ea7539654e9f8ebd53272",
+      "home_team": "Arsenal",
+      "away_team": "Sunderland",
+      "commence_time": "2026-02-07T15:00:00+00:00",
+      "home_odds": 0.7624,
+      "draw_odds": 0.1637,
+      "away_odds": 0.0738,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "9a38c80a3bab5163166bcf10f4995e8d",
+      "home_team": "Bournemouth",
+      "away_team": "Aston Villa",
+      "commence_time": "2026-02-07T15:00:00+00:00",
+      "home_odds": 0.3567,
+      "draw_odds": 0.2583,
+      "away_odds": 0.3851,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "8ca6a2f0fb6436b92bf3745d4ba81c54",
+      "home_team": "Burnley",
+      "away_team": "West Ham United",
+      "commence_time": "2026-02-07T15:00:00+00:00",
+      "home_odds": 0.3207,
+      "draw_odds": 0.2774,
+      "away_odds": 0.4018,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "a6fb47d91c1bdfd7152af4938e73b4d3",
+      "home_team": "Wolverhampton Wanderers",
+      "away_team": "Chelsea",
+      "commence_time": "2026-02-07T15:00:00+00:00",
+      "home_odds": 0.2047,
+      "draw_odds": 0.2358,
+      "away_odds": 0.5595,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "5064501681485a3db4abd297a0e775f4",
+      "home_team": "Fulham",
+      "away_team": "Everton",
+      "commence_time": "2026-02-07T15:00:00+00:00",
+      "home_odds": 0.4427,
+      "draw_odds": 0.296,
+      "away_odds": 0.2614,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "5c062fe74faee27e969bdccaa3040ef5",
+      "home_team": "Newcastle United",
+      "away_team": "Brentford",
+      "commence_time": "2026-02-07T17:30:00+00:00",
+      "home_odds": 0.5114,
+      "draw_odds": 0.2523,
+      "away_odds": 0.2363,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "a7f9683fe58c4fc6a5ac52396f279456",
+      "home_team": "Brighton and Hove Albion",
+      "away_team": "Crystal Palace",
+      "commence_time": "2026-02-08T14:00:00+00:00",
+      "home_odds": 0.5239,
+      "draw_odds": 0.2455,
+      "away_odds": 0.2306,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    },
+    {
+      "match_id": "e526c157d950230afb02bc6534fbaf82",
+      "home_team": "Liverpool",
+      "away_team": "Manchester City",
+      "commence_time": "2026-02-08T16:30:00+00:00",
+      "home_odds": 0.3871,
+      "draw_odds": 0.2515,
+      "away_odds": 0.3614,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
+    }
+  ],
+  "cached_at": "2026-01-28T23:27:00.612336",
+  "sport_key": "soccer_epl",
+  "sport_name": "English Premier League"
+}
