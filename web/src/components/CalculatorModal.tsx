@@ -1513,7 +1513,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
 
         {/* Footer */}
         <div className="p-4 border-t border-[#30363d]">
-          <p className="text-xs text-[#8b949e] text-center">
+          <p className="text-xs text-[#8b949e] text-center whitespace-nowrap">
             {txt.disclaimer}
           </p>
         </div>

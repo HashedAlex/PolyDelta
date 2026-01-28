@@ -2267,19 +2267,26 @@ def fetch_soccer_matches_polymarket(sport_type):
 
                 # 找到 "Yes" 的价格 (通常是第一个 outcome)
                 yes_price = None
-                yes_liq = None
                 for i, outcome in enumerate(outcomes):
                     if outcome.lower() == "yes":
                         yes_price = float(outcome_prices[i]) if i < len(outcome_prices) else None
-                        # 获取流动性 (如果有)
                         break
 
                 if yes_price is None:
                     continue
 
+                # 获取该市场的流动性
+                market_liq = market.get("liquidityNum") or market.get("liquidity")
+                if market_liq:
+                    try:
+                        market_liq = float(market_liq)
+                    except:
+                        market_liq = None
+
                 # 检查是否是 "Draw" 市场
                 if draw_pattern.search(question):
                     draw_price = yes_price
+                    draw_liq = market_liq
                     continue
 
                 # 检查是否是 "Will [Team] win" 市场
@@ -2293,11 +2300,13 @@ def fetch_soccer_matches_polymarket(sport_type):
                         team_in_question.lower() == team1_raw.lower() or
                         fuzz.ratio(team_in_question_clean.lower(), team1_clean.lower()) > 85):
                         home_price = yes_price
+                        home_liq = market_liq
                     # 匹配 Team2 (Away)
                     elif (team_in_question_clean.lower() == team2_clean.lower() or
                           team_in_question.lower() == team2_raw.lower() or
                           fuzz.ratio(team_in_question_clean.lower(), team2_clean.lower()) > 85):
                         away_price = yes_price
+                        away_liq = market_liq
 
             # 过滤已结束的比赛
             if home_price is not None and (home_price > 0.95 or home_price < 0.05):
@@ -2341,10 +2350,12 @@ def match_soccer_games(web2_matches, poly_matches):
     匹配策略:
     1. 首先应用严格字典映射 (SOCCER_TEAM_MAPPING)
     2. 然后使用模糊匹配作为后备
+    3. 添加 Polymarket 独有的比赛 (Web2 没有的)
     """
     print("\n[匹配] 正在匹配 Web2 和 Polymarket 的足球比赛...")
 
     merged = []
+    matched_poly_indices = set()  # 记录已匹配的 Polymarket 比赛索引
 
     for web2_match in web2_matches:
         home_team = web2_match["home_team"]
@@ -2356,7 +2367,8 @@ def match_soccer_games(web2_matches, poly_matches):
 
         # 在 Polymarket 中寻找匹配
         poly_match = None
-        for pm in poly_matches:
+        matched_idx = None
+        for idx, pm in enumerate(poly_matches):
             pm_home = normalize_team_for_matching(pm["home_team"])
             pm_away = normalize_team_for_matching(pm["away_team"])
 
@@ -2364,6 +2376,7 @@ def match_soccer_games(web2_matches, poly_matches):
             if (pm_home.lower() == home_normalized.lower() and
                 pm_away.lower() == away_normalized.lower()):
                 poly_match = pm
+                matched_idx = idx
                 print(f"[匹配] 严格映射成功: {home_team} vs {away_team}")
                 break
 
@@ -2381,16 +2394,18 @@ def match_soccer_games(web2_matches, poly_matches):
                     "away_liq": pm.get("home_liq"),
                     "url": pm.get("url"),
                 }
+                matched_idx = idx
                 print(f"[匹配] 严格映射成功 (反向): {home_team} vs {away_team}")
                 break
 
         # 如果严格映射失败，尝试模糊匹配
         if not poly_match:
-            for pm in poly_matches:
+            for idx, pm in enumerate(poly_matches):
                 # 正向模糊匹配
                 if (fuzzy_match_soccer_team(pm["home_team"])[0] == fuzzy_match_soccer_team(home_team)[0] and
                     fuzzy_match_soccer_team(pm["away_team"])[0] == fuzzy_match_soccer_team(away_team)[0]):
                     poly_match = pm
+                    matched_idx = idx
                     print(f"[匹配] 模糊匹配成功: {home_team} vs {away_team}")
                     break
                 # 反向模糊匹配
@@ -2407,8 +2422,12 @@ def match_soccer_games(web2_matches, poly_matches):
                         "away_liq": pm.get("home_liq"),
                         "url": pm.get("url"),
                     }
+                    matched_idx = idx
                     print(f"[匹配] 模糊匹配成功 (反向): {home_team} vs {away_team}")
                     break
+
+        if matched_idx is not None:
+            matched_poly_indices.add(matched_idx)
 
         merged.append({
             **web2_match,
@@ -2422,7 +2441,59 @@ def match_soccer_games(web2_matches, poly_matches):
         })
 
     matched_count = sum(1 for m in merged if m.get("poly_home_price"))
-    print(f"[匹配] 完成: {len(merged)} 场比赛, 成功匹配 Polymarket: {matched_count} 场")
+    print(f"[匹配] Web2 比赛匹配完成: {len(merged)} 场, 成功匹配 Polymarket: {matched_count} 场")
+
+    # ============================================
+    # 新增：添加 Polymarket 独有的比赛
+    # ============================================
+    poly_only_count = 0
+    print(f"\n[Polymarket 独有] 正在添加 Polymarket 独有的足球比赛...")
+
+    for idx, pm in enumerate(poly_matches):
+        if idx in matched_poly_indices:
+            continue  # 跳过已匹配的
+
+        # 只添加有价格的比赛
+        if pm.get("home_price") is None or pm.get("away_price") is None:
+            continue
+
+        # 去除 FC 后缀，获取干净的队名
+        home_clean = re.sub(r'\s*(FC|AFC|CF)$', '', pm["home_team"], flags=re.IGNORECASE).strip()
+        away_clean = re.sub(r'\s*(FC|AFC|CF)$', '', pm["away_team"], flags=re.IGNORECASE).strip()
+
+        # 创建 Polymarket-only 记录
+        match_id = f"poly_soccer_{idx}"
+
+        # 使用当前时间 + 7 天作为默认比赛时间 (Polymarket 比赛通常在近期)
+        default_time = datetime.utcnow() + timedelta(days=7)
+
+        merged.append({
+            "match_id": match_id,
+            "home_team": home_clean,
+            "away_team": away_clean,
+            "commence_time": default_time,
+            "web2_home_odds": None,
+            "web2_away_odds": None,
+            "web2_draw_odds": None,
+            "source_bookmaker": None,
+            "source_url": None,
+            "poly_home_price": pm["home_price"],
+            "poly_draw_price": pm.get("draw_price"),
+            "poly_away_price": pm["away_price"],
+            "polymarket_url": pm.get("url"),
+            "liquidity_home": pm.get("home_liq"),
+            "liquidity_draw": pm.get("draw_liq"),
+            "liquidity_away": pm.get("away_liq"),
+        })
+        poly_only_count += 1
+        home_pct = f"{pm['home_price']*100:.1f}%" if pm['home_price'] else "-"
+        draw_pct = f"{pm.get('draw_price', 0)*100:.1f}%" if pm.get('draw_price') else "-"
+        away_pct = f"{pm['away_price']*100:.1f}%" if pm['away_price'] else "-"
+        print(f"[Polymarket 独有] 添加: {home_clean} vs {away_clean} ({home_pct} / {draw_pct} / {away_pct})")
+
+    print(f"[Polymarket 独有] 添加了 {poly_only_count} 场足球比赛")
+    print(f"\n[匹配] 最终合计: {len(merged)} 场比赛")
+
     return merged
 
 
