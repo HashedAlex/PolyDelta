@@ -56,6 +56,8 @@ export default async function Page() {
   // 按赛事类型分组并处理冠军盘口数据
   const worldCupMarkets: MarketItem[] = []
   const nbaMarkets: MarketItem[] = []
+  const eplWinnerMarkets: MarketItem[] = []
+  const uclWinnerMarkets: MarketItem[] = []
 
   allData.forEach((item) => {
     const marketItem: MarketItem = {
@@ -74,6 +76,10 @@ export default async function Page() {
       worldCupMarkets.push(marketItem)
     } else if (item.sport_type === 'nba') {
       nbaMarkets.push(marketItem)
+    } else if (item.sport_type === 'epl_winner') {
+      eplWinnerMarkets.push(marketItem)
+    } else if (item.sport_type === 'ucl_winner') {
+      uclWinnerMarkets.push(marketItem)
     }
   })
 
@@ -158,6 +164,8 @@ export default async function Page() {
 
   worldCupMarkets.sort(sortByPolymarketPrice)
   nbaMarkets.sort(sortByPolymarketPrice)
+  eplWinnerMarkets.sort(sortByPolymarketPrice)
+  uclWinnerMarkets.sort(sortByPolymarketPrice)
 
   // 计算统计数据
   const stats = {
@@ -178,6 +186,8 @@ export default async function Page() {
     <Dashboard
       worldCupMarkets={worldCupMarkets}
       nbaMarkets={nbaMarkets}
+      eplWinnerMarkets={eplWinnerMarkets}
+      uclWinnerMarkets={uclWinnerMarkets}
       dailyMatches={dailyMatches}
       eplMatches={eplMatches}
       uclMatches={uclMatches}

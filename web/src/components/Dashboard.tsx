@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { MatchCard } from './MatchCard'
 import { FIFAMarketTable } from './FIFAMarketTable'
 import { NBAMarketTable } from './NBAMarketTable'
+import { SoccerWinnerTable } from './SoccerWinnerTable'
 
 // 市场数据类型 (冠军盘口)
 export interface MarketItem {
@@ -47,6 +48,8 @@ export interface DailyMatchItem {
 interface DashboardProps {
   worldCupMarkets: MarketItem[]
   nbaMarkets: MarketItem[]
+  eplWinnerMarkets: MarketItem[]  // EPL Winner markets
+  uclWinnerMarkets: MarketItem[]  // UCL Winner markets
   dailyMatches: DailyMatchItem[]  // NBA daily matches
   eplMatches: DailyMatchItem[]    // EPL daily matches
   uclMatches: DailyMatchItem[]    // UCL daily matches
@@ -66,6 +69,8 @@ type SportType = 'worldcup' | 'nba' | 'soccer'
 type NbaSubTab = 'daily' | 'championship'
 type FifaSubTab = 'championship' // 将来可添加: 'group_winners' | 'daily'
 type SoccerSubTab = 'epl' | 'ucl'
+// 三级导航类型 (Soccer view mode)
+type SoccerViewMode = 'matches' | 'winner'
 
 /**
  * 获取比赛的优先级分数（用于排序）
@@ -84,7 +89,7 @@ function getMatchPriority(match: DailyMatchItem): number {
   return 0                           // 都没有
 }
 
-export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatches, uclMatches, stats }: DashboardProps) {
+export function Dashboard({ worldCupMarkets, nbaMarkets, eplWinnerMarkets, uclWinnerMarkets, dailyMatches, eplMatches, uclMatches, stats }: DashboardProps) {
   // Use URL as the single source of truth for tab state
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -92,10 +97,12 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
   // Read tab state directly from URL (not useState)
   const tab = searchParams.get('tab')
   const sub = searchParams.get('sub')
+  const view = searchParams.get('view')
   const activeSport: SportType = tab === 'worldcup' ? 'worldcup' : tab === 'soccer' ? 'soccer' : 'nba'
   const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
   const fifaSubTab: FifaSubTab = 'championship' // 目前只有championship，将来可扩展
   const soccerSubTab: SoccerSubTab = sub === 'ucl' ? 'ucl' : 'epl'
+  const soccerViewMode: SoccerViewMode = view === 'winner' ? 'winner' : 'matches'
 
   // Only local UI state uses useState
   const [hideLowOdds, setHideLowOdds] = useState(true)
@@ -123,7 +130,11 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
   }
 
   const setSoccerSubTab = (subTab: SoccerSubTab) => {
-    router.push(`/?tab=soccer&sub=${subTab}`, { scroll: false })
+    router.push(`/?tab=soccer&sub=${subTab}&view=${soccerViewMode}`, { scroll: false })
+  }
+
+  const setSoccerViewMode = (viewMode: SoccerViewMode) => {
+    router.push(`/?tab=soccer&sub=${soccerSubTab}&view=${viewMode}`, { scroll: false })
   }
 
   // 每日比赛排序：优先显示双边齐全的套利机会
@@ -176,7 +187,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
               </div>
               <div className="text-center">
                 <div className="text-xl sm:text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
-                <div className="text-[#8b949e] text-xs sm:text-sm">Champions</div>
+                <div className="text-[#8b949e] text-xs sm:text-sm">Winners</div>
               </div>
               <div className="text-center">
                 <div className="text-xl sm:text-2xl font-bold text-[#3fb950]">{stats.arbitrageCount}</div>
@@ -360,42 +371,102 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
 
       {/* 二级导航 - Soccer Sub-tabs (EPL/UCL) */}
       {activeSport === 'soccer' && (
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex gap-2 p-1 bg-[#0d1117] rounded-lg">
-            <button
-              onClick={() => setSoccerSubTab('epl')}
-              className={`
-                flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
-                transition-all duration-200
-                ${soccerSubTab === 'epl'
-                  ? 'bg-[#d29922] text-black'
-                  : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
-                }
-              `}
-            >
-              <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
-              <span>EPL</span>
-              <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
-                {eplMatches.length}
-              </span>
-            </button>
-            <button
-              onClick={() => setSoccerSubTab('ucl')}
-              className={`
-                flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
-                transition-all duration-200
-                ${soccerSubTab === 'ucl'
-                  ? 'bg-[#1f6feb] text-white'
-                  : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
-                }
-              `}
-            >
-              <span>⭐</span>
-              <span>UCL</span>
-              <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'ucl' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
-                {uclMatches.length}
-              </span>
-            </button>
+        <div className="flex flex-col gap-4 mb-6">
+          {/* League selector - shows total (matches + winner) */}
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2 p-1 bg-[#0d1117] rounded-lg">
+              <button
+                onClick={() => setSoccerSubTab('epl')}
+                className={`
+                  flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                  transition-all duration-200
+                  ${soccerSubTab === 'epl'
+                    ? 'bg-[#d29922] text-black'
+                    : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                  }
+                `}
+              >
+                <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+                <span>EPL</span>
+                <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
+                  {eplMatches.length + eplWinnerMarkets.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setSoccerSubTab('ucl')}
+                className={`
+                  flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                  transition-all duration-200
+                  ${soccerSubTab === 'ucl'
+                    ? 'bg-[#1f6feb] text-white'
+                    : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                  }
+                `}
+              >
+                <span>⭐</span>
+                <span>UCL</span>
+                <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'ucl' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
+                  {uclMatches.length + uclWinnerMarkets.length}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* View mode toggle (Matches / Winner) - shows individual counts */}
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2 p-1 bg-[#0d1117] rounded-lg">
+              <button
+                onClick={() => setSoccerViewMode('matches')}
+                className={`
+                  flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                  transition-all duration-200
+                  ${soccerViewMode === 'matches'
+                    ? soccerSubTab === 'epl' ? 'bg-[#d29922] text-black' : 'bg-[#1f6feb] text-white'
+                    : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                  }
+                `}
+              >
+                <span>📅</span>
+                <span>Daily Matches</span>
+                <span className={`px-1.5 py-0.5 rounded text-xs ${soccerViewMode === 'matches' ? (soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-white/20') : 'bg-[#30363d]'}`}>
+                  {soccerSubTab === 'epl' ? eplMatches.length : uclMatches.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setSoccerViewMode('winner')}
+                className={`
+                  flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                  transition-all duration-200
+                  ${soccerViewMode === 'winner'
+                    ? soccerSubTab === 'epl' ? 'bg-[#d29922] text-black' : 'bg-[#1f6feb] text-white'
+                    : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                  }
+                `}
+              >
+                <span>🏆</span>
+                <span>Winner</span>
+                <span className={`px-1.5 py-0.5 rounded text-xs ${soccerViewMode === 'winner' ? (soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-white/20') : 'bg-[#30363d]'}`}>
+                  {soccerSubTab === 'epl' ? eplWinnerMarkets.length : uclWinnerMarkets.length}
+                </span>
+              </button>
+            </div>
+
+            {/* Hide < 1% Toggle (only in Winner view) */}
+            {soccerViewMode === 'winner' && (
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={hideLowOdds}
+                    onChange={(e) => setHideLowOdds(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`w-10 h-5 rounded-full transition-colors duration-200 ${hideLowOdds ? 'bg-[#3fb950]' : 'bg-[#30363d]'}`} />
+                  <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200 ${hideLowOdds ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+                <span className="text-sm text-[#8b949e]">Hide &lt; 1%</span>
+              </label>
+            )}
           </div>
         </div>
       )}
@@ -472,8 +543,8 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
         />
       )}
 
-      {/* ========== EPL Daily Matches Content ========== */}
-      {activeSport === 'soccer' && soccerSubTab === 'epl' && (
+      {/* ========== EPL Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'epl' && soccerViewMode === 'matches' && (
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
@@ -517,8 +588,17 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
         </section>
       )}
 
-      {/* ========== UCL Daily Matches Content ========== */}
-      {activeSport === 'soccer' && soccerSubTab === 'ucl' && (
+      {/* ========== EPL Winner Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'epl' && soccerViewMode === 'winner' && (
+        <SoccerWinnerTable
+          markets={eplWinnerMarkets}
+          hideLowOdds={hideLowOdds}
+          league="epl"
+        />
+      )}
+
+      {/* ========== UCL Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'ucl' && soccerViewMode === 'matches' && (
         <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">⭐</span>
@@ -560,6 +640,15 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatche
             </div>
           )}
         </section>
+      )}
+
+      {/* ========== UCL Winner Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'ucl' && soccerViewMode === 'winner' && (
+        <SoccerWinnerTable
+          markets={uclWinnerMarkets}
+          hideLowOdds={hideLowOdds}
+          league="ucl"
+        />
       )}
 
       {/* Footer - Disclaimer */}

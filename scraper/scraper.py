@@ -270,11 +270,19 @@ SPORTS_CONFIG = {
         "cache_file": "cache_worldcup.json",
         "poly_keywords": ["world cup", "fifa", "2026"],
     },
-    "epl": {
-        "name": "English Premier League",
-        "web2_key": "soccer_epl_winner",
-        "cache_file": "cache_epl.json",
+    "epl_winner": {
+        "name": "English Premier League Winner",
+        "web2_key": None,  # The Odds API 没有 EPL Winner 市场
+        "cache_file": "cache_epl_winner.json",
         "poly_keywords": ["premier league", "epl", "english premier"],
+        "poly_only": True,  # 仅 Polymarket 数据
+    },
+    "ucl_winner": {
+        "name": "UEFA Champions League Winner",
+        "web2_key": None,  # The Odds API 没有 UCL Winner 市场
+        "cache_file": "cache_ucl_winner.json",
+        "poly_keywords": ["champions league", "ucl", "uefa"],
+        "poly_only": True,  # 仅 Polymarket 数据
     },
     "nba": {
         "name": "NBA Championship",
@@ -778,6 +786,11 @@ def fetch_web2_odds(sport_type):
         print(f"[Web2] 未知赛事类型: {sport_type}")
         return {}
 
+    # 如果是 poly_only 配置，跳过 Web2 API 调用
+    if config.get("poly_only"):
+        print(f"\n[Web2] {config['name']} 为 Polymarket 专属市场，跳过 Web2 API")
+        return {}
+
     print(f"\n[Web2] 正在获取 {config['name']} 数据...")
     cache_file = os.path.join(CACHE_DIR, config['cache_file'])
 
@@ -1073,7 +1086,8 @@ def get_market_token_ids(market):
 TEAM_EXTRACT_PATTERNS = {
     "nba": re.compile(r"Will the (.+?) win the \d{4} NBA Finals", re.IGNORECASE),
     "world_cup": re.compile(r"Will (.+?) win the \d{4} FIFA World Cup", re.IGNORECASE),
-    "epl": re.compile(r"Will (.+?) win the (?:Premier League|\d{4})", re.IGNORECASE),
+    "epl_winner": re.compile(r"Will (.+?) win the \d{4}[–-]\d{2,4} English Premier League", re.IGNORECASE),
+    "ucl_winner": re.compile(r"Will (.+?) win the \d{4}[–-]\d{2,4} Champions League", re.IGNORECASE),
 }
 
 
@@ -1090,21 +1104,34 @@ def fetch_polymarket_data(sport_type):
 
     print(f"\n[Polymarket] 正在获取 {config['name']} 数据...")
 
-    # Gamma API endpoint
+    # Gamma API endpoint - 使用分页获取更多市场
     url = "https://gamma-api.polymarket.com/markets"
-    params = {
-        "closed": "false",
-        "limit": 500  # 增加限制以获取更多市场
-    }
+
+    # 收集所有市场数据（使用分页）
+    all_markets = []
+    for offset in [0, 500, 1000, 1500, 2000]:
+        params = {
+            "closed": "false",
+            "limit": 500,
+            "offset": offset
+        }
+        try:
+            response = requests.get(url, params=params, timeout=60)
+            response.raise_for_status()
+            batch = response.json()
+            all_markets.extend(batch)
+            if len(batch) < 500:  # 没有更多数据了
+                break
+        except requests.exceptions.RequestException as e:
+            print(f"[Polymarket] 分页请求失败 (offset={offset}): {e}")
+            break
+
+    markets = all_markets
+    result = {}
+    keywords = config['poly_keywords']
+    pattern = TEAM_EXTRACT_PATTERNS.get(sport_type)
 
     try:
-        response = requests.get(url, params=params, timeout=60)
-        response.raise_for_status()
-        markets = response.json()
-
-        result = {}
-        keywords = config['poly_keywords']
-        pattern = TEAM_EXTRACT_PATTERNS.get(sport_type)
 
         for market in markets:
             question = market.get("question", "")
@@ -1127,10 +1154,21 @@ def fetch_polymarket_data(sport_type):
                     if "win the" in question_lower and "qualify" not in question_lower:
                         matched = True
 
-            # 对于 EPL：必须包含 "win the" + "premier league"
-            elif sport_type == "epl":
-                if "premier league" in question_lower and "win" in question_lower:
-                    matched = True
+            # 对于 EPL Winner：必须包含 "win the" + "english premier league"
+            elif sport_type == "epl_winner":
+                if "english premier league" in question_lower and "win" in question_lower:
+                    # 排除非夺冠盘口 (2nd place, 3rd place, last place, relegated, top 4, top goal scorer)
+                    exclude_patterns = ["2nd place", "3rd place", "last place", "relegated", "top 4", "top goal scorer", "finish in"]
+                    if not any(p in question_lower for p in exclude_patterns):
+                        matched = True
+
+            # 对于 UCL Winner：必须包含 "win the" + "champions league"
+            elif sport_type == "ucl_winner":
+                if "champions league" in question_lower and "win" in question_lower:
+                    # 排除 "top scorer", "advance", "league phase" 等非夺冠盘口
+                    exclude_patterns = ["top scorer", "advance", "league phase", "round of 16", "finish first"]
+                    if not any(p in question_lower for p in exclude_patterns):
+                        matched = True
 
             if matched:
                 slug = market.get("slug", market.get("id", ""))
