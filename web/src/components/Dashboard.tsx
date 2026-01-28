@@ -29,8 +29,10 @@ export interface DailyMatchItem {
   commence_time: Date
   web2_home_odds: number | null
   web2_away_odds: number | null
+  web2_draw_odds: number | null  // Soccer 3-way
   poly_home_price: number | null
   poly_away_price: number | null
+  poly_draw_price: number | null  // Soccer 3-way
   source_bookmaker: string | null
   source_url: string | null
   polymarket_url: string | null
@@ -38,25 +40,32 @@ export interface DailyMatchItem {
   analysis_timestamp: Date | null
   liquidity_home: number | null
   liquidity_away: number | null
+  liquidity_draw: number | null  // Soccer 3-way
+  sport_type?: string  // 'nba' | 'epl' | 'ucl'
 }
 
 interface DashboardProps {
   worldCupMarkets: MarketItem[]
   nbaMarkets: MarketItem[]
-  dailyMatches: DailyMatchItem[]
+  dailyMatches: DailyMatchItem[]  // NBA daily matches
+  eplMatches: DailyMatchItem[]    // EPL daily matches
+  uclMatches: DailyMatchItem[]    // UCL daily matches
   stats: {
     totalOpportunities: number
     arbitrageCount: number
     dailyMatchCount: number
+    eplMatchCount: number
+    uclMatchCount: number
     lastUpdate: string
   }
 }
 
 // 一级导航类型
-type SportType = 'worldcup' | 'nba'
+type SportType = 'worldcup' | 'nba' | 'soccer'
 // 二级导航类型
 type NbaSubTab = 'daily' | 'championship'
 type FifaSubTab = 'championship' // 将来可添加: 'group_winners' | 'daily'
+type SoccerSubTab = 'epl' | 'ucl'
 
 /**
  * 获取比赛的优先级分数（用于排序）
@@ -75,7 +84,7 @@ function getMatchPriority(match: DailyMatchItem): number {
   return 0                           // 都没有
 }
 
-export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: DashboardProps) {
+export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, eplMatches, uclMatches, stats }: DashboardProps) {
   // Use URL as the single source of truth for tab state
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -83,9 +92,10 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   // Read tab state directly from URL (not useState)
   const tab = searchParams.get('tab')
   const sub = searchParams.get('sub')
-  const activeSport: SportType = tab === 'nba' ? 'nba' : 'worldcup'
+  const activeSport: SportType = tab === 'nba' ? 'nba' : tab === 'soccer' ? 'soccer' : 'worldcup'
   const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
   const fifaSubTab: FifaSubTab = 'championship' // 目前只有championship，将来可扩展
+  const soccerSubTab: SoccerSubTab = sub === 'ucl' ? 'ucl' : 'epl'
 
   // Only local UI state uses useState
   const [hideLowOdds, setHideLowOdds] = useState(true)
@@ -97,6 +107,8 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   const setActiveSport = (sport: SportType) => {
     if (sport === 'nba') {
       router.push('/?tab=nba&sub=championship', { scroll: false })
+    } else if (sport === 'soccer') {
+      router.push('/?tab=soccer&sub=epl', { scroll: false })
     } else {
       router.push('/?tab=worldcup&sub=championship', { scroll: false })
     }
@@ -110,8 +122,18 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
     router.push(`/?tab=worldcup&sub=${subTab}`, { scroll: false })
   }
 
+  const setSoccerSubTab = (subTab: SoccerSubTab) => {
+    router.push(`/?tab=soccer&sub=${subTab}`, { scroll: false })
+  }
+
   // 每日比赛排序：优先显示双边齐全的套利机会
   const sortedDailyMatches = [...dailyMatches].sort(
+    (a, b) => getMatchPriority(b) - getMatchPriority(a)
+  )
+  const sortedEplMatches = [...eplMatches].sort(
+    (a, b) => getMatchPriority(b) - getMatchPriority(a)
+  )
+  const sortedUclMatches = [...uclMatches].sort(
     (a, b) => getMatchPriority(b) - getMatchPriority(a)
   )
 
@@ -204,6 +226,24 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             <span>NBA</span>
             <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'nba' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
               {nbaMarkets.length + dailyMatches.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveSport('soccer')}
+            className={`
+              flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
+              transition-all duration-200
+              ${activeSport === 'soccer'
+                ? 'bg-[#d29922] text-black'
+                : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+              }
+            `}
+          >
+            <span>⚽</span>
+            <span className="hidden sm:inline">Soccer Leagues</span>
+            <span className="sm:hidden">Soccer</span>
+            <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'soccer' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
+              {eplMatches.length + uclMatches.length}
             </span>
           </button>
         </div>
@@ -318,6 +358,48 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
         </div>
       )}
 
+      {/* 二级导航 - Soccer Sub-tabs (EPL/UCL) */}
+      {activeSport === 'soccer' && (
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex gap-2 p-1 bg-[#0d1117] rounded-lg">
+            <button
+              onClick={() => setSoccerSubTab('epl')}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                transition-all duration-200
+                ${soccerSubTab === 'epl'
+                  ? 'bg-[#d29922] text-black'
+                  : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                }
+              `}
+            >
+              <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+              <span>Premier League</span>
+              <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'epl' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
+                {eplMatches.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setSoccerSubTab('ucl')}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+                transition-all duration-200
+                ${soccerSubTab === 'ucl'
+                  ? 'bg-[#1f6feb] text-white'
+                  : 'bg-transparent text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]'
+                }
+              `}
+            >
+              <span>⭐</span>
+              <span>Champions League</span>
+              <span className={`px-1.5 py-0.5 rounded text-xs ${soccerSubTab === 'ucl' ? 'bg-white/20' : 'bg-[#30363d]'}`}>
+                {uclMatches.length}
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ========== FIFA Championship Content ========== */}
       {activeSport === 'worldcup' && fifaSubTab === 'championship' && (
         <FIFAMarketTable
@@ -369,6 +451,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
                   polymarketUrl={match.polymarket_url}
                   liquidityHome={match.liquidity_home}
                   liquidityAway={match.liquidity_away}
+                  sportType="nba"
                 />
               ))}
             </div>
@@ -387,6 +470,96 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
           markets={nbaMarkets}
           hideLowOdds={hideLowOdds}
         />
+      )}
+
+      {/* ========== EPL Daily Matches Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'epl' && (
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+            <h2 className="text-xl font-bold text-[#e6edf3]">Premier League Matches</h2>
+            <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
+              {eplMatches.length} games
+            </span>
+          </div>
+
+          {sortedEplMatches.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {sortedEplMatches.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  matchId={match.match_id}
+                  homeTeam={match.home_team}
+                  awayTeam={match.away_team}
+                  commenceTime={new Date(match.commence_time)}
+                  web2HomeOdds={match.web2_home_odds}
+                  web2AwayOdds={match.web2_away_odds}
+                  web2DrawOdds={match.web2_draw_odds}
+                  polyHomePrice={match.poly_home_price}
+                  polyAwayPrice={match.poly_away_price}
+                  polyDrawPrice={match.poly_draw_price}
+                  sourceBookmaker={match.source_bookmaker}
+                  sourceUrl={match.source_url}
+                  polymarketUrl={match.polymarket_url}
+                  liquidityHome={match.liquidity_home}
+                  liquidityAway={match.liquidity_away}
+                  liquidityDraw={match.liquidity_draw}
+                  sportType="epl"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-[#8b949e]">
+              <p>No Premier League matches scheduled.</p>
+              <p className="text-sm mt-2">Check back later for upcoming matches.</p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ========== UCL Daily Matches Content ========== */}
+      {activeSport === 'soccer' && soccerSubTab === 'ucl' && (
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">⭐</span>
+            <h2 className="text-xl font-bold text-[#e6edf3]">Champions League Matches</h2>
+            <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
+              {uclMatches.length} games
+            </span>
+          </div>
+
+          {sortedUclMatches.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {sortedUclMatches.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  matchId={match.match_id}
+                  homeTeam={match.home_team}
+                  awayTeam={match.away_team}
+                  commenceTime={new Date(match.commence_time)}
+                  web2HomeOdds={match.web2_home_odds}
+                  web2AwayOdds={match.web2_away_odds}
+                  web2DrawOdds={match.web2_draw_odds}
+                  polyHomePrice={match.poly_home_price}
+                  polyAwayPrice={match.poly_away_price}
+                  polyDrawPrice={match.poly_draw_price}
+                  sourceBookmaker={match.source_bookmaker}
+                  sourceUrl={match.source_url}
+                  polymarketUrl={match.polymarket_url}
+                  liquidityHome={match.liquidity_home}
+                  liquidityAway={match.liquidity_away}
+                  liquidityDraw={match.liquidity_draw}
+                  sportType="ucl"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-[#8b949e]">
+              <p>No Champions League matches scheduled.</p>
+              <p className="text-sm mt-2">Check back later for upcoming matches.</p>
+            </div>
+          )}
+        </section>
       )}
 
       {/* Footer - Disclaimer */}

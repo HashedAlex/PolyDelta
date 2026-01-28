@@ -23,10 +23,30 @@ export default async function Page() {
     ],
   })
 
-  // 从数据库获取每日比赛数据
+  // 从数据库获取每日比赛数据 (NBA)
   const dailyMatchesRaw = await prisma.dailyMatch.findMany({
     where: {
       sport_type: 'nba',
+    },
+    orderBy: {
+      commence_time: 'asc',
+    },
+  })
+
+  // 获取 EPL 比赛数据
+  const eplMatchesRaw = await prisma.dailyMatch.findMany({
+    where: {
+      sport_type: 'epl',
+    },
+    orderBy: {
+      commence_time: 'asc',
+    },
+  })
+
+  // 获取 UCL 比赛数据
+  const uclMatchesRaw = await prisma.dailyMatch.findMany({
+    where: {
+      sport_type: 'ucl',
     },
     orderBy: {
       commence_time: 'asc',
@@ -57,7 +77,7 @@ export default async function Page() {
     }
   })
 
-  // 处理每日比赛数据
+  // 处理每日比赛数据 (NBA)
   const dailyMatches: DailyMatchItem[] = dailyMatchesRaw.map((match) => ({
     id: match.id,
     match_id: match.match_id,
@@ -66,8 +86,10 @@ export default async function Page() {
     commence_time: match.commence_time,
     web2_home_odds: match.web2_home_odds,
     web2_away_odds: match.web2_away_odds,
+    web2_draw_odds: match.web2_draw_odds,
     poly_home_price: match.poly_home_price,
     poly_away_price: match.poly_away_price,
+    poly_draw_price: match.poly_draw_price,
     source_bookmaker: match.source_bookmaker,
     source_url: match.source_url,
     polymarket_url: match.polymarket_url,
@@ -75,6 +97,56 @@ export default async function Page() {
     analysis_timestamp: match.analysis_timestamp,
     liquidity_home: match.liquidity_home,
     liquidity_away: match.liquidity_away,
+    liquidity_draw: match.liquidity_draw,
+    sport_type: 'nba',
+  }))
+
+  // 处理 EPL 比赛数据
+  const eplMatches: DailyMatchItem[] = eplMatchesRaw.map((match) => ({
+    id: match.id,
+    match_id: match.match_id,
+    home_team: match.home_team,
+    away_team: match.away_team,
+    commence_time: match.commence_time,
+    web2_home_odds: match.web2_home_odds,
+    web2_away_odds: match.web2_away_odds,
+    web2_draw_odds: match.web2_draw_odds,
+    poly_home_price: match.poly_home_price,
+    poly_away_price: match.poly_away_price,
+    poly_draw_price: match.poly_draw_price,
+    source_bookmaker: match.source_bookmaker,
+    source_url: match.source_url,
+    polymarket_url: match.polymarket_url,
+    ai_analysis: match.ai_analysis,
+    analysis_timestamp: match.analysis_timestamp,
+    liquidity_home: match.liquidity_home,
+    liquidity_away: match.liquidity_away,
+    liquidity_draw: match.liquidity_draw,
+    sport_type: 'epl',
+  }))
+
+  // 处理 UCL 比赛数据
+  const uclMatches: DailyMatchItem[] = uclMatchesRaw.map((match) => ({
+    id: match.id,
+    match_id: match.match_id,
+    home_team: match.home_team,
+    away_team: match.away_team,
+    commence_time: match.commence_time,
+    web2_home_odds: match.web2_home_odds,
+    web2_away_odds: match.web2_away_odds,
+    web2_draw_odds: match.web2_draw_odds,
+    poly_home_price: match.poly_home_price,
+    poly_away_price: match.poly_away_price,
+    poly_draw_price: match.poly_draw_price,
+    source_bookmaker: match.source_bookmaker,
+    source_url: match.source_url,
+    polymarket_url: match.polymarket_url,
+    ai_analysis: match.ai_analysis,
+    analysis_timestamp: match.analysis_timestamp,
+    liquidity_home: match.liquidity_home,
+    liquidity_away: match.liquidity_away,
+    liquidity_draw: match.liquidity_draw,
+    sport_type: 'ucl',
   }))
 
   // 按 Polymarket 价格（胜率）排序，热门球队在前
@@ -95,6 +167,8 @@ export default async function Page() {
       return ev !== null && Math.abs(ev) >= 5
     }).length,
     dailyMatchCount: dailyMatches.length,
+    eplMatchCount: eplMatches.length,
+    uclMatchCount: uclMatches.length,
     lastUpdate: allData[0]?.last_updated
       ? new Date(allData[0].last_updated).toLocaleString()
       : 'N/A',
@@ -105,6 +179,8 @@ export default async function Page() {
       worldCupMarkets={worldCupMarkets}
       nbaMarkets={nbaMarkets}
       dailyMatches={dailyMatches}
+      eplMatches={eplMatches}
+      uclMatches={uclMatches}
       stats={stats}
     />
   )
