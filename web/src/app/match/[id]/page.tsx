@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
 import { PremiumLock } from '@/components/PremiumLock'
+import { OddsHistoryCard } from '@/components/OddsHistoryCard'
 
 interface MatchData {
   matchId: string
@@ -902,6 +903,16 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
               )}
             </div>
           </section>
+        )}
+
+        {/* Odds History Card - Only show for championship */}
+        {match.isChampionship && (
+          <OddsHistoryCard
+            eventId={match.homeTeam}
+            eventType="championship"
+            sportType={match.sportType}
+            teamName={match.homeTeam}
+          />
         )}
 
         {/* AI Analysis Cards */}

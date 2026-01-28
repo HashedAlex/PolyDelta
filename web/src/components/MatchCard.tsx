@@ -162,20 +162,20 @@ export function MatchCard({
         )}
       </div>
 
-      {/* Teams - 单行横向展示 */}
+      {/* Teams - 单行横向展示，移动端用较小字体 */}
       <div className="flex flex-row items-center gap-2 mb-4 min-w-0">
-        <span className="text-base font-bold text-[#e6edf3] truncate" title={localHomeTeam}>
+        <span className="text-sm sm:text-base font-bold text-[#e6edf3] truncate" title={localHomeTeam}>
           {localHomeTeam}
         </span>
         <span className="text-xs text-[#6e7681] flex-shrink-0">vs</span>
-        <span className="text-base font-bold text-[#e6edf3] truncate" title={localAwayTeam}>
+        <span className="text-sm sm:text-base font-bold text-[#e6edf3] truncate" title={localAwayTeam}>
           {localAwayTeam}
         </span>
       </div>
 
       {/* Odds Comparison Table */}
-      <div className="bg-[#0d1117] rounded-lg p-3">
-        <div className="grid grid-cols-5 gap-2 text-xs mb-2">
+      <div className="bg-[#0d1117] rounded-lg p-2 sm:p-3">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2 text-[10px] sm:text-xs mb-2">
           <div className="text-[#8b949e]">{txt.team}</div>
           <div className="text-[#8b949e] text-center">
             {sourceBookmaker ? (
@@ -204,7 +204,7 @@ export function MatchCard({
         </div>
 
         {/* Home Team Row */}
-        <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2 text-xs sm:text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={localHomeTeam}>
             {homeTeam.split(' ').pop()}
           </div>
@@ -227,7 +227,7 @@ export function MatchCard({
         </div>
 
         {/* Away Team Row */}
-        <div className="grid grid-cols-5 gap-2 text-sm py-1.5 border-t border-[#30363d]">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2 text-xs sm:text-sm py-1.5 border-t border-[#30363d]">
           <div className="text-[#e6edf3] truncate" title={localAwayTeam}>
             {awayTeam.split(' ').pop()}
           </div>

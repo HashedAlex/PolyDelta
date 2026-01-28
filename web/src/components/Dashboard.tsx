@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ArbitrageCard } from './ArbitrageCard'
 import { MatchCard } from './MatchCard'
+import { FIFAMarketTable } from './FIFAMarketTable'
+import { NBAMarketTable } from './NBAMarketTable'
 
 // 市场数据类型 (冠军盘口)
 export interface MarketItem {
@@ -142,7 +144,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
   )
 
   return (
-    <main className="min-h-screen p-6">
+    <main className="min-h-screen p-6 pt-16 sm:pt-6">
       {/* Warning Banner - inline width */}
       {showBanner && (
         <div className="mb-4 -mt-2 bg-[#d29922]/20 border border-[#d29922]/40 rounded-lg px-4 py-3 flex items-center gap-3 w-fit">
@@ -164,27 +166,27 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
       {/* Header */}
       <header className="mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
               PolyDelta
             </h1>
-            <p className="text-[#8b949e] mt-1">Discover cross-market arbitrage opportunities</p>
+            <p className="text-[#8b949e] mt-1 text-sm sm:text-base">Discover cross-market arbitrage opportunities</p>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             {/* Stats */}
-            <div className="flex gap-6 text-sm">
+            <div className="flex gap-4 sm:gap-6 text-sm">
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#58a6ff]">{stats.dailyMatchCount}</div>
-                <div className="text-[#8b949e]">Today&apos;s Games</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#58a6ff]">{stats.dailyMatchCount}</div>
+                <div className="text-[#8b949e] text-xs sm:text-sm">Today&apos;s Games</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
-                <div className="text-[#8b949e]">Champions</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#d29922]">{stats.totalOpportunities}</div>
+                <div className="text-[#8b949e] text-xs sm:text-sm">Champions</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#3fb950]">{stats.arbitrageCount}</div>
-                <div className="text-[#8b949e]">Arbitrage</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#3fb950]">{stats.arbitrageCount}</div>
+                <div className="text-[#8b949e] text-xs sm:text-sm">Arbitrage</div>
               </div>
             </div>
           </div>
@@ -196,11 +198,11 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
       {/* 一级导航 - Sport Type */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="flex gap-2 p-1 bg-[#161b22] rounded-lg">
+        <div className="flex gap-1 sm:gap-2 p-1 bg-[#161b22] rounded-lg">
           <button
             onClick={() => setActiveSport('worldcup')}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium
+              flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
               transition-all duration-200
               ${activeSport === 'worldcup'
                 ? 'bg-[#3fb950] text-black'
@@ -209,7 +211,8 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
             `}
           >
             <span>⚽</span>
-            <span>FIFA World Cup</span>
+            <span className="hidden sm:inline">FIFA World Cup</span>
+            <span className="sm:hidden">FIFA</span>
             <span className={`px-1.5 py-0.5 rounded text-xs ${activeSport === 'worldcup' ? 'bg-black/20' : 'bg-[#30363d]'}`}>
               {worldCupMarkets.length}
             </span>
@@ -217,7 +220,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
           <button
             onClick={() => setActiveSport('nba')}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium
+              flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium
               transition-all duration-200
               ${activeSport === 'nba'
                 ? 'bg-[#58a6ff] text-white'
@@ -345,40 +348,10 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
       {/* ========== FIFA Championship Content ========== */}
       {activeSport === 'worldcup' && fifaSubTab === 'championship' && (
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">🏆</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">FIFA World Cup 2026 - Championship</h2>
-            <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
-              {hideLowOdds && filteredWorldCupMarkets.length !== worldCupMarkets.length
-                ? `${filteredWorldCupMarkets.length} / ${worldCupMarkets.length} teams`
-                : `${filteredWorldCupMarkets.length} teams`}
-            </span>
-          </div>
-
-          {filteredWorldCupMarkets.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedWorldCupMarkets.map((item) => (
-                <ArbitrageCard
-                  key={item.id}
-                  teamName={item.team_name}
-                  sportType="world_cup"
-                  web2Odds={item.web2_odds}
-                  sourceBookmaker={item.source_bookmaker}
-                  sourceUrl={item.source_url}
-                  polymarketPrice={item.polymarket_price}
-                  polymarketUrl={item.polymarket_url}
-                  ev={item.ev}
-                  liquidity={item.liquidity_usdc}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-[#8b949e]">
-              No World Cup championship data available
-            </div>
-          )}
-        </section>
+        <FIFAMarketTable
+          markets={worldCupMarkets}
+          hideLowOdds={hideLowOdds}
+        />
       )}
 
       {/* 将来可在此添加其他FIFA sub-tabs的内容:
@@ -438,40 +411,10 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, dailyMatches, stats }: 
 
       {/* ========== NBA Championship Content ========== */}
       {activeSport === 'nba' && nbaSubTab === 'championship' && (
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">🏆</span>
-            <h2 className="text-xl font-bold text-[#e6edf3]">NBA Championship</h2>
-            <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
-              {hideLowOdds && filteredNbaMarkets.length !== nbaMarkets.length
-                ? `${filteredNbaMarkets.length} / ${nbaMarkets.length} teams`
-                : `${filteredNbaMarkets.length} teams`}
-            </span>
-          </div>
-
-          {filteredNbaMarkets.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedNbaMarkets.map((item) => (
-                <ArbitrageCard
-                  key={item.id}
-                  teamName={item.team_name}
-                  sportType="nba"
-                  web2Odds={item.web2_odds}
-                  sourceBookmaker={item.source_bookmaker}
-                  sourceUrl={item.source_url}
-                  polymarketPrice={item.polymarket_price}
-                  polymarketUrl={item.polymarket_url}
-                  ev={item.ev}
-                  liquidity={item.liquidity_usdc}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-[#8b949e]">
-              No NBA Championship data available
-            </div>
-          )}
-        </section>
+        <NBAMarketTable
+          markets={nbaMarkets}
+          hideLowOdds={hideLowOdds}
+        />
       )}
 
       {/* Footer - Disclaimer */}
