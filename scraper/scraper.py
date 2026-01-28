@@ -2577,6 +2577,9 @@ def save_soccer_matches(matches, sport_type):
             (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
+        history_saved = 0
+        history_skipped = 0
+
         for match in matches:
             cursor.execute(insert_sql, (
                 sport_type,
@@ -2598,8 +2601,28 @@ def save_soccer_matches(matches, sport_type):
                 match.get("liquidity_draw"),
             ))
 
+            # 保存历史记录（智能去重，支持3-way）
+            if save_odds_history_daily(
+                cursor,
+                match_id=match["match_id"],
+                sport_type=sport_type,
+                web2_home_odds=match.get("home_odds"),
+                web2_away_odds=match.get("away_odds"),
+                poly_home_price=match.get("poly_home_price"),
+                poly_away_price=match.get("poly_away_price"),
+                liquidity_home=match.get("liquidity_home"),
+                liquidity_away=match.get("liquidity_away"),
+                web2_draw_odds=match.get("draw_odds"),
+                poly_draw_price=match.get("poly_draw_price"),
+                liquidity_draw=match.get("liquidity_draw"),
+            ):
+                history_saved += 1
+            else:
+                history_skipped += 1
+
         conn.commit()
         print(f"[入库] 成功保存 {len(matches)} 场 {sport_type.upper()} 比赛")
+        print(f"[入库] 历史记录: 新增 {history_saved} 条, 跳过 {history_skipped} 条 (无变化)")
 
         cursor.close()
         conn.close()
@@ -2755,9 +2778,10 @@ def save_odds_history_daily(cursor, match_id, sport_type,
                             web2_home_odds, web2_away_odds,
                             poly_home_price, poly_away_price,
                             liquidity_home=None, liquidity_away=None,
+                            web2_draw_odds=None, poly_draw_price=None, liquidity_draw=None,
                             ev=None, threshold=0.005):
     """
-    保存每日比赛历史记录（智能去重）
+    保存每日比赛历史记录（智能去重，支持足球3-way）
 
     Returns:
         bool: True 表示插入了新记录，False 表示跳过
@@ -2765,7 +2789,7 @@ def save_odds_history_daily(cursor, match_id, sport_type,
     # 查询最新记录
     cursor.execute("""
         SELECT web2_home_odds, web2_away_odds, poly_home_price, poly_away_price,
-               liquidity_home, liquidity_away, ev
+               liquidity_home, liquidity_away, web2_draw_odds, poly_draw_price, liquidity_draw, ev
         FROM odds_history
         WHERE event_type = 'daily' AND event_id = %s
         ORDER BY recorded_at DESC LIMIT 1
@@ -2773,7 +2797,7 @@ def save_odds_history_daily(cursor, match_id, sport_type,
     last = cursor.fetchone()
 
     if last:
-        (last_w2h, last_w2a, last_ph, last_pa, last_lh, last_la, last_ev) = last
+        (last_w2h, last_w2a, last_ph, last_pa, last_lh, last_la, last_w2d, last_pd, last_ld, last_ev) = last
         # 检查是否有显著变化
         if not any([
             _check_value_changed(web2_home_odds, last_w2h, threshold),
@@ -2782,6 +2806,9 @@ def save_odds_history_daily(cursor, match_id, sport_type,
             _check_value_changed(poly_away_price, last_pa, threshold),
             _check_value_changed(liquidity_home, last_lh, 1.0),
             _check_value_changed(liquidity_away, last_la, 1.0),
+            _check_value_changed(web2_draw_odds, last_w2d, threshold),
+            _check_value_changed(poly_draw_price, last_pd, threshold),
+            _check_value_changed(liquidity_draw, last_ld, 1.0),
             _check_value_changed(ev, last_ev, threshold),
         ]):
             return False
@@ -2790,10 +2817,13 @@ def save_odds_history_daily(cursor, match_id, sport_type,
         INSERT INTO odds_history
             (event_type, event_id, sport_type,
              web2_home_odds, web2_away_odds, poly_home_price, poly_away_price,
-             liquidity_home, liquidity_away, ev, recorded_at)
-        VALUES ('daily', %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+             liquidity_home, liquidity_away,
+             web2_draw_odds, poly_draw_price, liquidity_draw,
+             ev, recorded_at)
+        VALUES ('daily', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
     """, (match_id, sport_type, web2_home_odds, web2_away_odds,
-          poly_home_price, poly_away_price, liquidity_home, liquidity_away, ev))
+          poly_home_price, poly_away_price, liquidity_home, liquidity_away,
+          web2_draw_odds, poly_draw_price, liquidity_draw, ev))
     return True
 
 
