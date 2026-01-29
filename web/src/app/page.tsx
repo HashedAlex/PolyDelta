@@ -23,10 +23,14 @@ export default async function Page() {
     ],
   })
 
+  // Calculate cutoff: matches that started > 3 hours ago are likely finished
+  const matchEndCutoff = new Date(Date.now() - 3 * 60 * 60 * 1000)
+
   // 从数据库获取每日比赛数据 (NBA)
   const dailyMatchesRaw = await prisma.dailyMatch.findMany({
     where: {
       sport_type: 'nba',
+      commence_time: { gt: matchEndCutoff },
     },
     orderBy: {
       commence_time: 'asc',
@@ -37,6 +41,7 @@ export default async function Page() {
   const eplMatchesRaw = await prisma.dailyMatch.findMany({
     where: {
       sport_type: 'epl',
+      commence_time: { gt: matchEndCutoff },
     },
     orderBy: {
       commence_time: 'asc',
@@ -47,6 +52,7 @@ export default async function Page() {
   const uclMatchesRaw = await prisma.dailyMatch.findMany({
     where: {
       sport_type: 'ucl',
+      commence_time: { gt: matchEndCutoff },
     },
     orderBy: {
       commence_time: 'asc',

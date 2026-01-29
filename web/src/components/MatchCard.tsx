@@ -71,7 +71,7 @@ function formatMatchTime(date: Date): string {
   const timeStr = matchDate.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: true
   })
 
   if (isToday) {
