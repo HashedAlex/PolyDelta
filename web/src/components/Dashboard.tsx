@@ -99,7 +99,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, eplWinnerMarkets, uclWi
   const sub = searchParams.get('sub')
   const view = searchParams.get('view')
   const activeSport: SportType = tab === 'worldcup' ? 'worldcup' : tab === 'soccer' ? 'soccer' : 'nba'
-  const nbaSubTab: NbaSubTab = sub === 'daily' ? 'daily' : 'championship'
+  const nbaSubTab: NbaSubTab = sub === 'championship' ? 'championship' : 'daily'
   const fifaSubTab: FifaSubTab = 'championship' // 目前只有championship，将来可扩展
   const soccerSubTab: SoccerSubTab = sub === 'ucl' ? 'ucl' : 'epl'
   const soccerViewMode: SoccerViewMode = view === 'winner' ? 'winner' : 'matches'
@@ -113,7 +113,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, eplWinnerMarkets, uclWi
   // Navigation handlers - update URL instead of state
   const setActiveSport = (sport: SportType) => {
     if (sport === 'nba') {
-      router.push('/?tab=nba&sub=championship', { scroll: false })
+      router.push('/?tab=nba&sub=daily', { scroll: false })
     } else if (sport === 'soccer') {
       router.push('/?tab=soccer&sub=epl', { scroll: false })
     } else {

@@ -1436,6 +1436,7 @@ def fuzzy_match_team(name, threshold=75):
 def fetch_nba_matches_web2():
     """
     从 TheOddsAPI 获取 NBA 每日比赛 (H2H) 数据
+    支持缓存：API 失败时使用缓存数据
     返回: [
         {
             "match_id": str,
@@ -1452,9 +1453,48 @@ def fetch_nba_matches_web2():
     """
     print("\n[Web2] 正在获取 NBA 每日比赛 (H2H) 数据...")
 
-    if not ODDS_API_KEY or ODDS_API_KEY == "你的_TheOddsAPI_Key":
-        print("[Web2] 警告: ODDS_API_KEY 未设置")
+    # 缓存文件路径
+    cache_file = os.path.join(CACHE_DIR, "cache_daily_nba.json")
+
+    def load_from_cache():
+        """从缓存加载数据"""
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r') as f:
+                    cached = json.load(f)
+                matches = []
+                for m in cached.get("matches", []):
+                    m["commence_time"] = datetime.fromisoformat(m["commence_time"])
+                    matches.append(m)
+                cache_time = cached.get("cached_at", "unknown")
+                print(f"[Web2] 使用 NBA 缓存数据 (缓存时间: {cache_time}), {len(matches)} 场比赛")
+                return matches
+            except Exception as e:
+                print(f"[Web2] NBA 缓存加载失败: {e}")
         return []
+
+    def save_to_cache(matches):
+        """保存数据到缓存"""
+        try:
+            cache_data = []
+            for m in matches:
+                m_copy = m.copy()
+                m_copy["commence_time"] = m["commence_time"].isoformat()
+                cache_data.append(m_copy)
+            with open(cache_file, 'w') as f:
+                json.dump({
+                    "matches": cache_data,
+                    "cached_at": datetime.now().isoformat(),
+                    "sport_key": "basketball_nba",
+                    "sport_name": "NBA",
+                }, f, indent=2)
+            print(f"[Web2] NBA 数据已缓存到 {cache_file}")
+        except Exception as e:
+            print(f"[Web2] NBA 缓存保存失败: {e}")
+
+    if not ODDS_API_KEY or ODDS_API_KEY == "你的_TheOddsAPI_Key":
+        print("[Web2] 警告: ODDS_API_KEY 未设置，尝试使用缓存...")
+        return load_from_cache()
 
     url = "https://api.the-odds-api.com/v4/sports/basketball_nba/odds"
     params = {
@@ -1469,8 +1509,16 @@ def fetch_nba_matches_web2():
         response = requests.get(url, params=params, timeout=30)
 
         if response.status_code == 404:
-            print("[Web2] NBA 比赛暂无数据")
-            return []
+            print("[Web2] NBA 比赛暂无数据，尝试使用缓存...")
+            return load_from_cache()
+
+        if response.status_code == 401:
+            print("[Web2] API 配额已用尽，尝试使用缓存...")
+            return load_from_cache()
+
+        if response.status_code == 429:
+            print("[Web2] API 请求过于频繁，尝试使用缓存...")
+            return load_from_cache()
 
         response.raise_for_status()
         events = response.json()
@@ -1562,11 +1610,16 @@ def fetch_nba_matches_web2():
             })
 
         print(f"[Web2] 获取到 {len(matches)} 场 NBA 比赛")
+
+        # 成功获取数据后保存到缓存
+        if matches:
+            save_to_cache(matches)
+
         return matches
 
     except requests.exceptions.RequestException as e:
-        print(f"[Web2] API 请求失败: {e}")
-        return []
+        print(f"[Web2] API 请求失败: {e}，尝试使用缓存...")
+        return load_from_cache()
 
 
 def fetch_nba_matches_polymarket():
@@ -2648,6 +2701,7 @@ def match_soccer_games(web2_matches, poly_matches):
 def save_soccer_matches(matches, sport_type):
     """
     保存足球每日比赛到数据库 (支持 3-way)
+    保留旧 Polymarket 数据：当新抓取没有 Poly 数据但旧记录有时，保留旧数据
     """
     if not matches:
         print("[入库] 无足球比赛数据需要保存")
@@ -2656,6 +2710,43 @@ def save_soccer_matches(matches, sport_type):
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
+
+        # 先获取现有的 Polymarket 数据，用于在新数据缺失时保留
+        cursor.execute("""
+            SELECT match_id, poly_home_price, poly_away_price, poly_draw_price,
+                   polymarket_url, liquidity_home, liquidity_away, liquidity_draw
+            FROM daily_matches
+            WHERE sport_type = %s AND poly_home_price IS NOT NULL
+        """, (sport_type,))
+        existing_poly = {}
+        for row in cursor.fetchall():
+            existing_poly[row[0]] = {
+                "poly_home_price": row[1],
+                "poly_away_price": row[2],
+                "poly_draw_price": row[3],
+                "polymarket_url": row[4],
+                "liquidity_home": row[5],
+                "liquidity_away": row[6],
+                "liquidity_draw": row[7],
+            }
+
+        # 对新数据中缺少 Polymarket 数据的比赛，从旧数据恢复
+        preserved_count = 0
+        for match in matches:
+            mid = match["match_id"]
+            if mid in existing_poly and not match.get("poly_home_price"):
+                old = existing_poly[mid]
+                match["poly_home_price"] = old["poly_home_price"]
+                match["poly_away_price"] = old["poly_away_price"]
+                match["poly_draw_price"] = old["poly_draw_price"]
+                match["polymarket_url"] = old["polymarket_url"]
+                match["liquidity_home"] = old["liquidity_home"]
+                match["liquidity_away"] = old["liquidity_away"]
+                match["liquidity_draw"] = old["liquidity_draw"]
+                preserved_count += 1
+
+        if preserved_count:
+            print(f"[入库] 保留了 {preserved_count} 场比赛的 Polymarket 历史数据")
 
         # 删除该赛事旧数据
         cursor.execute("DELETE FROM daily_matches WHERE sport_type = %s", (sport_type,))
@@ -3243,25 +3334,39 @@ def main():
     print("Kalshi: 已禁用 (网络限制)")
     print("=" * 60)
 
+    # ============================================
+    # 优先获取每日比赛 (API 配额优先给 daily 数据)
+    # ============================================
+
+    # 1. 获取 NBA 每日比赛 (H2H)
+    daily_matches_nba = fetch_and_save_nba_matches()
+
+    # 2. 获取足球每日比赛 (3-way H2H)
+    daily_matches_epl = fetch_and_save_soccer_matches("epl")
+    daily_matches_ucl = fetch_and_save_soccer_matches("ucl")
+
+    # ============================================
+    # 然后获取冠军盘口 (有缓存兜底，配额不够也没关系)
+    # ============================================
+
     all_data = []
     stats = {}
 
-    # 循环抓取每个赛事
     for sport_type in SPORTS_CONFIG.keys():
         print(f"\n{'='*60}")
         print(f"正在处理: {SPORTS_CONFIG[sport_type]['name']}")
         print("=" * 60)
 
-        # 1. 获取 Web2 数据
+        # 获取 Web2 数据
         web2_data = fetch_web2_odds(sport_type)
 
-        # 2. 获取 Polymarket 数据
+        # 获取 Polymarket 数据
         poly_data = fetch_polymarket_data(sport_type)
 
-        # 3. 获取 Kalshi 数据 (已禁用，返回空)
+        # 获取 Kalshi 数据 (已禁用，返回空)
         kalshi_data = fetch_kalshi_data(sport_type)
 
-        # 4. 合并数据
+        # 合并数据
         merged = merge_and_save_data(sport_type, web2_data, poly_data, kalshi_data)
         all_data.extend(merged)
 
@@ -3273,18 +3378,11 @@ def main():
             "merged": len(merged)
         }
 
-    # 5. 统一入库 (冠军盘口)
+    # 统一入库 (冠军盘口)
     save_to_database(all_data)
 
-    # 5.5. 获取 FIFA 出线预测市场 (Props)
+    # 获取 FIFA 出线预测市场 (Props)
     fifa_qualification_count = save_fifa_qualification_markets()
-
-    # 6. 获取每日比赛 (H2H)
-    daily_matches_nba = fetch_and_save_nba_matches()
-
-    # 7. 获取足球每日比赛 (3-way H2H)
-    daily_matches_epl = fetch_and_save_soccer_matches("epl")
-    daily_matches_ucl = fetch_and_save_soccer_matches("ucl")
 
     # 最终统计
     print("\n" + "=" * 60)
