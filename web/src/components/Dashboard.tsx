@@ -636,7 +636,7 @@ export function Dashboard({ worldCupMarkets, nbaMarkets, eplWinnerMarkets, uclWi
           ) : (
             <div className="text-center py-12 text-[#8b949e]">
               <p>No UCL matches scheduled.</p>
-              <p className="text-sm mt-2">Check back later for upcoming matches.</p>
+              <p className="text-sm mt-2">The UCL League Phase has concluded. The Round of 16 begins on Feb 4, 2026.</p>
             </div>
           )}
         </section>
