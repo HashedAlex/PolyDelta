@@ -106,12 +106,14 @@ def process_match(cursor, match):
         return False
 
     # Update database with structured fields + full markdown report.
+    # Write to both ai_analysis (read by frontend) and ai_analysis_full (backup).
     cursor.execute("""
         UPDATE daily_matches SET
             ai_prediction = %s,
             ai_probability = %s,
             ai_market = %s,
             ai_risk = %s,
+            ai_analysis = %s,
             ai_analysis_full = %s,
             ai_generated_at = NOW()
         WHERE id = %s
@@ -120,6 +122,7 @@ def process_match(cursor, match):
         result["win_probability"],
         result["recommended_market"],
         result["risk_level"],
+        result.get("full_report_markdown"),
         result.get("full_report_markdown"),
         match_id,
     ))

@@ -316,40 +316,43 @@ function parseAIAnalysis(
     }
   }
 
-  // === DAILY MATCH: 需要aiAnalysis才生成 ===
-  if (!aiAnalysis) return null
+  // === DAILY MATCH: fall through to fallback generator even if aiAnalysis is null ===
+  // This allows EPL/UCL cards to render using odds data when no AI analysis exists
 
   // 优先尝试解析数据库中的 AI 分析 (英文或中文，取决于传入的 aiAnalysis)
-  try {
-    // 尝试多种格式：
-    // 1. ```json ... ``` (markdown code block)
-    // 2. json\n{...} (AI 返回的格式)
-    // 3. 纯 JSON
-    let jsonStr = aiAnalysis
+  if (aiAnalysis) {
+    try {
+      // 尝试多种格式：
+      // 1. ```json ... ``` (markdown code block)
+      // 2. json\n{...} (AI 返回的格式)
+      // 3. 纯 JSON
+      let jsonStr = aiAnalysis
 
-    // 格式1: markdown code block
-    const markdownMatch = aiAnalysis.match(/```json\n?([\s\S]*?)\n?```/)
-    if (markdownMatch) {
-      jsonStr = markdownMatch[1]
-    }
-    // 格式2: "json\n{...}" - AI 返回的格式
-    else if (aiAnalysis.startsWith('json\n') || aiAnalysis.startsWith('json\r\n')) {
-      jsonStr = aiAnalysis.replace(/^json\s*/, '')
-    }
-    // 格式3: 纯 JSON (以 { 开头)
-    else if (aiAnalysis.trim().startsWith('{')) {
-      jsonStr = aiAnalysis.trim()
-    }
+      // 格式1: markdown code block
+      const markdownMatch = aiAnalysis.match(/```json\n?([\s\S]*?)\n?```/)
+      if (markdownMatch) {
+        jsonStr = markdownMatch[1]
+      }
+      // 格式2: "json\n{...}" - AI 返回的格式
+      else if (aiAnalysis.startsWith('json\n') || aiAnalysis.startsWith('json\r\n')) {
+        jsonStr = aiAnalysis.replace(/^json\s*/, '')
+      }
+      // 格式3: 纯 JSON (以 { 开头)
+      else if (aiAnalysis.trim().startsWith('{')) {
+        jsonStr = aiAnalysis.trim()
+      }
 
-    const parsed = JSON.parse(jsonStr) as AIAnalysisData
-    return { ...parsed, kelly_suggestion: kellySuggestion }
-  } catch (e) {
-    console.error('[parseAIAnalysis] Daily match JSON parse failed:', e, 'Input:', aiAnalysis?.substring(0, 100))
+      const parsed = JSON.parse(jsonStr) as AIAnalysisData
+      return { ...parsed, kelly_suggestion: kellySuggestion }
+    } catch (e) {
+      console.error('[parseAIAnalysis] Daily match JSON parse failed:', e, 'Input:', aiAnalysis?.substring(0, 100))
+    }
   }
 
-  // Fallback: JSON解析失败时使用前端生成器
+  // Fallback: JSON解析失败时 or aiAnalysis is null — use frontend generator
   {
     // 日常比赛的fallback分析
+    const hasPolymarket = polyPrice != null && polyPrice > 0
 
     // === DAILY MATCH ANALYSIS ===
     // 根据 Kelly 建议生成动态内容
@@ -371,6 +374,13 @@ function parseAIAnalysis(
       headline = 'Value Bet Opportunity (+EV)'
       analysis = `Market price (${((polyPrice ?? 0) * 100).toFixed(1)}%) appears undervalued based on AI analysis. Expected edge of ${kellySuggestion.edge}% based on fundamentals. Line movement and news sentiment support this position.`
       kellyAdvice = `Quarter Kelly position recommended. Calculated edge: +${kellySuggestion.edge}%`
+    } else if (!hasPolymarket) {
+      // Bookmaker-only mode: no Polymarket data available
+      score = 50
+      status = 'Wait'
+      headline = 'Bookmaker Only — No Prediction Market Data'
+      analysis = `${homeTeam} has ${((web2Odds ?? 0) * 100).toFixed(1)}% implied probability from traditional bookmakers. No Polymarket pricing available for this match, so no cross-market edge can be calculated. Analysis is based on bookmaker odds only.`
+      kellyAdvice = 'No prediction market data. Cannot calculate cross-market edge. Monitor for Polymarket listing.'
     } else {
       score = 40
       status = 'Wait'
@@ -379,6 +389,15 @@ function parseAIAnalysis(
       kellyAdvice = 'Do not bet. Edge is below threshold. Wait for better entry.'
     }
 
+    // Build odds analysis pillar — adapt to Polymarket availability
+    const oddsContent = hasPolymarket
+      ? `Traditional: ${homeTeam} ${((web2Odds ?? 0) * 100).toFixed(1)}% | Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%. ${(web2Odds ?? 0) > (polyPrice ?? 0) ? 'Market may be undervaluing home team.' : (web2Odds ?? 0) < (polyPrice ?? 0) ? 'Market may be overvaluing home team.' : 'Odds closely aligned.'}`
+      : `Traditional: ${homeTeam} ${((web2Odds ?? 0) * 100).toFixed(1)}% | Polymarket: Not Available. Cross-market comparison not possible without prediction market data.`
+
+    const oddsFactors = hasPolymarket
+      ? [`Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`, `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`]
+      : [`Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`, `Polymarket: Not Available`]
+
     return {
       strategy_card: {
         score,
@@ -386,7 +405,9 @@ function parseAIAnalysis(
         headline,
         analysis,
         kelly_advice: kellyAdvice,
-        risk_text: '⚠️ Smart contract risk. Liquidity depth may vary. Always verify before trading.'
+        risk_text: hasPolymarket
+          ? '⚠️ Smart contract risk. Liquidity depth may vary. Always verify before trading.'
+          : '⚠️ Bookmaker odds only. No prediction market data available for cross-validation.'
       },
       news_card: {
         prediction: `${homeTeam || 'Home Team'} to Win`,
@@ -397,31 +418,28 @@ function parseAIAnalysis(
             icon: '🏥',
             title: `Injury/Availability Report`,
             content: `No real-time injury data available for ${homeTeam} vs ${awayTeam}. Check official injury reports before game time. Rest days and back-to-back situations can significantly impact team performance.`,
-            sentiment: 'neutral'
+            sentiment: 'neutral' as const
           },
           {
             icon: '📈',
             title: `Recent Form`,
             content: `Detailed recent form data unavailable. Consider checking both teams' last 10 games record, home/away splits, and offensive/defensive efficiency rankings to assess current momentum.`,
-            sentiment: 'neutral'
+            sentiment: 'neutral' as const
           },
           {
             icon: '⚔️',
             title: `Head-to-Head`,
             content: `No season series data available for ${homeTeam} vs ${awayTeam}. H2H records can reveal stylistic matchup advantages, but should be weighed against current roster changes.`,
-            sentiment: 'neutral'
+            sentiment: 'neutral' as const
           },
           {
             icon: '📊',
             title: `Odds Analysis`,
-            content: `Traditional: ${homeTeam} ${((web2Odds ?? 0) * 100).toFixed(1)}% | Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%. ${(web2Odds ?? 0) > (polyPrice ?? 0) ? 'Market may be undervaluing home team.' : (web2Odds ?? 0) < (polyPrice ?? 0) ? 'Market may be overvaluing home team.' : 'Odds closely aligned.'}`,
-            sentiment: (web2Odds ?? 0) > (polyPrice ?? 0) ? 'positive' : 'neutral'
+            content: oddsContent,
+            sentiment: hasPolymarket && (web2Odds ?? 0) > (polyPrice ?? 0) ? 'positive' as const : 'neutral' as const
           }
         ],
-        factors: [
-          `Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`,
-          `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`
-        ],
+        factors: oddsFactors,
         news_footer: '🚫 AI analysis based on public data. AI cannot predict random sports events.'
       },
       kelly_suggestion: kellySuggestion

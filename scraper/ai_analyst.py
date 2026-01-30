@@ -326,10 +326,11 @@ def generate_ai_report(match_data, is_championship=False, league="NBA"):
         return None
 
     ev = float(match_data.get('ev', 0))
+    poly_price = float(match_data.get('polymarket_price', 0))
     threshold = 0.05 if is_championship else 0.02
 
-    # Threshold filter: only analyze high-value opportunities
-    if ev < threshold:
+    # Skip threshold check if no Polymarket data — analyze based on bookmaker odds alone
+    if poly_price > 0 and ev < threshold:
         return None
 
     title = match_data.get('title', 'Unknown Match')
@@ -376,11 +377,21 @@ Use these as your STARTING POINT. Only adjust based on [LATEST NEWS] evidence.""
     else:
         market_anchor = "[MARKET BASELINE]\nMarket Data Unavailable. Estimate based on fundamentals only."
 
-    user_prompt = f"""{news_section}
+    if poly_price > 0:
+        user_prompt = f"""{news_section}
 {market_anchor}
 
 Analyze: {title}
 - Net EV: +{ev_percent:.1f}%
+
+Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it concise (under 200 words)."""
+    else:
+        # No Polymarket data — analyze based on bookmaker odds alone
+        user_prompt = f"""{news_section}
+{market_anchor}
+
+Analyze: {title}
+- Note: No prediction market (Polymarket) data available for this match. Base analysis on bookmaker odds and fundamentals only.
 
 Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it concise (under 200 words)."""
 

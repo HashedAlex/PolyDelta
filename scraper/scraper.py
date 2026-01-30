@@ -2511,24 +2511,38 @@ def save_soccer_matches(matches, sport_type):
         conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
 
-        # 先获取现有的 Polymarket 数据，用于在新数据缺失时保留
+        # 先获取现有的 Polymarket 数据 + AI 分析字段，用于在新数据缺失时保留
         cursor.execute("""
             SELECT match_id, poly_home_price, poly_away_price, poly_draw_price,
-                   polymarket_url, liquidity_home, liquidity_away, liquidity_draw
+                   polymarket_url, liquidity_home, liquidity_away, liquidity_draw,
+                   ai_analysis, ai_prediction, ai_probability, ai_market, ai_risk,
+                   ai_analysis_full, ai_generated_at
             FROM daily_matches
-            WHERE sport_type = %s AND poly_home_price IS NOT NULL
+            WHERE sport_type = %s
         """, (sport_type,))
         existing_poly = {}
+        existing_ai = {}
         for row in cursor.fetchall():
-            existing_poly[row[0]] = {
-                "poly_home_price": row[1],
-                "poly_away_price": row[2],
-                "poly_draw_price": row[3],
-                "polymarket_url": row[4],
-                "liquidity_home": row[5],
-                "liquidity_away": row[6],
-                "liquidity_draw": row[7],
-            }
+            if row[1] is not None:  # poly_home_price IS NOT NULL
+                existing_poly[row[0]] = {
+                    "poly_home_price": row[1],
+                    "poly_away_price": row[2],
+                    "poly_draw_price": row[3],
+                    "polymarket_url": row[4],
+                    "liquidity_home": row[5],
+                    "liquidity_away": row[6],
+                    "liquidity_draw": row[7],
+                }
+            if row[8] is not None or row[9] is not None:  # has ai_analysis or ai_prediction
+                existing_ai[row[0]] = {
+                    "ai_analysis": row[8],
+                    "ai_prediction": row[9],
+                    "ai_probability": row[10],
+                    "ai_market": row[11],
+                    "ai_risk": row[12],
+                    "ai_analysis_full": row[13],
+                    "ai_generated_at": row[14],
+                }
 
         # 对新数据中缺少 Polymarket 数据的比赛，从旧数据恢复
         preserved_count = 0
@@ -2559,18 +2573,27 @@ def save_soccer_matches(matches, sport_type):
              poly_home_price, poly_away_price, poly_draw_price,
              polymarket_url,
              liquidity_home, liquidity_away, liquidity_draw,
+             ai_analysis, ai_prediction, ai_probability, ai_market, ai_risk,
+             ai_analysis_full, ai_generated_at,
              last_updated)
         VALUES
-            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+             %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
         """
 
         history_saved = 0
         history_skipped = 0
+        ai_preserved = 0
 
         for match in matches:
+            mid = match["match_id"]
+
+            # Restore AI analysis fields from existing data
+            ai_data = existing_ai.get(mid, {})
+
             cursor.execute(insert_sql, (
                 sport_type,
-                match["match_id"],
+                mid,
                 match["home_team"],
                 match["away_team"],
                 match["commence_time"],
@@ -2586,7 +2609,17 @@ def save_soccer_matches(matches, sport_type):
                 match.get("liquidity_home"),
                 match.get("liquidity_away"),
                 match.get("liquidity_draw"),
+                ai_data.get("ai_analysis"),
+                ai_data.get("ai_prediction"),
+                ai_data.get("ai_probability"),
+                ai_data.get("ai_market"),
+                ai_data.get("ai_risk"),
+                ai_data.get("ai_analysis_full"),
+                ai_data.get("ai_generated_at"),
             ))
+
+            if ai_data:
+                ai_preserved += 1
 
             # 保存历史记录（智能去重，支持3-way）
             if save_odds_history_daily(
@@ -2609,6 +2642,7 @@ def save_soccer_matches(matches, sport_type):
 
         conn.commit()
         print(f"[入库] 成功保存 {len(matches)} 场 {sport_type.upper()} 比赛")
+        print(f"[入库] AI分析保留: {ai_preserved} 条")
         print(f"[入库] 历史记录: 新增 {history_saved} 条, 跳过 {history_skipped} 条 (无变化)")
 
         cursor.close()
