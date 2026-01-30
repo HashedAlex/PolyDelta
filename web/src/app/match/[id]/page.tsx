@@ -270,7 +270,8 @@ function parseAIAnalysis(
   web2Odds?: number | null,
   polyPrice?: number | null,
   isChampionship?: boolean,
-  _sportType?: string  // Reserved for future use
+  _sportType?: string,
+  web2AwayOdds?: number | null
 ): AIAnalysisDataExtended | null {
   // 计算 Kelly 建议 (冠军赛不用套利模式)
   const kellySuggestion = isChampionship
@@ -351,11 +352,20 @@ function parseAIAnalysis(
 
   // Fallback: JSON解析失败时 or aiAnalysis is null — use frontend generator
   {
-    // 日常比赛的fallback分析
     const hasPolymarket = polyPrice != null && polyPrice > 0
+    const homeProb = web2Odds ?? 0
+    const awayProb = web2AwayOdds ?? 0
+    const drawProb = (homeProb > 0 && awayProb > 0) ? Math.max(0, 1 - homeProb - awayProb) : 0
+    const isSoccer = _sportType !== 'nba'
+
+    // Determine favored team based on odds
+    const homeFavored = homeProb >= awayProb
+    const favoredTeam = homeFavored ? (homeTeam || 'Home Team') : (awayTeam || 'Away Team')
+    const underdogTeam = homeFavored ? (awayTeam || 'Away Team') : (homeTeam || 'Home Team')
+    const favoredProb = homeFavored ? homeProb : awayProb
+    const underdogProb = homeFavored ? awayProb : homeProb
 
     // === DAILY MATCH ANALYSIS ===
-    // 根据 Kelly 建议生成动态内容
     let score = 45
     let status: 'Buy' | 'Sell' | 'Wait' = 'Wait'
     let headline = 'No Clear Edge'
@@ -366,7 +376,7 @@ function parseAIAnalysis(
       score = 90
       status = 'Buy'
       headline = 'Arbitrage Opportunity Detected!'
-      analysis = `Polymarket price (${((polyPrice ?? 0) * 100).toFixed(1)}%) is significantly lower than ${homeTeam}'s traditional implied odds (${((web2Odds ?? 0) * 100).toFixed(1)}%). This creates a ${kellySuggestion.edge}% edge after fees. The spread indicates traditional books haven't adjusted yet.`
+      analysis = `Polymarket price (${((polyPrice ?? 0) * 100).toFixed(1)}%) is significantly lower than ${homeTeam}'s traditional implied odds (${(homeProb * 100).toFixed(1)}%). This creates a ${kellySuggestion.edge}% edge after fees. The spread indicates traditional books haven't adjusted yet.`
       kellyAdvice = `Full Kelly suggests high confidence buy. Edge: +${kellySuggestion.edge}%`
     } else if (kellySuggestion.mode === 'Value Bet (+EV)') {
       score = 72
@@ -375,28 +385,99 @@ function parseAIAnalysis(
       analysis = `Market price (${((polyPrice ?? 0) * 100).toFixed(1)}%) appears undervalued based on AI analysis. Expected edge of ${kellySuggestion.edge}% based on fundamentals. Line movement and news sentiment support this position.`
       kellyAdvice = `Quarter Kelly position recommended. Calculated edge: +${kellySuggestion.edge}%`
     } else if (!hasPolymarket) {
-      // Bookmaker-only mode: no Polymarket data available
+      // Bookmaker-only mode
       score = 50
       status = 'Wait'
       headline = 'Bookmaker Only — No Prediction Market Data'
-      analysis = `${homeTeam} has ${((web2Odds ?? 0) * 100).toFixed(1)}% implied probability from traditional bookmakers. No Polymarket pricing available for this match, so no cross-market edge can be calculated. Analysis is based on bookmaker odds only.`
+      const drawNote = isSoccer && drawProb > 0 ? ` Draw is priced at ${(drawProb * 100).toFixed(1)}%.` : ''
+      analysis = `${favoredTeam} is favored at ${(favoredProb * 100).toFixed(1)}% implied probability vs ${underdogTeam} at ${(underdogProb * 100).toFixed(1)}%.${drawNote} No Polymarket pricing available, so no cross-market edge can be calculated. Analysis is based on bookmaker odds only.`
       kellyAdvice = 'No prediction market data. Cannot calculate cross-market edge. Monitor for Polymarket listing.'
     } else {
       score = 40
       status = 'Wait'
       headline = 'No Clear Edge - Wait'
-      analysis = `Traditional odds (${((web2Odds ?? 0) * 100).toFixed(1)}%) and Polymarket (${((polyPrice ?? 0) * 100).toFixed(1)}%) are closely aligned. No arbitrage or value opportunity detected after fees. Markets appear efficient.`
+      analysis = `Traditional odds (${(homeProb * 100).toFixed(1)}%) and Polymarket (${((polyPrice ?? 0) * 100).toFixed(1)}%) are closely aligned. No arbitrage or value opportunity detected after fees. Markets appear efficient.`
       kellyAdvice = 'Do not bet. Edge is below threshold. Wait for better entry.'
     }
 
     // Build odds analysis pillar — adapt to Polymarket availability
+    const drawInfo = isSoccer && drawProb > 0 ? ` Draw: ${(drawProb * 100).toFixed(1)}%.` : ''
+    const polyGap = hasPolymarket ? homeProb - (polyPrice ?? 0) : 0  // positive = bookmaker higher than Poly
+    const significantGap = Math.abs(polyGap) >= 0.03  // require 3%+ gap to call it under/overvalued
     const oddsContent = hasPolymarket
-      ? `Traditional: ${homeTeam} ${((web2Odds ?? 0) * 100).toFixed(1)}% | Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%. ${(web2Odds ?? 0) > (polyPrice ?? 0) ? 'Market may be undervaluing home team.' : (web2Odds ?? 0) < (polyPrice ?? 0) ? 'Market may be overvaluing home team.' : 'Odds closely aligned.'}`
-      : `Traditional: ${homeTeam} ${((web2Odds ?? 0) * 100).toFixed(1)}% | Polymarket: Not Available. Cross-market comparison not possible without prediction market data.`
+      ? `Traditional: ${homeTeam} ${(homeProb * 100).toFixed(1)}% | ${awayTeam} ${(awayProb * 100).toFixed(1)}%.${drawInfo} Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%. ${significantGap ? (polyGap > 0 ? 'Market may be undervaluing home team.' : 'Market may be overvaluing home team.') : 'Odds closely aligned — no significant cross-market gap.'}`
+      : `${homeTeam} ${(homeProb * 100).toFixed(1)}% | ${awayTeam} ${(awayProb * 100).toFixed(1)}%.${drawInfo} Polymarket: Not Available.`
 
     const oddsFactors = hasPolymarket
-      ? [`Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`, `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`]
-      : [`Trad implied: ${((web2Odds ?? 0) * 100).toFixed(1)}%`, `Polymarket: Not Available`]
+      ? [`${homeTeam}: ${(homeProb * 100).toFixed(1)}%`, `${awayTeam}: ${(awayProb * 100).toFixed(1)}%`, `Polymarket: ${((polyPrice ?? 0) * 100).toFixed(1)}%`]
+      : [`${homeTeam}: ${(homeProb * 100).toFixed(1)}%`, `${awayTeam}: ${(awayProb * 100).toFixed(1)}%`]
+
+    // Determine prediction confidence based on favored team's odds
+    // Soccer uses lower thresholds because 3-way markets split probability across home/draw/away
+    // A 45% favorite in soccer is equivalent to ~65% in a 2-way NBA market
+    const predConfidence: 'High' | 'Medium' | 'Low' = isSoccer
+      ? (favoredProb > 0.50 ? 'High' : favoredProb > 0.35 ? 'Medium' : 'Low')
+      : (favoredProb > 0.65 ? 'High' : favoredProb > 0.45 ? 'Medium' : 'Low')
+    const predConfidencePct = Math.round(favoredProb * 100)
+
+    // Build contextual pillars based on available data
+    const matchupPillar: PillarAnalysis = isSoccer
+      ? {
+          icon: '🏟️',
+          title: `Home Advantage: ${homeTeam}`,
+          content: `${homeTeam} plays at home with ${(homeProb * 100).toFixed(1)}% implied probability${homeFavored ? ' and is the bookmaker favorite' : ` but ${awayTeam} is favored at ${(awayProb * 100).toFixed(1)}%`}. Home advantage is a significant factor in football — historically home teams win ~46% of matches in top European leagues.`,
+          sentiment: homeFavored ? 'positive' as const : 'neutral' as const
+        }
+      : {
+          icon: '🏠',
+          title: `Home Court: ${homeTeam}`,
+          content: `${homeTeam} has home court advantage at ${(homeProb * 100).toFixed(1)}% implied probability. ${homeFavored ? 'Bookmakers favor the home team.' : `However, ${awayTeam} is favored at ${(awayProb * 100).toFixed(1)}%.`}`,
+          sentiment: homeFavored ? 'positive' as const : 'neutral' as const
+        }
+
+    const competitivenessPillar: PillarAnalysis = (() => {
+      const gap = Math.abs(homeProb - awayProb) * 100
+      if (gap < 10) {
+        return {
+          icon: '⚖️',
+          title: 'Closely Matched Contest',
+          content: `Only ${gap.toFixed(1)}% separates the two sides in bookmaker pricing. This suggests a highly competitive match with no dominant favorite. In tight matches, small factors like form, injuries, and motivation can be decisive.`,
+          sentiment: 'neutral' as const
+        }
+      } else if (gap < 25) {
+        return {
+          icon: '📊',
+          title: `${favoredTeam} Moderate Favorite`,
+          content: `${favoredTeam} holds a ${gap.toFixed(1)}% edge over ${underdogTeam} in bookmaker pricing (${(favoredProb * 100).toFixed(1)}% vs ${(underdogProb * 100).toFixed(1)}%). A clear but not overwhelming advantage — upsets at this margin occur roughly 30-40% of the time.`,
+          sentiment: 'positive' as const
+        }
+      } else {
+        return {
+          icon: '💪',
+          title: `${favoredTeam} Heavy Favorite`,
+          content: `${favoredTeam} is strongly favored with a ${gap.toFixed(1)}% probability gap (${(favoredProb * 100).toFixed(1)}% vs ${(underdogProb * 100).toFixed(1)}%). The odds heavily favor ${favoredTeam}, but heavy favorites can underperform when complacency or rotation becomes a factor.`,
+          sentiment: 'positive' as const
+        }
+      }
+    })()
+
+    const drawPillar: PillarAnalysis | null = isSoccer && drawProb > 0 ? {
+      icon: '🤝',
+      title: `Draw Probability: ${(drawProb * 100).toFixed(1)}%`,
+      content: `The draw is priced at ${(drawProb * 100).toFixed(1)}% implied probability. ${drawProb > 0.30 ? 'A significant draw chance suggests a tight, tactically cautious match.' : drawProb > 0.25 ? 'Moderate draw probability — typical for competitive fixtures.' : 'Lower draw probability suggests one team is expected to dominate.'}`,
+      sentiment: drawProb > 0.30 ? 'negative' as const : 'neutral' as const
+    } : null
+
+    const oddsPillar: PillarAnalysis = {
+      icon: '📊',
+      title: 'Odds Analysis',
+      content: oddsContent,
+      sentiment: hasPolymarket && significantGap && polyGap > 0 ? 'positive' as const : 'neutral' as const
+    }
+
+    const pillars: PillarAnalysis[] = [matchupPillar, competitivenessPillar]
+    if (drawPillar) pillars.push(drawPillar)
+    pillars.push(oddsPillar)
 
     return {
       strategy_card: {
@@ -410,35 +491,10 @@ function parseAIAnalysis(
           : '⚠️ Bookmaker odds only. No prediction market data available for cross-validation.'
       },
       news_card: {
-        prediction: `${homeTeam || 'Home Team'} to Win`,
-        confidence: (web2Odds ?? 0.5) > 0.65 ? 'High' : (web2Odds ?? 0.5) > 0.5 ? 'Medium' : 'Low',
-        confidence_pct: Math.round((web2Odds ?? 0.5) * 100),
-        pillars: [
-          {
-            icon: '🏥',
-            title: `Injury/Availability Report`,
-            content: `No real-time injury data available for ${homeTeam} vs ${awayTeam}. Check official injury reports before game time. Rest days and back-to-back situations can significantly impact team performance.`,
-            sentiment: 'neutral' as const
-          },
-          {
-            icon: '📈',
-            title: `Recent Form`,
-            content: `Detailed recent form data unavailable. Consider checking both teams' last 10 games record, home/away splits, and offensive/defensive efficiency rankings to assess current momentum.`,
-            sentiment: 'neutral' as const
-          },
-          {
-            icon: '⚔️',
-            title: `Head-to-Head`,
-            content: `No season series data available for ${homeTeam} vs ${awayTeam}. H2H records can reveal stylistic matchup advantages, but should be weighed against current roster changes.`,
-            sentiment: 'neutral' as const
-          },
-          {
-            icon: '📊',
-            title: `Odds Analysis`,
-            content: oddsContent,
-            sentiment: hasPolymarket && (web2Odds ?? 0) > (polyPrice ?? 0) ? 'positive' as const : 'neutral' as const
-          }
-        ],
+        prediction: `${favoredTeam} to Win`,
+        confidence: predConfidence,
+        confidence_pct: predConfidencePct,
+        pillars,
         factors: oddsFactors,
         news_footer: '🚫 AI analysis based on public data. AI cannot predict random sports events.'
       },
@@ -795,8 +851,13 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                     {match.homeTeam} <span className="text-[#8b949e] font-normal">vs</span> {match.awayTeam}
                   </h1>
                   <p className="text-[#8b949e] mt-1 flex items-center gap-2">
-                    <span>🏀</span>
-                    <span>{txt.nbaDailyMatch}</span>
+                    <span>{match.sportType === 'nba' ? '🏀' : '⚽'}</span>
+                    <span>{
+                      match.sportType === 'nba' ? txt.nbaDailyMatch :
+                      match.sportType === 'soccer_epl' || match.sportType === 'epl' ? 'EPL Daily Match' :
+                      match.sportType === 'soccer_uefa_champs_league' || match.sportType === 'ucl' ? 'UCL Daily Match' :
+                      'Daily Match'
+                    }</span>
                     <span>•</span>
                     <span>{formatDate(match.commenceTime)}</span>
                   </p>
@@ -974,7 +1035,8 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
             match.web2HomeOdds,
             match.polyHomePrice,
             match.isChampionship,
-            match.sportType
+            match.sportType,
+            match.web2AwayOdds
           )
 
           if (!analysisData) {
@@ -1147,9 +1209,8 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                 <div className="px-6 py-5 space-y-4">
                   {/* Prediction with Confidence — prefer structured DB fields */}
                   {(() => {
-                    const displayPrediction = match.aiPrediction
-                      ? `${match.aiPrediction} to Win`
-                      : news_card.prediction
+                    const rawPrediction = match.aiPrediction || news_card.prediction
+                    const displayPrediction = rawPrediction?.replace(/ to win$/i, '').trim() + ' to Win'
                     const displayConfidence = match.aiProbability
                       ? (match.aiProbability >= 70 ? 'High' : match.aiProbability >= 55 ? 'Medium' : 'Low')
                       : news_card.confidence

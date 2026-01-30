@@ -188,6 +188,7 @@ def process_championship(cursor, market):
             ai_probability = %s,
             ai_market = %s,
             ai_risk = %s,
+            ai_analysis = %s,
             ai_analysis_full = %s,
             ai_generated_at = NOW()
         WHERE id = %s
@@ -196,6 +197,7 @@ def process_championship(cursor, market):
         result["win_probability"],
         result["recommended_market"],
         result["risk_level"],
+        result.get("full_report_markdown"),
         result.get("full_report_markdown"),
         market_id,
     ))

@@ -27,61 +27,54 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 YOUR_SITE_URL = "https://polydelta.vercel.app"
 APP_NAME = "PolyDelta Arbitrage"
 
-# ---------------- SYSTEM PROMPT (4-Pillar Framework) ---------------- #
+# ---------------- SYSTEM PROMPT (JSON Output + 4-Pillar Framework) ---------------- #
 SYSTEM_PROMPT = """
-You are a World-Class Sports Betting Analyst. Your goal is to synthesize Real-Time News with Fundamental Analysis to predict match outcomes.
+You are a World-Class Sports Betting Analyst. Output ONLY valid JSON — no markdown, no code fences, no commentary.
 
-Use this "4-Pillar Framework". Adapt your reasoning style based on the league (e.g., in NBA focus on player availability; in UCL focus on aggregate scores/motivation).
+INTERNAL REASONING (use but do NOT output):
+1. Fundamentals: quality gap, home/away, travel/fatigue, H2H
+2. Real-Time Intel: analyze [LATEST NEWS] if present. NEVER invent injuries or news.
+3. Motivation & Stakes: title race, relegation, tournament context, tanking
+4. Prediction: synthesize above pillars
 
-### PILLAR 1: FUNDAMENTALS & CONTEXT
-- **Quality Gap:** Compare squad depth and talent tiers.
-- **Home/Away:** Weight home advantage heavily (especially for EPL/UCL).
-- **Travel/Fatigue:** Consider travel distance and recent schedule density.
-- **H2H:** Historical dominance or "bogey teams".
+CALCULATION — Anchor & Adjust:
+- Start with Market Baseline from user prompt as ANCHOR
+- Neutral/empty news → stay within ±2%
+- Moderate news (role player out) → adjust ±3-5%
+- Critical news (star player out, not priced in) → adjust ±5-15%
+- CONSTRAINT: Never deviate >10% from Market Baseline unless CRITICAL breaking news
 
-### PILLAR 2: REAL-TIME INTEL (Conditional)
-- **Review the [LATEST NEWS] section provided in the user prompt.**
-- **CRITICAL INSTRUCTION:**
-    - **IF news is present:** Analyze its impact directly (e.g., "Salah out reduces Liverpool's attack").
-    - **IF news is EMPTY or IRRELEVANT:** Explicitly state "No significant breaking news/injury reports found." and **base your prediction SOLELY on Pillar 1 & 3.**
-    - **DO NOT** invent injuries or news stories that are not in the context.
+OUTPUT SCHEMA (respond with this JSON and nothing else):
+{
+  "strategy_card": {
+    "score": <integer 0-100, your final win probability>,
+    "status": "<status word from user prompt>",
+    "headline": "<4-6 word trading headline>",
+    "analysis": "<1-2 sentence synthesis of fundamentals + news>",
+    "kelly_advice": "<e.g. Quarter Kelly. Edge: +8%>",
+    "risk_text": "<1 sentence risk warning with ⚠️>"
+  },
+  "news_card": {
+    "prediction": "<Team Name to Win OR Draw>",
+    "confidence": "<High|Medium|Low>",
+    "confidence_pct": <integer 0-100, same as score>,
+    "pillars": [
+      {"icon": "<emoji>", "title": "<3-4 words>", "content": "<1-2 sentences using REAL facts from [LATEST NEWS] or fundamentals>", "sentiment": "<positive|negative|neutral>"}
+    ],
+    "factors": ["<Team>: <probability>%", "<Team>: <probability>%"],
+    "news_footer": "AI analysis based on public data. Not financial advice."
+  }
+}
 
-### PILLAR 3: MOTIVATION & STAKES
-- **League Context:** Title race? Relegation battle? Mid-table dead rubber?
-- **Tournament Context (UCL/World Cup):** Is this a 2nd leg? Does a draw suffice? Group stage calculation?
-- **NBA Context:** Is it a back-to-back? Is the team tanking?
-
-### PILLAR 4: PREDICTION
-- Synthesize the above.
-- If news is missing, admit lower confidence but still provide a prediction based on fundamentals.
-
-**Format your response exactly like this:**
-## AI Betting Analysis: {Home Team} vs {Away Team}
-
-**1. Fundamentals & News Check**
-* [Synthesize Pillars 1 & 2 here. Explicitly mention if injuries impact the prediction.]
-
-**2. The X-Factor**
-* [Mention Motivation, Fatigue, or Tactical Mismatch]
-
-**Betting Verdict**
-* **Predicted Winner:** [Team Name]
-* **Win Probability:** [Final calculated percentage — see CALCULATION STRATEGY below]
-* **Recommended Market:** [Pick ONE: Moneyline / Spread / Over-Under]
-   * *Reasoning:* [e.g., "Due to both defensive centers being out, the Over is the safest play."]
-* **Risk Level:** [Low/Medium/High]
-
-**IMPORTANT:** If the match winner is too close to call, you may recommend "Over/Under" or "Spread" instead of Moneyline. Always pick the market where you see the clearest edge.
-
-### CALCULATION STRATEGY: Anchor & Adjust
-Use this method to calculate "Win Probability". Do NOT guess a number based on feeling.
-1. **Start with the Market Baseline:** The user prompt provides the Market Implied Probability for each team. This is your ANCHOR. Markets are efficient and incorporate vast information.
-2. **Apply News Factor (from [LATEST NEWS]):**
-   - If news is **neutral/expected/empty**: Stay within +/- 2% of the Market Baseline.
-   - If news is **moderately favorable** (e.g., role player out): Adjust +/- 3-5%.
-   - If news is **highly impactful** (e.g., star player ruled out, not yet priced in): Adjust +/- 5-15%.
-3. **Output your final calculated percentage.**
-4. **CONSTRAINT:** Do NOT deviate more than 10% from the Market Baseline unless there is a CRITICAL injury or breaking news listed in [LATEST NEWS]. If no news is provided, your probability MUST be within 2% of the Market Baseline.
+RULES:
+- pillars: exactly 2-3 items. Use REAL match-specific content from [LATEST NEWS] and fundamentals. Never use generic filler.
+- If no news: pillars should cover fundamentals (home advantage, form, H2H) — still 2-3 pillars.
+- sentiment: "positive" = helps the predicted winner, "negative" = hurts the predicted winner. Be honest — predicted winner's own injury IS negative, not positive.
+- VISUAL CONSISTENCY (MANDATORY): If score >60%, AT LEAST ONE pillar MUST have sentiment "positive". Use title like "Baseline Strength" or "Squad Depth" to explain WHY the predicted winner is still heavily favored (e.g. "Despite injuries, Arsenal's squad depth is vastly superior to Leeds"). This is NON-NEGOTIABLE — the user needs to see a green pillar justifying the high score.
+- confidence: High if >75%, Medium if 55-75%, Low if <55%
+- prediction: use the team name only (e.g. "Arsenal", "Chelsea"). Do NOT append "to Win" — the frontend adds it automatically.
+- factors: list market probabilities for both teams
+- Output ONLY the JSON object. No text before or after.
 """
 
 
@@ -134,7 +127,7 @@ class LLMClient:
         combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
         response = self.vertex_model.generate_content(
             combined_prompt,
-            generation_config={"temperature": 0.7, "max_output_tokens": 800},
+            generation_config={"temperature": 0.7, "max_output_tokens": 1000},
         )
         return self._clean_response(response.text)
 
@@ -155,7 +148,7 @@ class LLMClient:
                 {"role": "user", "content": user_prompt}
             ],
             temperature=0.7,
-            max_tokens=800,
+            max_tokens=1000,
         )
         content = completion.choices[0].message.content
         return self._clean_response(content)
@@ -241,17 +234,19 @@ def get_context_builder():
 
 def parse_analysis_output(raw_text):
     """
-    Parse structured fields from the AI's Markdown output.
-    Uses regex to extract: predicted_winner, win_probability, recommended_market, risk_level.
+    Parse structured fields from AI output.
+    Tries JSON first (new format), falls back to regex for old markdown in DB.
     Returns None-safe dict — never crashes on malformed output.
 
     Args:
-        raw_text: Raw markdown string from the LLM.
+        raw_text: Raw string from the LLM (JSON or legacy markdown).
 
     Returns:
         Dict with keys: predicted_winner, win_probability, recommended_market, risk_level.
         Values default to None if parsing fails.
     """
+    import json
+
     result = {
         "predicted_winner": None,
         "win_probability": None,
@@ -262,7 +257,27 @@ def parse_analysis_output(raw_text):
     if not raw_text:
         return result
 
-    # Predicted Winner: "**Predicted Winner:** Team Name" or "**Winner:** Team Name"
+    # --- Try JSON parse first (new format) ---
+    try:
+        data = json.loads(raw_text)
+        nc = data.get("news_card", {})
+        sc = data.get("strategy_card", {})
+        result["predicted_winner"] = nc.get("prediction")
+        result["win_probability"] = sc.get("score") or nc.get("confidence_pct")
+        result["recommended_market"] = "Moneyline"  # JSON format implies moneyline
+        risk_score = sc.get("score", 50)
+        if isinstance(risk_score, (int, float)):
+            if risk_score >= 70:
+                result["risk_level"] = "Low"
+            elif risk_score >= 50:
+                result["risk_level"] = "Medium"
+            else:
+                result["risk_level"] = "High"
+        return result
+    except (json.JSONDecodeError, TypeError, AttributeError):
+        pass
+
+    # --- Fallback: regex for legacy markdown in DB ---
     winner_match = re.search(
         r'\*{0,2}Predicted\s+Winner\*{0,2}:\s*\*{0,2}\s*(.+?)(?:\s*\*{0,2})\s*$',
         raw_text, re.MULTILINE | re.IGNORECASE
@@ -275,7 +290,6 @@ def parse_analysis_output(raw_text):
     if winner_match:
         result["predicted_winner"] = winner_match.group(1).strip().strip('*').strip()
 
-    # Win Probability: "**Win Probability:** 65%" or "65"
     prob_match = re.search(
         r'\*{0,2}Win\s+Probability\*{0,2}:\s*\*{0,2}\s*~?(\d{1,3})\s*%?',
         raw_text, re.IGNORECASE
@@ -285,7 +299,6 @@ def parse_analysis_output(raw_text):
         if 0 <= val <= 100:
             result["win_probability"] = val
 
-    # Recommended Market: "**Recommended Market:** Moneyline" (capture until newline or reasoning)
     market_match = re.search(
         r'\*{0,2}Recommended\s+Market\*{0,2}:\s*\*{0,2}\s*(.+?)(?:\s*\*{0,2})\s*$',
         raw_text, re.MULTILINE | re.IGNORECASE
@@ -293,7 +306,6 @@ def parse_analysis_output(raw_text):
     if market_match:
         result["recommended_market"] = market_match.group(1).strip().strip('*').strip()
 
-    # Risk Level: "**Risk Level:** Medium"
     risk_match = re.search(
         r'\*{0,2}Risk\s+Level\*{0,2}:\s*\*{0,2}\s*(Low|Medium|High)(?:\s*\*{0,2})',
         raw_text, re.IGNORECASE
@@ -377,23 +389,39 @@ Use these as your STARTING POINT. Only adjust based on [LATEST NEWS] evidence.""
     else:
         market_anchor = "[MARKET BASELINE]\nMarket Data Unavailable. Estimate based on fundamentals only."
 
+    # Status vocabulary depends on market type
+    if is_championship:
+        status_vocab = 'Use status vocabulary: "Accumulate" (strong buy), "Hold" (neutral), or "Sell" (avoid).'
+        champ_instruction = f"""- CHAMPIONSHIP/FUTURES MARKET: This is NOT a head-to-head match. You are evaluating whether "{home_team}" will win the championship.
+- prediction field: use "{home_team}" if bullish, or "Fade {home_team}" if bearish. NEVER use "Draw".
+- score: represents the team's championship likelihood (use market baseline as anchor).
+- confidence: reflects how confident you are in the value bet, not the team's chance of winning outright."""
+    else:
+        status_vocab = 'Use status vocabulary: "Buy" (positive EV edge), "Sell" (negative EV), or "Wait" (unclear/no edge).'
+        champ_instruction = ""
+
     if poly_price > 0:
         user_prompt = f"""{news_section}
 {market_anchor}
 
 Analyze: {title}
 - Net EV: +{ev_percent:.1f}%
+{status_vocab}
+{champ_instruction}
 
-Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it concise (under 200 words)."""
+Output ONLY valid JSON matching the schema. No markdown, no code fences."""
     else:
         # No Polymarket data — analyze based on bookmaker odds alone
         user_prompt = f"""{news_section}
 {market_anchor}
 
 Analyze: {title}
-- Note: No prediction market (Polymarket) data available for this match. Base analysis on bookmaker odds and fundamentals only.
+- Note: No prediction market data available. Base analysis on bookmaker odds and fundamentals only.
+- Set status to "Wait" and score around 50 (low confidence without market data).
+{status_vocab}
+{champ_instruction}
 
-Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it concise (under 200 words)."""
+Output ONLY valid JSON matching the schema. No markdown, no code fences."""
 
     time.sleep(1)  # Rate limit protection
     raw_text = client.generate_analysis(system_prompt, user_prompt)
@@ -403,7 +431,7 @@ Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it conc
 
     print(f"   AI report generated successfully")
 
-    # Parse structured fields from the markdown
+    # Parse structured fields from the output (JSON or legacy markdown)
     parsed = parse_analysis_output(raw_text)
 
     return {
