@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 // Link removed - using router.push for navigation
 import ReactMarkdown from 'react-markdown'
@@ -27,6 +27,7 @@ interface MatchData {
   aiProbability: number | null
   aiMarket: string | null
   aiRisk: string | null
+  aiAnalysisFull: string | null
   isChampionship?: boolean
 }
 
@@ -547,7 +548,14 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
   const [showCalculator, setShowCalculator] = useState(false)
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([])
+  const [chatLoading, setChatLoading] = useState(false)
+  const chatEndRef = useRef<HTMLDivElement>(null)
   const [fromParam, setFromParam] = useState<string | null>(null)
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages, chatLoading])
 
   const txt = {
     loading: 'Loading match data...',
@@ -653,21 +661,41 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
     fetchMatch()
   }, [params.id])
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || chatLoading || !match) return
 
-    // Add user message
-    setChatMessages(prev => [...prev, { role: 'user', content: chatInput }])
-
-    // Simulate AI response (mock for now)
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, {
-        role: 'ai',
-        content: "I'm an AI assistant for match analysis. This is a demo response. In the full version, I'll provide real-time insights about odds movements, team news, and betting strategies for this match."
-      }])
-    }, 1000)
-
+    const userMessage = chatInput.trim()
     setChatInput('')
+
+    const updatedMessages: { role: 'user' | 'ai'; content: string }[] = [
+      ...chatMessages,
+      { role: 'user', content: userMessage },
+    ]
+    setChatMessages(updatedMessages)
+    setChatLoading(true)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId: match.matchId,
+          messages: updatedMessages,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (data.success && data.reply) {
+        setChatMessages(prev => [...prev, { role: 'ai', content: data.reply }])
+      } else {
+        setChatMessages(prev => [...prev, { role: 'ai', content: data.error || 'Sorry, something went wrong.' }])
+      }
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'ai', content: 'Network error. Please try again.' }])
+    } finally {
+      setChatLoading(false)
+    }
   }
 
   if (loading) {
@@ -1104,7 +1132,6 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                     const displayPrediction = match.aiPrediction
                       ? `${match.aiPrediction} to Win`
                       : news_card.prediction
-                    const displayProbability = match.aiProbability ?? news_card.confidence_pct
                     const displayConfidence = match.aiProbability
                       ? (match.aiProbability >= 70 ? 'High' : match.aiProbability >= 55 ? 'Medium' : 'Low')
                       : news_card.confidence
@@ -1265,9 +1292,12 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
             </h2>
           </div>
 
-          {/* Chat Messages */}
+          {/* Chat Messages — grows with conversation, caps at viewport height */}
           {chatMessages.length > 0 && (
-            <div className="px-6 py-4 space-y-4 max-h-64 overflow-y-auto border-b border-[#30363d]">
+            <div
+              className="px-6 py-4 space-y-4 overflow-y-auto border-b border-[#30363d]"
+              style={{ maxHeight: 'calc(100vh - 200px)' }}
+            >
               {chatMessages.map((msg, index) => (
                 <div
                   key={index}
@@ -1280,11 +1310,20 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                         : 'bg-[#21262d] text-[#e6edf3]'
                     }`}
                   >
-                    {msg.role === 'ai' && <span className="text-xs text-[#8b949e] block mb-1">🤖 AI Assistant</span>}
+                    {msg.role === 'ai' && <span className="text-xs text-[#8b949e] block mb-1">AI Assistant</span>}
                     <p className="text-sm">{msg.content}</p>
                   </div>
                 </div>
               ))}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] px-4 py-2 rounded-lg bg-[#21262d] text-[#8b949e]">
+                    <span className="text-xs block mb-1">AI Assistant</span>
+                    <p className="text-sm animate-pulse">Thinking...</p>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
           )}
 
@@ -1297,13 +1336,15 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder={txt.askPlaceholder}
-                className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:outline-none"
+                disabled={chatLoading}
+                className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:outline-none disabled:opacity-50"
               />
               <button
                 onClick={handleSendMessage}
-                className="px-6 py-3 bg-[#58a6ff] hover:bg-[#4493e6] text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                disabled={chatLoading}
+                className="px-6 py-3 bg-[#58a6ff] hover:bg-[#4493e6] text-white font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>{txt.send}</span>
+                <span>{chatLoading ? '...' : txt.send}</span>
                 <span>→</span>
               </button>
             </div>

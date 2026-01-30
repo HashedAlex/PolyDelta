@@ -241,6 +241,7 @@ export function CalculatorModal({ isOpen, onClose, data, type }: CalculatorModal
         setMode('roi')
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, type, data.web2Odds, data.web2HomeOdds])
 
   if (!isOpen) return null

@@ -113,6 +113,7 @@ export async function GET(
             aiProbability: championship.aiProbability || null,
             aiMarket: championship.aiMarket || null,
             aiRisk: championship.aiRisk || null,
+            aiAnalysisFull: championship.aiAnalysisFull || null,
             lastUpdated: championship.last_updated?.toISOString() || null,
             isChampionship: true,
           },
@@ -162,6 +163,7 @@ export async function GET(
       aiProbability: match.aiProbability || null,
       aiMarket: match.aiMarket || null,
       aiRisk: match.aiRisk || null,
+      aiAnalysisFull: match.aiAnalysisFull || null,
       lastUpdated: match.last_updated?.toISOString() || null,
     }
 

@@ -26,6 +26,7 @@ model MarketOdds {
   aiMarket           String?   @map("ai_market")
   aiRisk             String?   @db.VarChar(10) @map("ai_risk")
   aiGeneratedAt      DateTime? @map("ai_generated_at") @db.Timestamp(6)
+  aiAnalysisFull     String?   @db.Text @map("ai_analysis_full")
   liquidity_usdc     Float?
   prop_type          String?   @default("championship") @db.VarChar(50)
   event_id           String?   @db.VarChar(50)
@@ -61,6 +62,7 @@ model DailyMatch {
   aiMarket           String?   @map("ai_market")
   aiRisk             String?   @db.VarChar(10) @map("ai_risk")
   aiGeneratedAt      DateTime? @map("ai_generated_at") @db.Timestamp(6)
+  aiAnalysisFull     String?   @db.Text @map("ai_analysis_full")
   liquidity_away     Float?
   liquidity_home     Float?
   liquidity_draw     Float?    // Soccer 3-way: Draw liquidity
