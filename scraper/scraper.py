@@ -991,8 +991,16 @@ def fetch_polymarket_data(sport_type):
                         matched = True
 
             if matched:
+                # Use event-level URL instead of individual market slug
+                # Individual market slugs return 404 on Polymarket
+                EVENT_URL_MAP = {
+                    "ucl_winner": "https://polymarket.com/event/uefa-champions-league-winner",
+                    "nba": "https://polymarket.com/event/2026-nba-champion",
+                    "epl_winner": "https://polymarket.com/event/english-premier-league-winner",
+                    "world_cup": "https://polymarket.com/event/2026-fifa-world-cup-winner",
+                }
                 slug = market.get("slug", market.get("id", ""))
-                market_url = f"https://polymarket.com/event/{slug}"
+                market_url = EVENT_URL_MAP.get(sport_type, f"https://polymarket.com/event/{slug}")
 
                 # 获取 outcomes 和 prices
                 outcomes = market.get("outcomes", [])
