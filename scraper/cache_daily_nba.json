@@ -85,13 +85,13 @@
       "home_team": "Golden State Warriors",
       "away_team": "Detroit Pistons",
       "commence_time": "2026-01-31T03:10:00+00:00",
-      "home_odds": 0.5226,
-      "away_odds": 0.4774,
+      "home_odds": 0.5327,
+      "away_odds": 0.4673,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-01-30T06:48:00.898473",
+  "cached_at": "2026-01-30T07:01:34.263169",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
