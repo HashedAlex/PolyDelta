@@ -109,6 +109,10 @@ export async function GET(
             polymarketUrl: championship.polymarket_url,
             aiAnalysis: championship.ai_analysis,
             analysisTimestamp: championship.analysis_timestamp?.toISOString() || null,
+            aiPrediction: championship.aiPrediction || null,
+            aiProbability: championship.aiProbability || null,
+            aiMarket: championship.aiMarket || null,
+            aiRisk: championship.aiRisk || null,
             lastUpdated: championship.last_updated?.toISOString() || null,
             isChampionship: true,
           },
@@ -154,6 +158,10 @@ export async function GET(
       polymarketUrl: match.polymarket_url,
       aiAnalysis: match.ai_analysis,
       analysisTimestamp: match.analysis_timestamp?.toISOString() || null,
+      aiPrediction: match.aiPrediction || null,
+      aiProbability: match.aiProbability || null,
+      aiMarket: match.aiMarket || null,
+      aiRisk: match.aiRisk || null,
       lastUpdated: match.last_updated?.toISOString() || null,
     }
 

@@ -1,8 +1,8 @@
-name: Update Odds
+name: "Workflow A: Scrape Odds"
 
 on:
     schedule:
-      - cron: '0 */8 * * *'
+      - cron: '0 */8 * * *'  # 00:00, 08:00, 16:00 UTC
     workflow_dispatch:
 
 permissions:
@@ -21,7 +21,6 @@ jobs:
           env:
             DATABASE_URL: ${{ secrets.DATABASE_URL }}
             ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-            OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         - name: Commit cache files
           run: |
             git config user.name "github-actions[bot]"

@@ -1,0 +1,23 @@
+name: "Workflow B: AI Analysis"
+
+on:
+    schedule:
+      - cron: '30 */8 * * *'  # 00:30, 08:30, 16:30 UTC (30min after scraper)
+    workflow_dispatch:
+
+jobs:
+    analyze:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-python@v5
+          with:
+            python-version: '3.11'
+        - run: pip install -r scraper/requirements.txt
+        - run: python scripts/daily_analysis_job.py
+          env:
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+            GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+            GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+            OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

@@ -48,7 +48,7 @@ _LEAGUE_SOURCES = {
         "Guardian_UCL", "SkySports_Football", "ESPN_FC",
     ],
     "FIFA": [
-        "ESPN_FC", "SkySports_Football",
+        "ESPN_FC", "SkySports_Football", "BBC_Football",
     ],
 }
 

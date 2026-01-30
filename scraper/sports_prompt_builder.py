@@ -20,7 +20,7 @@ Key Principles:
 - Safety Net: "Market Fair Value" output when no clear edge exists
 
 v3.0: LLMClient using OpenRouter API
-v2.0: SportsIntelligenceService real-time intelligence injection
+v2.0: ContextBuilder real-time intelligence injection
 """
 import os
 import time
@@ -34,27 +34,8 @@ try:
 except ImportError:
     from ai_analyst import get_llm_client, LLMClient, get_context_builder
 
-# 导入情报服务
-try:
-    from .sports_intelligence_service import (
-        get_match_intelligence,
-        get_chatbot_context,
-        SportType,
-        EventType
-    )
-    HAS_INTELLIGENCE_SERVICE = True
-except ImportError:
-    try:
-        from sports_intelligence_service import (
-            get_match_intelligence,
-            get_chatbot_context,
-            SportType,
-            EventType
-        )
-        HAS_INTELLIGENCE_SERVICE = True
-    except ImportError:
-        HAS_INTELLIGENCE_SERVICE = False
-        print("   SportsIntelligenceService not available. Running without real-time intelligence.")
+# ContextBuilder is the single source of truth for all news/context.
+# Imported via ai_analyst.get_context_builder() — no separate import needed here.
 
 # 加载环境变量
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -115,14 +96,9 @@ Writing Style Rules:
 - **Density:** Pack as much insight into as few words as possible. Every sentence must add value.
 """
 
-    def __init__(self, enable_intelligence: bool = True):
-        """
-        初始化 Prompt Builder
-
-        Args:
-            enable_intelligence: 是否启用实时情报服务 (默认启用)
-        """
-        self.enable_intelligence = enable_intelligence and HAS_INTELLIGENCE_SERVICE
+    def __init__(self):
+        """初始化 Prompt Builder"""
+        pass
 
     def build(self, sport: str, event_type: str, data_context: Dict[str, Any]) -> str:
         """
@@ -149,24 +125,19 @@ Writing Style Rules:
 
     def _fetch_intelligence(self, sport: str, event_type: str, data_context: Dict[str, Any]) -> str:
         """
-        获取实时情报并格式化为可注入的文本
-
-        Args:
-            sport: 运动类型
-            event_type: 事件类型
-            data_context: 数据上下文
+        Fetch real-time context via ContextBuilder (single source of truth).
 
         Returns:
-            格式化的情报文本块，如果获取失败返回空字符串
+            Formatted context string for prompt injection, or empty string.
         """
-        if not self.enable_intelligence:
+        ctx_builder = get_context_builder()
+        if not ctx_builder:
             return ""
 
         try:
-            # 提取队伍名称
             if event_type.upper() == "FUTURE":
                 team_a = data_context.get('team_name', '')
-                team_b = None
+                team_b = ""
             else:
                 team_a = data_context.get('home_team', '')
                 team_b = data_context.get('away_team', '')
@@ -174,43 +145,17 @@ Writing Style Rules:
             if not team_a:
                 return ""
 
-            # 调用情报服务
-            evt = "future" if event_type.upper() == "FUTURE" else "daily"
-            intelligence = get_match_intelligence(sport.lower(), team_a, team_b, evt)
+            league_map = {'nba': 'NBA', 'fifa': 'FIFA', 'epl': 'EPL', 'ucl': 'UCL'}
+            league_code = league_map.get(sport.lower(), sport.upper())
 
-            return intelligence
+            context_str = ctx_builder.build_match_context(team_a, team_b, league_code)
+            if context_str:
+                print(f"   [ContextBuilder] Injected context for {team_a}" + (f" vs {team_b}" if team_b else ""))
+            return context_str or ""
 
         except Exception as e:
-            print(f"   ⚠️ Intelligence fetch error: {str(e)[:50]}")
+            print(f"   [ContextBuilder] Fetch error: {str(e)[:50]}")
             return ""
-
-    def get_chatbot_context(self, sport: str, event_type: str, data_context: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        获取 Chatbot 可用的情报上下文（用于归因引用）
-
-        Returns:
-            包含情报数据的字典，可用于 Chatbot 回答问题时引用来源
-        """
-        if not self.enable_intelligence:
-            return {}
-
-        try:
-            if event_type.upper() == "FUTURE":
-                team_a = data_context.get('team_name', '')
-                team_b = None
-            else:
-                team_a = data_context.get('home_team', '')
-                team_b = data_context.get('away_team', '')
-
-            if not team_a:
-                return {}
-
-            evt = "future" if event_type.upper() == "FUTURE" else "daily"
-            return get_chatbot_context(sport.lower(), team_a, team_b, evt)
-
-        except Exception as e:
-            print(f"   ⚠️ Chatbot context error: {str(e)[:50]}")
-            return {}
 
     # ==============================================================================
     # 🏀 NBA Championship / Playoffs Logic - "Investment Value" Framework
@@ -271,6 +216,16 @@ Do NOT write a generic season summary. Focus on: **Is this a BUY, SELL, or HOLD?
 4. **Market Sentiment**
    - Is public money inflating/deflating the price?
    - Sharp money movement indicators?
+
+# PROBABILITY CALCULATION: Anchor & Adjust (MANDATORY)
+Use this method for "confidence_pct". Do NOT guess a number based on feeling.
+1. **Market Baseline (Your Anchor):** {team_name} = {web2_odds:.1f}% (Bookmaker implied probability).
+2. **Apply News Factor** from the Context Data:
+   - Neutral/no news: Stay within +/- 2% of the baseline.
+   - Moderately favorable news: Adjust +/- 3-5%.
+   - Highly impactful news (star ruled out, not yet priced in): Adjust +/- 5-15%.
+3. **CONSTRAINT:** Do NOT deviate more than 10% from the Market Baseline unless a CRITICAL event is listed in the Context Data.
+4. **confidence_pct** = Your final adjusted probability for {team_name}.
 
 # Output Requirements
 Return JSON:
@@ -379,6 +334,16 @@ Focus on **Bracket Difficulty** and **Squad Matchups**. Is this team's price jus
 4. **Value Signal**
    - Has the price moved due to recent news/results?
    - Is market overreacting to friendlies or qualifying form?
+
+# PROBABILITY CALCULATION: Anchor & Adjust (MANDATORY)
+Use this method for "confidence_pct". Do NOT guess a number based on feeling.
+1. **Market Baseline (Your Anchor):** {team_name} = {web2_odds:.1f}% (Bookmaker implied probability).
+2. **Apply News Factor** from the Context Data:
+   - Neutral/no news: Stay within +/- 2% of the baseline.
+   - Moderately favorable news: Adjust +/- 3-5%.
+   - Highly impactful news (key player ruled out, not yet priced in): Adjust +/- 5-15%.
+3. **CONSTRAINT:** Do NOT deviate more than 10% from the Market Baseline unless a CRITICAL event is listed in the Context Data.
+4. **confidence_pct** = Your final adjusted probability for {team_name}.
 
 # Output Requirements
 Return JSON:
@@ -497,6 +462,16 @@ Instead, select the **Top 2-3 Critical Factors** that will decide this game.
 5. **Odds Value (ALWAYS INCLUDE)**
    - Compare Trad vs Poly prices
    - Where's the edge? Is market efficient?
+
+# PROBABILITY CALCULATION: Anchor & Adjust (MANDATORY)
+Use this method for "confidence_pct". Do NOT guess a number based on feeling.
+1. **Market Baseline (Your Anchor):** {home_team} = {home_odds:.1f}%, {away_team} = {away_odds:.1f}%. These are bookmaker-derived probabilities.
+2. **Apply News Factor** from the Context Data:
+   - Neutral/no news: Stay within +/- 2% of the baseline.
+   - Moderately favorable news (role player out): Adjust +/- 3-5%.
+   - Highly impactful news (star ruled out, not yet priced in): Adjust +/- 5-15%.
+3. **CONSTRAINT:** Do NOT deviate more than 10% from the Market Baseline unless a CRITICAL injury/news event is listed in the Context Data.
+4. **confidence_pct** = Your final probability for the predicted winner.
 
 # Output Requirements
 Return JSON:

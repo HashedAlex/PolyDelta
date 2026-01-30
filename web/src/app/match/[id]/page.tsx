@@ -23,6 +23,10 @@ interface MatchData {
   polymarketUrl: string | null
   aiAnalysis: string | null
   analysisTimestamp: string | null
+  aiPrediction: string | null
+  aiProbability: number | null
+  aiMarket: string | null
+  aiRisk: string | null
   isChampionship?: boolean
 }
 
@@ -1095,25 +1099,69 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
 
                 {/* Content */}
                 <div className="px-6 py-5 space-y-4">
-                  {/* Prediction with Confidence */}
-                  <div className="flex items-center justify-between bg-[#0d1117] rounded-lg p-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">🏆</span>
-                      <div>
-                        <span className="text-xs text-[#6e7681]">{txt.prediction}</span>
-                        <p className="text-xl font-bold text-[#e6edf3]">{news_card.prediction}</p>
+                  {/* Prediction with Confidence — prefer structured DB fields */}
+                  {(() => {
+                    const displayPrediction = match.aiPrediction
+                      ? `${match.aiPrediction} to Win`
+                      : news_card.prediction
+                    const displayProbability = match.aiProbability ?? news_card.confidence_pct
+                    const displayConfidence = match.aiProbability
+                      ? (match.aiProbability >= 70 ? 'High' : match.aiProbability >= 55 ? 'Medium' : 'Low')
+                      : news_card.confidence
+                    return (
+                      <div className="flex items-center justify-between bg-[#0d1117] rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">🏆</span>
+                          <div>
+                            <span className="text-xs text-[#6e7681]">{txt.prediction}</span>
+                            <p className="text-xl font-bold text-[#e6edf3]">{displayPrediction}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                            displayConfidence === 'High' ? 'bg-[#3fb950] text-black' :
+                            displayConfidence === 'Medium' ? 'bg-[#d29922] text-black' :
+                            'bg-[#6e7681] text-white'
+                          }`}>
+                            {displayConfidence} ({displayProbability}%)
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                        news_card.confidence === 'High' ? 'bg-[#3fb950] text-black' :
-                        news_card.confidence === 'Medium' ? 'bg-[#d29922] text-black' :
-                        'bg-[#6e7681] text-white'
-                      }`}>
-                        {news_card.confidence} ({news_card.confidence_pct}%)
-                      </span>
-                    </div>
-                  </div>
+                    )
+                  })()}
+
+                  {/* Betting Verdict — DB structured fields with news_card fallback */}
+                  {(() => {
+                    const winProb = match.aiProbability ?? news_card.confidence_pct
+                    const bestMarket = match.aiMarket || null
+                    const riskLevel = match.aiRisk || (
+                      news_card.confidence === 'High' ? 'Low' :
+                      news_card.confidence === 'Medium' ? 'Medium' : 'High'
+                    )
+                    const cols = bestMarket ? 'grid-cols-3' : 'grid-cols-2'
+                    return (
+                      <div className={`grid ${cols} gap-3`}>
+                        <div className="bg-[#0d1117] rounded-lg p-3 text-center">
+                          <span className="text-xs text-[#6e7681] block mb-1">Win Probability</span>
+                          <span className="text-2xl font-bold text-[#58a6ff]">{winProb}%</span>
+                        </div>
+                        {bestMarket && (
+                          <div className="bg-[#0d1117] rounded-lg p-3 text-center">
+                            <span className="text-xs text-[#6e7681] block mb-1">Best Market</span>
+                            <span className="text-sm font-bold text-[#e6edf3]">{bestMarket}</span>
+                          </div>
+                        )}
+                        <div className="bg-[#0d1117] rounded-lg p-3 text-center">
+                          <span className="text-xs text-[#6e7681] block mb-1">Risk Level</span>
+                          <span className={`text-sm font-bold ${
+                            riskLevel === 'Low' ? 'text-[#3fb950]' :
+                            riskLevel === 'Medium' ? 'text-[#d29922]' :
+                            'text-[#f85149]'
+                          }`}>{riskLevel}</span>
+                        </div>
+                      </div>
+                    )
+                  })()}
 
                   {/* Key Insights - Wrapped with PremiumLock */}
                   <PremiumLock ctaText="Sign in to view Full Analysis">

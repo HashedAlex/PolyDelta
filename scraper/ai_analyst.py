@@ -66,12 +66,22 @@ Use this "4-Pillar Framework". Adapt your reasoning style based on the league (e
 
 **Betting Verdict**
 * **Predicted Winner:** [Team Name]
-* **Win Probability:** [e.g., 65%] (Estimate this based on your confidence)
+* **Win Probability:** [Final calculated percentage — see CALCULATION STRATEGY below]
 * **Recommended Market:** [Pick ONE: Moneyline / Spread / Over-Under]
    * *Reasoning:* [e.g., "Due to both defensive centers being out, the Over is the safest play."]
 * **Risk Level:** [Low/Medium/High]
 
 **IMPORTANT:** If the match winner is too close to call, you may recommend "Over/Under" or "Spread" instead of Moneyline. Always pick the market where you see the clearest edge.
+
+### CALCULATION STRATEGY: Anchor & Adjust
+Use this method to calculate "Win Probability". Do NOT guess a number based on feeling.
+1. **Start with the Market Baseline:** The user prompt provides the Market Implied Probability for each team. This is your ANCHOR. Markets are efficient and incorporate vast information.
+2. **Apply News Factor (from [LATEST NEWS]):**
+   - If news is **neutral/expected/empty**: Stay within +/- 2% of the Market Baseline.
+   - If news is **moderately favorable** (e.g., role player out): Adjust +/- 3-5%.
+   - If news is **highly impactful** (e.g., star player ruled out, not yet priced in): Adjust +/- 5-15%.
+3. **Output your final calculated percentage.**
+4. **CONSTRAINT:** Do NOT deviate more than 10% from the Market Baseline unless there is a CRITICAL injury or breaking news listed in [LATEST NEWS]. If no news is provided, your probability MUST be within 2% of the Market Baseline.
 """
 
 
@@ -351,13 +361,28 @@ def generate_ai_report(match_data, is_championship=False, league="NBA"):
     else:
         news_section = "[LATEST NEWS]\nNo real-time news available for this match.\n"
 
+    # Pre-compute implied probabilities for Anchor & Adjust
+    home_team = match_data.get('home_team', 'Home')
+    away_team = match_data.get('away_team', 'Away')
+
+    if web2_odds and web2_odds > 0:
+        implied_home = web2_odds
+        implied_away = 100 - web2_odds
+        market_anchor = f"""[MARKET BASELINE — Your Anchor]
+- {home_team}: {implied_home:.1f}% implied probability (Bookmaker)
+- {away_team}: {implied_away:.1f}% implied probability (Bookmaker)
+- Polymarket Price ({home_team}): {poly_price:.1f}%
+Use these as your STARTING POINT. Only adjust based on [LATEST NEWS] evidence."""
+    else:
+        market_anchor = "[MARKET BASELINE]\nMarket Data Unavailable. Estimate based on fundamentals only."
+
     user_prompt = f"""{news_section}
+{market_anchor}
+
 Analyze: {title}
-- Web2 Bookmaker Odds: {web2_odds:.1f}% implied probability
-- Polymarket Price: {poly_price:.1f}%
 - Net EV: +{ev_percent:.1f}%
 
-Apply the 4-Pillar Framework. Keep it concise (under 200 words)."""
+Apply the 4-Pillar Framework + Anchor & Adjust for Win Probability. Keep it concise (under 200 words)."""
 
     time.sleep(1)  # Rate limit protection
     raw_text = client.generate_analysis(system_prompt, user_prompt)

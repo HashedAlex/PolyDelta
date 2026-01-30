@@ -105,11 +105,11 @@ def process_match(cursor, match):
         print(f"   [{match_id}] Skipped (no report generated)")
         return False
 
-    # Update database with full markdown + structured fields
+    # Update database with structured fields only.
+    # Do NOT overwrite ai_analysis — it contains JSON from sports_prompt_builder
+    # that the frontend card relies on. Only populate the new structured columns.
     cursor.execute("""
         UPDATE daily_matches SET
-            ai_analysis = %s,
-            analysis_timestamp = NOW(),
             ai_prediction = %s,
             ai_probability = %s,
             ai_market = %s,
@@ -117,7 +117,6 @@ def process_match(cursor, match):
             ai_generated_at = NOW()
         WHERE id = %s
     """, (
-        result["full_report_markdown"],
         result["predicted_winner"],
         result["win_probability"],
         result["recommended_market"],
