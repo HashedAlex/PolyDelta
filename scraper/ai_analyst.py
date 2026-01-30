@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import httpx
 from openai import OpenAI
@@ -11,12 +12,67 @@ try:
 except ImportError:
     HAS_VERTEX_AI = False
 
+try:
+    from .context_builder import ContextBuilder
+except ImportError:
+    try:
+        from context_builder import ContextBuilder
+    except ImportError:
+        ContextBuilder = None
+
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # ---------------- CONFIGURATION ---------------- #
 YOUR_SITE_URL = "https://polydelta.vercel.app"
 APP_NAME = "PolyDelta Arbitrage"
+
+# ---------------- SYSTEM PROMPT (4-Pillar Framework) ---------------- #
+SYSTEM_PROMPT = """
+You are a World-Class Sports Betting Analyst. Your goal is to synthesize Real-Time News with Fundamental Analysis to predict match outcomes.
+
+Use this "4-Pillar Framework". Adapt your reasoning style based on the league (e.g., in NBA focus on player availability; in UCL focus on aggregate scores/motivation).
+
+### PILLAR 1: FUNDAMENTALS & CONTEXT
+- **Quality Gap:** Compare squad depth and talent tiers.
+- **Home/Away:** Weight home advantage heavily (especially for EPL/UCL).
+- **Travel/Fatigue:** Consider travel distance and recent schedule density.
+- **H2H:** Historical dominance or "bogey teams".
+
+### PILLAR 2: REAL-TIME INTEL (Conditional)
+- **Review the [LATEST NEWS] section provided in the user prompt.**
+- **CRITICAL INSTRUCTION:**
+    - **IF news is present:** Analyze its impact directly (e.g., "Salah out reduces Liverpool's attack").
+    - **IF news is EMPTY or IRRELEVANT:** Explicitly state "No significant breaking news/injury reports found." and **base your prediction SOLELY on Pillar 1 & 3.**
+    - **DO NOT** invent injuries or news stories that are not in the context.
+
+### PILLAR 3: MOTIVATION & STAKES
+- **League Context:** Title race? Relegation battle? Mid-table dead rubber?
+- **Tournament Context (UCL/World Cup):** Is this a 2nd leg? Does a draw suffice? Group stage calculation?
+- **NBA Context:** Is it a back-to-back? Is the team tanking?
+
+### PILLAR 4: PREDICTION
+- Synthesize the above.
+- If news is missing, admit lower confidence but still provide a prediction based on fundamentals.
+
+**Format your response exactly like this:**
+## AI Betting Analysis: {Home Team} vs {Away Team}
+
+**1. Fundamentals & News Check**
+* [Synthesize Pillars 1 & 2 here. Explicitly mention if injuries impact the prediction.]
+
+**2. The X-Factor**
+* [Mention Motivation, Fatigue, or Tactical Mismatch]
+
+**Betting Verdict**
+* **Predicted Winner:** [Team Name]
+* **Win Probability:** [e.g., 65%] (Estimate this based on your confidence)
+* **Recommended Market:** [Pick ONE: Moneyline / Spread / Over-Under]
+   * *Reasoning:* [e.g., "Due to both defensive centers being out, the Over is the safest play."]
+* **Risk Level:** [Low/Medium/High]
+
+**IMPORTANT:** If the match winner is too close to call, you may recommend "Over/Under" or "Spread" instead of Moneyline. Always pick the market where you see the clearest edge.
+"""
 
 
 class LLMClient:
@@ -68,7 +124,7 @@ class LLMClient:
         combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
         response = self.vertex_model.generate_content(
             combined_prompt,
-            generation_config={"temperature": 0.7, "max_output_tokens": 500},
+            generation_config={"temperature": 0.7, "max_output_tokens": 800},
         )
         return self._clean_response(response.text)
 
@@ -89,7 +145,7 @@ class LLMClient:
                 {"role": "user", "content": user_prompt}
             ],
             temperature=0.7,
-            max_tokens=500,
+            max_tokens=800,
         )
         content = completion.choices[0].message.content
         return self._clean_response(content)
@@ -162,9 +218,96 @@ def get_llm_client() -> LLMClient:
     return _llm_client
 
 
-def generate_ai_report(match_data, is_championship=False):
+# Global ContextBuilder instance
+_context_builder = None
+
+def get_context_builder():
+    """Get or create the global ContextBuilder instance."""
+    global _context_builder
+    if _context_builder is None and ContextBuilder is not None:
+        _context_builder = ContextBuilder()
+    return _context_builder
+
+
+def parse_analysis_output(raw_text):
+    """
+    Parse structured fields from the AI's Markdown output.
+    Uses regex to extract: predicted_winner, win_probability, recommended_market, risk_level.
+    Returns None-safe dict — never crashes on malformed output.
+
+    Args:
+        raw_text: Raw markdown string from the LLM.
+
+    Returns:
+        Dict with keys: predicted_winner, win_probability, recommended_market, risk_level.
+        Values default to None if parsing fails.
+    """
+    result = {
+        "predicted_winner": None,
+        "win_probability": None,
+        "recommended_market": None,
+        "risk_level": None,
+    }
+
+    if not raw_text:
+        return result
+
+    # Predicted Winner: "**Predicted Winner:** Team Name" or "**Winner:** Team Name"
+    winner_match = re.search(
+        r'\*{0,2}Predicted\s+Winner\*{0,2}:\s*\*{0,2}\s*(.+?)(?:\s*\*{0,2})\s*$',
+        raw_text, re.MULTILINE | re.IGNORECASE
+    )
+    if not winner_match:
+        winner_match = re.search(
+            r'\*{0,2}Winner\*{0,2}:\s*\*{0,2}\s*(.+?)(?:\s*\*{0,2})\s*$',
+            raw_text, re.MULTILINE | re.IGNORECASE
+        )
+    if winner_match:
+        result["predicted_winner"] = winner_match.group(1).strip().strip('*').strip()
+
+    # Win Probability: "**Win Probability:** 65%" or "65"
+    prob_match = re.search(
+        r'\*{0,2}Win\s+Probability\*{0,2}:\s*\*{0,2}\s*~?(\d{1,3})\s*%?',
+        raw_text, re.IGNORECASE
+    )
+    if prob_match:
+        val = int(prob_match.group(1))
+        if 0 <= val <= 100:
+            result["win_probability"] = val
+
+    # Recommended Market: "**Recommended Market:** Moneyline" (capture until newline or reasoning)
+    market_match = re.search(
+        r'\*{0,2}Recommended\s+Market\*{0,2}:\s*\*{0,2}\s*(.+?)(?:\s*\*{0,2})\s*$',
+        raw_text, re.MULTILINE | re.IGNORECASE
+    )
+    if market_match:
+        result["recommended_market"] = market_match.group(1).strip().strip('*').strip()
+
+    # Risk Level: "**Risk Level:** Medium"
+    risk_match = re.search(
+        r'\*{0,2}Risk\s+Level\*{0,2}:\s*\*{0,2}\s*(Low|Medium|High)(?:\s*\*{0,2})',
+        raw_text, re.IGNORECASE
+    )
+    if risk_match:
+        result["risk_level"] = risk_match.group(1).strip().capitalize()
+
+    return result
+
+
+def generate_ai_report(match_data, is_championship=False, league="NBA"):
     """
     Generate AI analysis report using the LLMClient.
+    Injects real-time news context when available.
+    Returns structured dict with full markdown + parsed fields.
+
+    Args:
+        match_data: Dict with title, ev, web2_odds, polymarket_price, home_team, away_team.
+        is_championship: Whether this is a championship/futures market.
+        league: League code ("NBA", "EPL", "UCL", "FIFA") for context fetching.
+
+    Returns:
+        Dict with keys: full_report_markdown, predicted_winner, win_probability,
+        recommended_market, risk_level. Or None if skipped/unavailable.
     """
     client = get_llm_client()
 
@@ -186,16 +329,54 @@ def generate_ai_report(match_data, is_championship=False):
 
     print(f"   AI Analyst observing: {title} (EV: +{ev_percent:.1f}%)")
 
-    system_prompt = "You are a professional US Sports Betting Analyst. Use standard US sports betting terminology (Spread, Moneyline, Props, Juice, Sharp Money, Square Money). Analyze the divergence between Bookmaker Odds (Sharp Money) and Polymarket Price (Retail Sentiment). Focus on WHY the gap exists. Output strictly clean Markdown."
-    user_prompt = f"Analyze arbitrage for: {title}. Web2 Odds: {web2_odds:.1f}%. Polymarket Price: {poly_price:.1f}%. Net EV: +{ev_percent:.1f}%. Provide: 1. Divergence Cause 2. Risk Assessment 3. Verdict. Keep it concise (under 150 words)."
+    # Fetch real-time context
+    context_str = ""
+    ctx_builder = get_context_builder()
+    if ctx_builder:
+        home = match_data.get('home_team', '')
+        away = match_data.get('away_team', '')
+        if home and away:
+            try:
+                context_str = ctx_builder.build_match_context(home, away, league)
+                if context_str:
+                    print(f"   [ContextBuilder] Injected real-time context for {home} vs {away}")
+            except Exception as e:
+                print(f"   [ContextBuilder] Failed: {str(e)[:60]}")
+
+    system_prompt = SYSTEM_PROMPT
+
+    # Build [LATEST NEWS] section for the user prompt
+    if context_str:
+        news_section = f"[LATEST NEWS]\n{context_str}\n"
+    else:
+        news_section = "[LATEST NEWS]\nNo real-time news available for this match.\n"
+
+    user_prompt = f"""{news_section}
+Analyze: {title}
+- Web2 Bookmaker Odds: {web2_odds:.1f}% implied probability
+- Polymarket Price: {poly_price:.1f}%
+- Net EV: +{ev_percent:.1f}%
+
+Apply the 4-Pillar Framework. Keep it concise (under 200 words)."""
 
     time.sleep(1)  # Rate limit protection
-    result = client.generate_analysis(system_prompt, user_prompt)
+    raw_text = client.generate_analysis(system_prompt, user_prompt)
 
-    if result:
-        print(f"   AI report generated successfully")
+    if not raw_text:
+        return None
 
-    return result
+    print(f"   AI report generated successfully")
+
+    # Parse structured fields from the markdown
+    parsed = parse_analysis_output(raw_text)
+
+    return {
+        "full_report_markdown": raw_text,
+        "predicted_winner": parsed["predicted_winner"],
+        "win_probability": parsed["win_probability"],
+        "recommended_market": parsed["recommended_market"],
+        "risk_level": parsed["risk_level"],
+    }
 
 
 # Legacy function compatibility

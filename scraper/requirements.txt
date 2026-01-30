@@ -8,6 +8,9 @@ python-Levenshtein>=0.27.0
 # Intelligence Service Dependencies
 feedparser>=6.0.0
 httpx>=0.25.0
+beautifulsoup4>=4.12.0
+python-dateutil>=2.8.0
+dateparser>=1.1.0
 
 # LLM Provider Dependencies (OpenRouter via OpenAI SDK)
 openai>=1.0.0

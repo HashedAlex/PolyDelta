@@ -182,15 +182,10 @@ class SportsIntelligenceService:
     """
 
     # ===== RSS Feed 配置 (Tier 1 - FREE) =====
-    RSS_FEEDS = {
-        SportType.NBA: [
-            ("Rotoworld NBA", "https://www.nbcsports.com/rss/basketball/nba"),
-            ("RealGM Wiretap", "https://basketball.realgm.com/rss/wiretap/0/0.xml"),
-        ],
-        SportType.FIFA: [
-            ("ESPN FC", "https://www.espn.com/espn/rss/soccer/news"),
-            ("BBC Sport", "http://feeds.bbci.co.uk/sport/football/rss.xml"),
-        ]
+    # Feeds are centralized in rss_service.py — mapping sport to source keys
+    RSS_FEED_KEYS = {
+        SportType.NBA: ["Rotoworld_NBA", "RealGM_NBA", "NBC_Sports_Edge"],
+        SportType.FIFA: ["BBC_Football", "ESPN_FC"],
     }
 
     # ===== Twitter 账号配置 (Tier 2 - LOW COST) =====
@@ -329,60 +324,49 @@ class SportsIntelligenceService:
     # ========================================================================
 
     def _fetch_tier1_rss(self, context: IntelligenceContext, teams: List[str]):
-        """Tier 1: 获取免费的 RSS 新闻"""
-        if not HAS_FEEDPARSER:
+        """Tier 1: 获取免费的 RSS 新闻 (via centralized RSSFetcher)"""
+        source_keys = self.RSS_FEED_KEYS.get(context.sport, [])
+        if not source_keys:
             return
 
-        feeds = self.RSS_FEEDS.get(context.sport, [])
-        print(f"   📡 [Tier 1] Fetching {len(feeds)} RSS feeds (FREE)")
+        print(f"   📡 [Tier 1] Fetching {len(source_keys)} RSS feeds (FREE)")
 
-        for feed_name, feed_url in feeds:
-            try:
-                feed = feedparser.parse(feed_url)
-
-                for entry in feed.entries[:15]:
-                    title = entry.get("title", "")
-                    summary = entry.get("summary", entry.get("description", ""))
-                    full_text = f"{title} {summary}".lower()
-
-                    # 检查相关性
-                    is_relevant = any(team.lower() in full_text for team in teams)
-                    if not is_relevant:
-                        continue
-
-                    # 解析时间
-                    pub_time = self._parse_rss_time(entry)
-                    category = self._categorize_content(full_text)
-
-                    item = IntelligenceItem(
-                        source=feed_name,
-                        content=title[:150],
-                        timestamp=pub_time,
-                        tier=DataTier.TIER_1_FREE,
-                        priority=2 if category == "injury" else 1,
-                        category=category,
-                        url=entry.get("link")
-                    )
-
-                    if category == "injury":
-                        context.injury_updates.append(item)
-                    else:
-                        context.breaking_news.append(item)
-
-                    context.sources_used.append(feed_name)
-
-            except Exception as e:
-                print(f"   ⚠️ RSS Error ({feed_name}): {str(e)[:40]}")
-
-    def _parse_rss_time(self, entry) -> datetime:
         try:
-            if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                return datetime(*entry.published_parsed[:6])
-            elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
-                return datetime(*entry.updated_parsed[:6])
-        except:
-            pass
-        return datetime.now() - timedelta(hours=1)
+            from .rss_service import RSSFetcher
+        except ImportError:
+            from rss_service import RSSFetcher
+
+        fetcher = RSSFetcher()
+        articles = fetcher.fetch_news(source_keys=source_keys, lookback_hours=48)
+
+        for article in articles:
+            title = article["title"]
+            summary = article["summary"]
+            full_text = f"{title} {summary}".lower()
+
+            # 检查相关性
+            is_relevant = any(team.lower() in full_text for team in teams)
+            if not is_relevant:
+                continue
+
+            category = self._categorize_content(full_text)
+
+            item = IntelligenceItem(
+                source=article["source"],
+                content=title[:150],
+                timestamp=article["published_at"] or (datetime.now() - timedelta(hours=1)),
+                tier=DataTier.TIER_1_FREE,
+                priority=2 if category == "injury" else 1,
+                category=category,
+                url=article["url"]
+            )
+
+            if category == "injury":
+                context.injury_updates.append(item)
+            else:
+                context.breaking_news.append(item)
+
+            context.sources_used.append(article["source"])
 
     # ========================================================================
     # Tier 2: Twitter via RapidAPI (LOW COST - ~$0.01/call)

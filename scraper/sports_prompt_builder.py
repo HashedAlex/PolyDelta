@@ -30,9 +30,9 @@ from dotenv import load_dotenv
 
 # 导入 LLMClient (多源轮询架构)
 try:
-    from .ai_analyst import get_llm_client, LLMClient
+    from .ai_analyst import get_llm_client, LLMClient, get_context_builder
 except ImportError:
-    from ai_analyst import get_llm_client, LLMClient
+    from ai_analyst import get_llm_client, LLMClient, get_context_builder
 
 # 导入情报服务
 try:
@@ -601,7 +601,20 @@ def generate_championship_analysis(
     else:
         system_prompt = builder.build('FIFA', 'FUTURE', context)
 
-    user_prompt = f"Analyze the championship futures for {team_name}. Provide your analysis now."
+    # Inject real-time context
+    context_str = ""
+    ctx_builder = get_context_builder()
+    if ctx_builder:
+        try:
+            league_code = 'NBA' if sport_type == 'nba' else 'FIFA'
+            context_str = ctx_builder.build_match_context(team_name, "", league_code)
+            if context_str:
+                print(f"   [ContextBuilder] Injected context for {team_name}")
+        except Exception as e:
+            print(f"   [ContextBuilder] Failed: {str(e)[:60]}")
+
+    context_block = f"\n\n{context_str}\n" if context_str else ""
+    user_prompt = f"{context_block}Analyze the championship futures for {team_name}. Provide your analysis now."
 
     # Call LLM (using multi-provider architecture)
     time.sleep(1)  # Rate limit protection
@@ -656,7 +669,21 @@ def generate_daily_match_analysis(
     sport = 'NBA' if sport_type == 'nba' else 'FIFA'
     system_prompt = builder.build(sport, 'DAILY', context)
 
-    user_prompt = f"Analyze the match: {home_team} vs {away_team}. Provide your analysis now."
+    # Inject real-time context
+    context_str = ""
+    ctx_builder = get_context_builder()
+    if ctx_builder:
+        try:
+            league_map = {'nba': 'NBA', 'world_cup': 'FIFA', 'epl': 'EPL', 'ucl': 'UCL'}
+            league_code = league_map.get(sport_type, sport)
+            context_str = ctx_builder.build_match_context(home_team, away_team, league_code)
+            if context_str:
+                print(f"   [ContextBuilder] Injected context for {home_team} vs {away_team}")
+        except Exception as e:
+            print(f"   [ContextBuilder] Failed: {str(e)[:60]}")
+
+    context_block = f"\n\n{context_str}\n" if context_str else ""
+    user_prompt = f"{context_block}Analyze the match: {home_team} vs {away_team}. Provide your analysis now."
 
     # Call LLM (using multi-provider architecture)
     time.sleep(1)  # Rate limit protection

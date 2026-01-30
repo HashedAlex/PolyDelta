@@ -21,6 +21,11 @@ model MarketOdds {
   source_url         String?
   ai_analysis        String?
   analysis_timestamp DateTime? @db.Timestamp(6)
+  aiPrediction       String?   @map("ai_prediction")
+  aiProbability      Int?      @map("ai_probability")
+  aiMarket           String?   @map("ai_market")
+  aiRisk             String?   @db.VarChar(10) @map("ai_risk")
+  aiGeneratedAt      DateTime? @map("ai_generated_at") @db.Timestamp(6)
   liquidity_usdc     Float?
   prop_type          String?   @default("championship") @db.VarChar(50)
   event_id           String?   @db.VarChar(50)
@@ -51,6 +56,11 @@ model DailyMatch {
   last_updated       DateTime? @default(now()) @db.Timestamp(6)
   ai_analysis        String?
   analysis_timestamp DateTime? @db.Timestamp(6)
+  aiPrediction       String?   @map("ai_prediction")
+  aiProbability      Int?      @map("ai_probability")
+  aiMarket           String?   @map("ai_market")
+  aiRisk             String?   @db.VarChar(10) @map("ai_risk")
+  aiGeneratedAt      DateTime? @map("ai_generated_at") @db.Timestamp(6)
   liquidity_away     Float?
   liquidity_home     Float?
   liquidity_draw     Float?    // Soccer 3-way: Draw liquidity
