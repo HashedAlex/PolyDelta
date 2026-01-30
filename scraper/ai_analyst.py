@@ -4,6 +4,13 @@ import httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
+try:
+    import vertexai
+    from vertexai.generative_models import GenerativeModel
+    HAS_VERTEX_AI = True
+except ImportError:
+    HAS_VERTEX_AI = False
+
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
@@ -14,17 +21,33 @@ APP_NAME = "PolyDelta Arbitrage"
 
 class LLMClient:
     """
-    LLM Client using OpenRouter API.
+    LLM Client supporting Google Vertex AI (primary) and OpenRouter (backup).
+    Toggle via LLM_PROVIDER env var: "google" (default) or "openrouter".
     """
 
-    # OpenRouter Model Configuration
+    # Model Configuration
+    VERTEX_MODEL = "gemini-2.0-flash-001"
     OPENROUTER_MODEL = "google/gemini-2.0-flash-001"
     OPENROUTER_FALLBACK = "deepseek/deepseek-chat"
 
     def __init__(self):
-        """Initialize OpenRouter client."""
-        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+        """Initialize LLM clients based on provider configuration."""
+        self.provider = os.getenv("LLM_PROVIDER", "google").lower()
 
+        # --- Google Vertex AI ---
+        self.vertex_available = False
+        self.google_project_id = os.getenv("GOOGLE_PROJECT_ID", "")
+        if HAS_VERTEX_AI and self.google_project_id:
+            try:
+                vertexai.init(project=self.google_project_id, location="us-central1")
+                self.vertex_model = GenerativeModel(self.VERTEX_MODEL)
+                self.vertex_available = True
+                print(f"   [LLMClient] Vertex AI initialized (project={self.google_project_id})")
+            except Exception as e:
+                print(f"   [LLMClient] Vertex AI init failed: {str(e)[:100]}")
+
+        # --- OpenRouter (backup / legacy) ---
+        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
         self.openrouter_client = None
         if self.openrouter_key:
             self.openrouter_client = OpenAI(
@@ -32,6 +55,22 @@ class LLMClient:
                 api_key=self.openrouter_key,
                 timeout=httpx.Timeout(60.0, connect=10.0)
             )
+
+    def is_available(self) -> bool:
+        """Check if any LLM provider is configured and available."""
+        return self.vertex_available or bool(self.openrouter_client)
+
+    def _call_vertex_ai(self, system_prompt: str, user_prompt: str) -> str:
+        """Call Google Vertex AI (Gemini) API."""
+        if not self.vertex_available:
+            raise RuntimeError("Vertex AI not configured")
+
+        combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
+        response = self.vertex_model.generate_content(
+            combined_prompt,
+            generation_config={"temperature": 0.7, "max_output_tokens": 500},
+        )
+        return self._clean_response(response.text)
 
     def _call_openrouter(self, system_prompt: str, user_prompt: str, model: str = None) -> str:
         """
@@ -72,21 +111,42 @@ class LLMClient:
     def generate_analysis(self, system_prompt: str, user_prompt: str) -> str:
         """
         Main entry point for LLM analysis.
+        Routes to the configured provider with automatic fallback.
 
         Returns: Raw response string (JSON or Markdown depending on prompt)
         """
-        if not self.openrouter_client:
-            print("   [LLMClient] OpenRouter not configured")
+        if not self.is_available():
+            print("   [LLMClient] No LLM provider configured")
             return None
 
-        try:
-            result = self._call_openrouter(system_prompt, user_prompt)
-            if result:
-                print("   [LLMClient] OpenRouter success")
-                return result
-        except Exception as e:
-            error_msg = str(e)[:100]
-            print(f"   [LLMClient] OpenRouter failed: {error_msg}")
+        # Determine call order based on configured provider
+        if self.provider == "google" and self.vertex_available:
+            primary = ("Vertex AI", self._call_vertex_ai)
+            fallback = ("OpenRouter", self._call_openrouter) if self.openrouter_client else None
+        else:
+            primary = ("OpenRouter", self._call_openrouter) if self.openrouter_client else None
+            fallback = ("Vertex AI", self._call_vertex_ai) if self.vertex_available else None
+
+        # Try primary
+        if primary:
+            try:
+                result = primary[1](system_prompt, user_prompt)
+                if result:
+                    print(f"   [LLMClient] {primary[0]} success")
+                    return result
+            except Exception as e:
+                print(f"   [LLMClient] {primary[0]} failed: {str(e)[:100]}")
+
+        # Try fallback
+        if fallback:
+            try:
+                print(f"   [LLMClient] Falling back to {fallback[0]}...")
+                result = fallback[1](system_prompt, user_prompt)
+                if result:
+                    print(f"   [LLMClient] {fallback[0]} fallback success")
+                    return result
+            except Exception as e:
+                print(f"   [LLMClient] {fallback[0]} fallback failed: {str(e)[:100]}")
 
         return None
 
@@ -108,7 +168,7 @@ def generate_ai_report(match_data, is_championship=False):
     """
     client = get_llm_client()
 
-    if not client.openrouter_client:
+    if not client.is_available():
         print("   No LLM provider configured, skipping AI analysis")
         return None
 
@@ -140,8 +200,6 @@ def generate_ai_report(match_data, is_championship=False):
 
 # Legacy function compatibility
 def call_llm(model, sys_prompt, user_prompt):
-    """Legacy function for backward compatibility. Uses OpenRouter."""
+    """Legacy function for backward compatibility. Routes through generate_analysis."""
     client = get_llm_client()
-    if client.openrouter_client:
-        return client._call_openrouter(sys_prompt, user_prompt, model=model)
-    return None
+    return client.generate_analysis(sys_prompt, user_prompt)

@@ -11,3 +11,6 @@ httpx>=0.25.0
 
 # LLM Provider Dependencies (OpenRouter via OpenAI SDK)
 openai>=1.0.0
+
+# LLM Provider Dependencies (Google Vertex AI)
+google-cloud-aiplatform>=1.38.0

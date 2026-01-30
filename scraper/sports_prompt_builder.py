@@ -565,7 +565,7 @@ def generate_championship_analysis(
         Markdown analysis report, or None
     """
     llm_client = get_llm_client()
-    if not llm_client.openrouter_client:
+    if not llm_client.is_available():
         print("   No LLM provider configured, skipping AI analysis")
         return None
 
@@ -635,7 +635,7 @@ def generate_daily_match_analysis(
         Markdown analysis report, or None
     """
     llm_client = get_llm_client()
-    if not llm_client.openrouter_client:
+    if not llm_client.is_available():
         print("   No LLM provider configured, skipping AI analysis")
         return None
 
