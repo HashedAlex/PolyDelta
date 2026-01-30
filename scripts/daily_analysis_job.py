@@ -106,8 +106,7 @@ def process_match(cursor, match):
         return False
 
     # Update database with structured fields only.
-    # Do NOT overwrite ai_analysis — it contains JSON from sports_prompt_builder
-    # that the frontend card relies on. Only populate the new structured columns.
+    # Only populate the structured AI columns. Do NOT overwrite ai_analysis.
     cursor.execute("""
         UPDATE daily_matches SET
             ai_prediction = %s,

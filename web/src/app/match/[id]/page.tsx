@@ -1123,14 +1123,14 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                             displayConfidence === 'Medium' ? 'bg-[#d29922] text-black' :
                             'bg-[#6e7681] text-white'
                           }`}>
-                            {displayConfidence} ({displayProbability}%)
+                            {displayConfidence} Confidence
                           </span>
                         </div>
                       </div>
                     )
                   })()}
 
-                  {/* Betting Verdict — DB structured fields with news_card fallback */}
+                  {/* Betting Verdict — Donut Ring + Bet Slip + Risk */}
                   {(() => {
                     const winProb = match.aiProbability ?? news_card.confidence_pct
                     const bestMarket = match.aiMarket || null
@@ -1138,26 +1138,61 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                       news_card.confidence === 'High' ? 'Low' :
                       news_card.confidence === 'Medium' ? 'Medium' : 'High'
                     )
-                    const cols = bestMarket ? 'grid-cols-3' : 'grid-cols-2'
+                    // SVG donut chart calculations
+                    const radius = 40
+                    const circumference = 2 * Math.PI * radius
+                    const offset = circumference - (winProb / 100) * circumference
+                    const ringColor = winProb > 60 ? '#3fb950' : winProb >= 50 ? '#d29922' : '#f85149'
+
                     return (
-                      <div className={`grid ${cols} gap-3`}>
-                        <div className="bg-[#0d1117] rounded-lg p-3 text-center">
-                          <span className="text-xs text-[#6e7681] block mb-1">Win Probability</span>
-                          <span className="text-2xl font-bold text-[#58a6ff]">{winProb}%</span>
+                      <div className="flex items-center justify-around gap-4 py-2">
+                        {/* Visual 1: Probability Ring (Donut Chart) */}
+                        <div className="flex flex-col items-center">
+                          <div className="relative w-24 h-24">
+                            <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                              {/* Background ring */}
+                              <circle cx="50" cy="50" r={radius} fill="none" stroke="#21262d" strokeWidth="8" />
+                              {/* Progress ring */}
+                              <circle
+                                cx="50" cy="50" r={radius} fill="none"
+                                stroke={ringColor} strokeWidth="8" strokeLinecap="round"
+                                strokeDasharray={circumference}
+                                strokeDashoffset={offset}
+                                style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+                              />
+                            </svg>
+                            {/* Center percentage */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-2xl font-bold" style={{ color: ringColor }}>{winProb}%</span>
+                            </div>
+                          </div>
+                          <span className="text-xs text-[#6e7681] mt-1">Win Probability</span>
                         </div>
+
+                        {/* Visual 2: Bet Slip Market (ticket style) */}
                         {bestMarket && (
-                          <div className="bg-[#0d1117] rounded-lg p-3 text-center">
-                            <span className="text-xs text-[#6e7681] block mb-1">Best Market</span>
-                            <span className="text-sm font-bold text-[#e6edf3]">{bestMarket}</span>
+                          <div className="flex flex-col items-center">
+                            <div className="relative px-5 py-3 rounded-lg border-2 border-dashed border-[#58a6ff]/60 bg-[#58a6ff]/10 hover:bg-[#58a6ff]/20 transition-colors cursor-default">
+                              <span className="text-xs text-[#58a6ff] block text-center mb-0.5 uppercase tracking-wider">Best Market</span>
+                              <span className="text-lg font-bold text-[#e6edf3] block text-center">{bestMarket}</span>
+                            </div>
                           </div>
                         )}
-                        <div className="bg-[#0d1117] rounded-lg p-3 text-center">
-                          <span className="text-xs text-[#6e7681] block mb-1">Risk Level</span>
-                          <span className={`text-sm font-bold ${
-                            riskLevel === 'Low' ? 'text-[#3fb950]' :
-                            riskLevel === 'Medium' ? 'text-[#d29922]' :
-                            'text-[#f85149]'
-                          }`}>{riskLevel}</span>
+
+                        {/* Risk Level — matches inner ring of Probability donut */}
+                        <div className="flex flex-col items-center">
+                          <div className={`relative w-[70px] h-[70px] rounded-full border-4 flex items-center justify-center ${
+                            riskLevel === 'Low' ? 'border-[#3fb950]/50 bg-[#3fb950]/10' :
+                            riskLevel === 'Medium' ? 'border-[#d29922]/50 bg-[#d29922]/10' :
+                            'border-[#f85149]/50 bg-[#f85149]/10'
+                          }`}>
+                            <span className={`text-sm font-bold ${
+                              riskLevel === 'Low' ? 'text-[#3fb950]' :
+                              riskLevel === 'Medium' ? 'text-[#d29922]' :
+                              'text-[#f85149]'
+                            }`}>{riskLevel}</span>
+                          </div>
+                          <span className="text-xs text-[#6e7681] mt-1">Risk</span>
                         </div>
                       </div>
                     )
@@ -1165,56 +1200,56 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
 
                   {/* Key Insights - Wrapped with PremiumLock */}
                   <PremiumLock ctaText="Sign in to view Full Analysis">
-                    {news_card.pillars && news_card.pillars.length > 0 && (
-                      <div className="space-y-3">
-                        <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">{txt.analysisBreakdown}</h4>
-                        {news_card.pillars.map((pillar, index) => (
-                          <div
-                            key={index}
-                            className={`rounded-lg p-3 border ${
-                              pillar.sentiment === 'positive' ? 'bg-[#3fb950]/5 border-[#3fb950]/30' :
-                              pillar.sentiment === 'negative' ? 'bg-[#f85149]/5 border-[#f85149]/30' :
-                              'bg-[#21262d] border-[#30363d]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 mb-1">
-                              <span>{pillar.icon}</span>
-                              <span className="text-sm font-bold text-[#e6edf3]">{pillar.title}</span>
-                              <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
-                                pillar.sentiment === 'positive' ? 'bg-[#3fb950]/20 text-[#3fb950]' :
-                                pillar.sentiment === 'negative' ? 'bg-[#f85149]/20 text-[#f85149]' :
-                                'bg-[#6e7681]/20 text-[#8b949e]'
-                              }`}>
-                                {pillar.sentiment === 'positive' ? `✓ ${txt.favorable}` :
-                                 pillar.sentiment === 'negative' ? `✗ ${txt.unfavorable}` : `— ${txt.neutral}`}
-                              </span>
+                      {news_card.pillars && news_card.pillars.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-xs text-[#6e7681] uppercase tracking-wider">{txt.analysisBreakdown}</h4>
+                          {news_card.pillars.map((pillar, index) => (
+                            <div
+                              key={index}
+                              className={`rounded-lg p-3 border ${
+                                pillar.sentiment === 'positive' ? 'bg-[#3fb950]/5 border-[#3fb950]/30' :
+                                pillar.sentiment === 'negative' ? 'bg-[#f85149]/5 border-[#f85149]/30' :
+                                'bg-[#21262d] border-[#30363d]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <span>{pillar.icon}</span>
+                                <span className="text-sm font-bold text-[#e6edf3]">{pillar.title}</span>
+                                <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
+                                  pillar.sentiment === 'positive' ? 'bg-[#3fb950]/20 text-[#3fb950]' :
+                                  pillar.sentiment === 'negative' ? 'bg-[#f85149]/20 text-[#f85149]' :
+                                  'bg-[#6e7681]/20 text-[#8b949e]'
+                                }`}>
+                                  {pillar.sentiment === 'positive' ? `✓ ${txt.favorable}` :
+                                   pillar.sentiment === 'negative' ? `✗ ${txt.unfavorable}` : `— ${txt.neutral}`}
+                                </span>
+                              </div>
+                              <p className="text-sm text-[#8b949e] leading-relaxed">{pillar.content}</p>
                             </div>
-                            <p className="text-sm text-[#8b949e] leading-relaxed">{pillar.content}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Legacy Factors (fallback) */}
-                    {(!news_card.pillars || news_card.pillars.length === 0) && news_card.factors && (
-                      <div>
-                        <h4 className="text-xs text-[#6e7681] mb-2">{txt.keyFactors}</h4>
-                        <ul className="space-y-2">
-                          {news_card.factors.map((factor, index) => (
-                            <li key={index} className="flex items-start gap-2 text-sm text-[#8b949e]">
-                              <span className="text-[#58a6ff] mt-0.5">•</span>
-                              <span>{factor}</span>
-                            </li>
                           ))}
-                        </ul>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                    {/* Disclaimer Footer */}
-                    <div className="text-xs text-[#6e7681] bg-[#21262d] px-4 py-2 rounded-lg">
-                      {news_card.news_footer}
-                    </div>
-                  </PremiumLock>
+                      {/* Legacy Factors (fallback) */}
+                      {(!news_card.pillars || news_card.pillars.length === 0) && news_card.factors && (
+                        <div>
+                          <h4 className="text-xs text-[#6e7681] mb-2">{txt.keyFactors}</h4>
+                          <ul className="space-y-2">
+                            {news_card.factors.map((factor, index) => (
+                              <li key={index} className="flex items-start gap-2 text-sm text-[#8b949e]">
+                                <span className="text-[#58a6ff] mt-0.5">•</span>
+                                <span>{factor}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Disclaimer Footer */}
+                      <div className="text-xs text-[#6e7681] bg-[#21262d] px-4 py-2 rounded-lg">
+                        {news_card.news_footer}
+                      </div>
+                    </PremiumLock>
                 </div>
               </section>
             </>

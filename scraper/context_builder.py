@@ -10,9 +10,11 @@ from typing import List, Optional
 try:
     from .rss_service import RSSFetcher
     from .epl_scraper import EPLScraper
+    from .nbc_scraper import NBCScraper
 except ImportError:
     from rss_service import RSSFetcher
     from epl_scraper import EPLScraper
+    from nbc_scraper import NBCScraper
 
 
 # Common short-name aliases for fuzzy matching
@@ -82,6 +84,7 @@ class ContextBuilder:
     def __init__(self):
         self._rss = RSSFetcher()
         self._epl = EPLScraper()
+        self._nbc = NBCScraper()
 
     def build_match_context(
         self,
@@ -126,7 +129,20 @@ class ContextBuilder:
                         f"- (Source: {a['source']}) {a['title']}. {a['summary'][:150]}"
                     )
 
-        # Step 2: EPL structured injuries (only for EPL)
+        # Step 2: NBA player news via NBCScraper (dedicated injury/player feed)
+        if league == "NBA":
+            try:
+                nbc_articles = self._nbc.fetch_news(lookback_hours=lookback_hours)
+                for a in nbc_articles:
+                    searchable = f"{a['title']} {a['summary']}"
+                    if _is_relevant(searchable, all_variants):
+                        line = f"- (Source: NBC Sports Edge) {a['title']}. {a['summary'][:150]}"
+                        if line not in items:  # Deduplicate against Step 1
+                            items.append(line)
+            except Exception as e:
+                print(f"   [ContextBuilder] NBC Sports fetch failed: {str(e)[:60]}")
+
+        # Step 3: EPL structured injuries (only for EPL)
         if league == "EPL":
             try:
                 injuries = self._epl.fetch_injuries()
