@@ -1725,9 +1725,9 @@ def fetch_nba_matches_polymarket():
                 if any(o in ["Yes", "No", "Over", "Under"] for o in outcomes):
                     continue
 
-                # 跳过 Spread 和 Over/Under 市场
+                # 跳过 Spread、Over/Under、半场 (1H) 市场
                 question_lower = question.lower()
-                if "spread" in question_lower or "o/u" in question_lower:
+                if any(kw in question_lower for kw in ["spread", "o/u", "1h"]):
                     continue
 
                 # 尝试匹配两个选项为两支队伍
