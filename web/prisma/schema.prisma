@@ -107,3 +107,13 @@ model OddsHistory {
   @@index([recorded_at], map: "idx_history_time")
   @@map("odds_history")
 }
+
+model TournamentReport {
+  id             Int      @id @default(autoincrement())
+  sport_type     String   @unique @db.VarChar(20)
+  report_json    String   @db.Text
+  generated_at   DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([sport_type], map: "idx_tournament_sport")
+  @@map("tournament_reports")
+}

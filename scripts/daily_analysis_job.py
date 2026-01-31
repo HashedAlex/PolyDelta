@@ -24,7 +24,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
-from scraper.ai_analyst import generate_ai_report, parse_analysis_output
+from scraper.ai_analyst import generate_ai_report, generate_tournament_report
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 RATE_LIMIT_DELAY = 2  # seconds between AI calls
@@ -140,7 +140,7 @@ def process_match(cursor, match):
         return False
 
     # Safety net: NBA/basketball has no draws — pick winner from best available odds
-    if sport_type == "nba" and result.get("predicted_winner", "").lower() == "draw":
+    if sport_type == "nba" and (result.get("predicted_winner") or "").lower() == "draw":
         if home_odds > 0 or away_odds > 0:
             winner = home if home_odds > away_odds else away
             source = "trad odds"
@@ -185,77 +185,49 @@ def process_match(cursor, match):
     return True
 
 
-def fetch_pending_championships(cursor):
-    """
-    Fetch championship/winner markets that do NOT already have an AI prediction.
-    """
+def fetch_top_teams_by_sport(cursor, sport_type, limit=8):
+    """Fetch top teams by Polymarket price for a given sport_type."""
     cursor.execute("""
-        SELECT id, sport_type, team_name, web2_odds,
-               polymarket_price, prop_type
+        SELECT team_name, polymarket_price, web2_odds
         FROM market_odds
-        WHERE ai_prediction IS NULL
-          AND web2_odds IS NOT NULL
+        WHERE sport_type = %s
           AND polymarket_price IS NOT NULL
-        ORDER BY sport_type, team_name
-    """)
+          AND polymarket_price > 0
+        ORDER BY polymarket_price DESC
+        LIMIT %s
+    """, (sport_type, limit))
     columns = [desc[0] for desc in cursor.description]
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
-def process_championship(cursor, market):
-    """Generate AI analysis for a single championship market and update the DB."""
-    market_id = market["id"]
-    team = market["team_name"]
-    sport_type = market["sport_type"]
-    web2_odds = market.get("web2_odds") or 0
-    poly_price = market.get("polymarket_price") or 0
+def process_tournament_report(cursor, market_sport_type, report_sport_type, league):
+    """Generate and upsert a tournament report.
 
-    ev = ((web2_odds - poly_price) / poly_price) if poly_price > 0 else 0
-    league = league_from_sport_type(sport_type)
+    Args:
+        market_sport_type: sport_type used to query market_odds for team data
+        report_sport_type: sport_type key stored in tournament_reports table
+        league: league name passed to AI prompt
+    """
+    teams = fetch_top_teams_by_sport(cursor, market_sport_type, limit=8)
+    if not teams:
+        print(f"   [Tournament] No teams found for {market_sport_type}, skipping")
+        return False
 
-    print(f"\n   [C-{market_id}] {team} ({sport_type}) — EV: {ev*100:+.1f}%")
+    print(f"   [Tournament] Processing {league} ({report_sport_type}) — {len(teams)} teams")
 
-    match_data = {
-        "title": f"{team} — Championship Winner",
-        "ev": ev,
-        "web2_odds": web2_odds * 100,
-        "polymarket_price": poly_price * 100,
-        "home_team": team,
-        "away_team": "Championship Field",
-    }
-
-    result = generate_ai_report(match_data, is_championship=True, league=league)
-
-    if not result:
-        print(f"   [C-{market_id}] Skipped (no report generated)")
+    report_json = generate_tournament_report(teams, league=league)
+    if not report_json:
+        print(f"   [Tournament] Failed to generate report for {league}")
         return False
 
     cursor.execute("""
-        UPDATE market_odds SET
-            ai_prediction = %s,
-            ai_probability = %s,
-            ai_market = %s,
-            ai_risk = %s,
-            ai_analysis = %s,
-            ai_analysis_full = %s,
-            ai_generated_at = NOW()
-        WHERE id = %s
-    """, (
-        result["predicted_winner"],
-        result["win_probability"],
-        result["recommended_market"],
-        result["risk_level"],
-        result.get("full_report_markdown"),
-        result.get("full_report_markdown"),
-        market_id,
-    ))
+        INSERT INTO tournament_reports (sport_type, report_json, generated_at)
+        VALUES (%s, %s, NOW())
+        ON CONFLICT (sport_type)
+        DO UPDATE SET report_json = EXCLUDED.report_json, generated_at = NOW()
+    """, (report_sport_type, report_json))
 
-    winner = result["predicted_winner"] or "N/A"
-    prob = result["win_probability"]
-    prob_str = f"{prob}%" if prob else "N/A"
-    risk = result["risk_level"] or "N/A"
-
-    print(f"   [C-{market_id}] ✓ {team}: {winner} | Prob: {prob_str} | Risk: {risk}")
+    print(f"   [Tournament] ✓ {league} report upserted")
     return True
 
 
@@ -294,29 +266,28 @@ def main():
             if success and i < len(matches) - 1:
                 time.sleep(RATE_LIMIT_DELAY)
 
-        # --- Phase 2: Championship / Winner Markets ---
-        print("\n--- Phase 2: Championship Markets ---")
-        championships = fetch_pending_championships(cursor)
-        print(f"Found {len(championships)} championships needing AI analysis")
+        # --- Phase 2: Tournament Landscape Reports ---
+        print("\n--- Phase 2: Tournament Reports ---")
+        # (market_odds sport_type, tournament_reports key, league name)
+        tournament_configs = [
+            ("epl_winner", "epl_winner", "EPL"),
+            ("ucl_winner", "ucl_winner", "UCL"),
+            ("nba", "nba_winner", "NBA"),
+            ("world_cup", "world_cup", "FIFA World Cup"),
+        ]
 
-        champ_generated = 0
-        champ_skipped = 0
-
-        for i, market in enumerate(championships):
-            success = process_championship(cursor, market)
+        tournament_generated = 0
+        for market_type, report_type, league_name in tournament_configs:
+            success = process_tournament_report(cursor, market_type, report_type, league_name)
             if success:
-                champ_generated += 1
+                tournament_generated += 1
                 conn.commit()
-            else:
-                champ_skipped += 1
-
-            if success and i < len(championships) - 1:
+            if success:
                 time.sleep(RATE_LIMIT_DELAY)
 
-        total_gen = daily_generated + champ_generated
-        total_skip = daily_skipped + champ_skipped
+        total_gen = daily_generated + tournament_generated
         print(f"\n{'=' * 60}")
-        print(f"Job complete: {total_gen} generated ({daily_generated} daily + {champ_generated} champ), {total_skip} skipped")
+        print(f"Job complete: {total_gen} generated ({daily_generated} daily + {tournament_generated} tournament), {daily_skipped} skipped")
         print(f"{'=' * 60}")
 
     except Exception as e:

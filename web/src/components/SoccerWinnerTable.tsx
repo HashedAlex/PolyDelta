@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { CalculatorModal } from './CalculatorModal'
 
 export interface MarketItem {
@@ -28,14 +29,14 @@ export function SoccerWinnerTable({ markets, hideLowOdds, league }: SoccerWinner
   // League-specific config
   const leagueConfig = {
     epl: {
-      name: 'EPL Winner 2024-25',
+      name: 'EPL Winner 2025-26',
       icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
       emptyMessage: 'No EPL Winner data available',
       matchPrefix: 'championship-epl',
       fromParam: 'epl-winner',
     },
     ucl: {
-      name: 'UCL Winner 2024-25',
+      name: 'UCL Winner 2025-26',
       icon: '⭐',
       emptyMessage: 'No UCL Winner data available',
       matchPrefix: 'championship-ucl',
@@ -88,6 +89,12 @@ export function SoccerWinnerTable({ markets, hideLowOdds, league }: SoccerWinner
               Total Liquidity: <span className="text-[#3fb950] font-medium">{formatVolume(totalVolume)}</span>
             </p>
           </div>
+          <Link
+            href={`/tournament-report/${league}`}
+            className="self-stretch px-4 flex items-center bg-[#bc8cff]/10 hover:bg-[#bc8cff]/20 text-[#bc8cff] border border-[#bc8cff]/30 rounded-lg text-sm font-medium transition-colors"
+          >
+            AI Tournament Report
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 bg-[#58a6ff]/10 text-[#58a6ff] border border-[#58a6ff]/30 rounded text-xs">
@@ -234,6 +241,7 @@ export function SoccerWinnerTable({ markets, hideLowOdds, league }: SoccerWinner
           type="championship"
         />
       )}
+
     </section>
   )
 }

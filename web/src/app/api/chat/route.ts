@@ -203,10 +203,47 @@ export async function POST(request: NextRequest) {
     }
 
     // --- Step 1: Fetch Context ---
+    const isTournamentReport = matchId.startsWith('tournament-report-')
     const isChampionship = matchId.startsWith('championship-')
     let contextBlock: string
 
-    if (isChampionship) {
+    if (isTournamentReport) {
+      const sportType = matchId.replace('tournament-report-', '')
+      const SPORT_TYPE_MAP: Record<string, string> = {
+        epl: 'epl_winner',
+        ucl: 'ucl_winner',
+        nba: 'nba_winner',
+        world_cup: 'world_cup',
+      }
+      const dbSportType = SPORT_TYPE_MAP[sportType] || sportType
+
+      const report = await prisma.tournamentReport.findUnique({
+        where: { sport_type: dbSportType },
+      })
+
+      if (!report) {
+        return NextResponse.json(
+          { success: false, error: 'Tournament report not found' },
+          { status: 404 }
+        )
+      }
+
+      const leagueNames: Record<string, string> = {
+        epl: 'EPL Winner 2025-26',
+        ucl: 'UCL Winner 2025-26',
+        nba: 'NBA Winner 2026',
+        world_cup: 'FIFA World Cup 2026 Winner',
+      }
+
+      contextBlock = `Type: Tournament Landscape Report
+League: ${leagueNames[sportType] || sportType.toUpperCase()}
+
+--- Full Tournament Report (JSON) ---
+${report.report_json}
+
+--- Instructions ---
+This is a tournament-level analysis covering ALL top contenders, their tier rankings (Favorites, Challengers, Dark Horses, Pretenders), verdicts (Accumulate/Hold/Sell), and a portfolio strategy. Use this data to answer questions about team comparisons, allocation advice, tier assessments, and tournament dynamics. You have the full tier list and strategy — use it aggressively.`
+    } else if (isChampionship) {
       const parts = matchId.replace('championship-', '').split('-')
       const sportType = parts[0]
       const teamName = parts.slice(1).join('-')

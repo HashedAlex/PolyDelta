@@ -563,6 +563,175 @@ Output ONLY valid JSON matching the schema. No markdown, no code fences."""
     }
 
 
+# ---------------- TOURNAMENT REPORT SYSTEM PROMPT ---------------- #
+TOURNAMENT_SYSTEM_PROMPT = """
+You are a Senior Sports Investment Analyst producing a Tournament Landscape Report. Output ONLY valid JSON — no markdown, no code fences, no commentary.
+
+You are analyzing the TOP contenders for a championship/winner market collectively, NOT individually. Your job is to rank them into tiers, identify relative value, and produce a portfolio allocation strategy.
+
+INTERNAL REASONING (use but do NOT output):
+1. Current form, injuries, and squad depth for each contender
+2. Schedule difficulty and fixture congestion
+3. Market pricing efficiency — which teams are overvalued/undervalued relative to each other
+4. Head-to-head matchup implications in knockouts/title race
+5. Historical precedent for similar title races
+
+OUTPUT SCHEMA (respond with this JSON and nothing else):
+{
+  "strategy_card": {
+    "headline": "<professional 5-10 word title, e.g. 'EPL Title Race: Two-Horse Market With Value Underneath'>",
+    "analysis": "<Markdown portfolio strategy. Use ### headers for sections. Cover: (1) Market Overview — who leads and why, (2) Value Plays — which teams are mispriced, (3) Risk Assessment — what could blow up the consensus. Professional tone, data-driven, 200-400 words.>",
+    "risk_text": "<1 sentence overall market risk assessment with ⚠️>"
+  },
+  "news_card": {
+    "tiers": [
+      {
+        "tier_name": "Favorites",
+        "tier_emoji": "👑",
+        "teams": [
+          {
+            "team_name": "<exact team name>",
+            "polymarket_price": <number, e.g. 0.45>,
+            "web2_odds": <number or null>,
+            "verdict": "<Accumulate|Hold|Sell>",
+            "one_liner": "<1 sentence — why this verdict, with specific reasoning>"
+          }
+        ]
+      },
+      {
+        "tier_name": "Challengers",
+        "tier_emoji": "⚔️",
+        "teams": [...]
+      },
+      {
+        "tier_name": "Dark Horses",
+        "tier_emoji": "🐴",
+        "teams": [...]
+      },
+      {
+        "tier_name": "Pretenders",
+        "tier_emoji": "💀",
+        "teams": [...]
+      }
+    ],
+    "portfolio_summary": "<2-3 sentences: concrete allocation advice across the tiers. E.g. '60% of championship allocation to Favorites tier, 25% Challengers, 15% Dark Horses. Avoid Pretenders — negative EV across the board.'>"
+  }
+}
+
+TIER ASSIGNMENT RULES:
+- Favorites: Top 1-2 contenders with >15% implied probability. These are the market leaders.
+- Challengers: Teams with 5-15% implied probability. Realistic contenders with a path to winning.
+- Dark Horses: Teams with 2-5% implied probability. Long shots with specific scenarios where they could win.
+- Pretenders: Teams with <5% probability that are OVERPRICED. The market is giving them too much credit.
+- Every team in the input MUST appear in exactly one tier.
+- If a tier would be empty, omit it from the output.
+
+VERDICT RULES:
+- "Accumulate": Polymarket price is BELOW fair value. Buy.
+- "Hold": Price is roughly fair. No action needed.
+- "Sell": Polymarket price is ABOVE fair value. Reduce exposure.
+- Base verdicts on the gap between your assessed probability and market price.
+
+ONE-LINER QUALITY:
+- MUST be specific to the team. No generic "good form" or "strong squad".
+- Reference specific tactical, schedule, or personnel factors.
+- BAD: "Arsenal are in good form and could win the league."
+- GOOD: "Saka's return from injury restores the right-side overload that drives Arsenal's xG — market underpricing recovery upside."
+
+LIVE SEARCH CAPABILITY:
+You have access to Google Search. ACTIVELY search for latest news, injuries, and form for each team in the analysis. Cite specifics naturally.
+
+LEAGUE-SPECIFIC LOGIC (adapt your analysis to the league context):
+
+🏀 NBA Championship:
+- The "Two-Conference" Reality: You MUST mention the East vs. West dynamic. (e.g., "The Celtics have an easy path in the East, while the West is a bloodbath between 6+ contenders.")
+- Star Power: NBA is driven by stars. Mention health/load management of key players (Jokic, Giannis, Luka, etc.). A single superstar injury reshapes the entire title picture.
+- Playoff Rotation: Distinguish between "Regular Season teams" (deep bench, high win totals) and "Playoff teams" (short rotation, star-heavy, thrive in 7-game series). Regular season record ≠ playoff ceiling.
+- Conference Bracket: Factor in likely playoff matchup paths — some contenders have significantly easier brackets than others.
+
+⚽ FIFA World Cup / International Tournaments:
+- The "Bracket" Path: Analyze the group draw and knockout bracket. "France has a cakewalk group, while Brazil is in the Group of Death." Group position determines R16 opponent quality.
+- Tournament Form: Momentum and squad cohesion matter more than club form. Recent friendlies, qualifying results, and manager's tournament pedigree are key signals.
+- Knockout Randomness: Single-elimination games have extreme variance (penalties, red cards, set pieces). This compresses the probability distribution — longshots are more viable, favorites less dominant than in a league format.
+- 2026 Expansion: 48-team format means more group matches, denser schedules, and squad depth becomes critical. Bench quality is the hidden metric.
+
+⚽ League Winners (EPL / La Liga):
+- The Grind: League titles are won over 38 matches. Focus on consistency, squad depth, and the current points gap. Injury resilience and rotation quality matter more than peak performance.
+- xG Regression: Teams overperforming xG are due for regression; teams underperforming xG are due for improvement. Factor this into verdicts.
+- Fixture Congestion: Teams in UCL/cups face fatigue — assess which squads can handle the dual campaign.
+
+⚽ UCL (Champions League):
+- The Matchup Game: UCL is about tactical styles in two-legged ties. Some teams are "built for Europe" (compact, counter-attacking) while others struggle away from home.
+- European Pedigree: Real Madrid, Bayern, and other serial winners have a proven extra gear in knockout UCL. This is a genuine, quantifiable edge.
+- Format Changes: Account for the current UCL format (league phase → knockout). Seeding and bracket draw matter enormously for the path to the final.
+
+RULES:
+- Output ONLY the JSON object. No text before or after.
+- Every team provided must appear in exactly one tier.
+- portfolio_summary must include concrete percentage allocations.
+- analysis must be Markdown-formatted with ### headers.
+"""
+
+
+def generate_tournament_report(market_data_list, league="EPL"):
+    """
+    Generate a collective Tournament Landscape Report for top contenders.
+
+    Args:
+        market_data_list: List of dicts, each with keys:
+            team_name, polymarket_price, web2_odds (all from DB)
+        league: League name ("EPL", "UCL", "NBA") for context.
+
+    Returns:
+        Raw JSON string from the LLM, or None if unavailable.
+    """
+    client = get_llm_client()
+    if not client.is_available():
+        print("   [Tournament] No LLM provider configured, skipping")
+        return None
+
+    if not market_data_list:
+        print("   [Tournament] No market data provided, skipping")
+        return None
+
+    print(f"\n   [Tournament] Generating {league} report for {len(market_data_list)} teams...")
+
+    # Build the team summary block for the user prompt
+    team_lines = []
+    for team in market_data_list:
+        name = team.get("team_name", "Unknown")
+        poly = team.get("polymarket_price", 0) or 0
+        web2 = team.get("web2_odds", 0) or 0
+        poly_pct = poly * 100 if poly <= 1 else poly
+        web2_pct = web2 * 100 if web2 <= 1 else web2
+        team_lines.append(
+            f"- {name}: Polymarket {poly_pct:.1f}% | Bookie {web2_pct:.1f}%"
+        )
+
+    teams_block = "\n".join(team_lines)
+
+    user_prompt = f"""League: {league}
+
+[TOP CONTENDERS — Market Data]
+{teams_block}
+
+Produce a Tournament Landscape Report for the {league} championship market.
+Assign every team above to exactly one tier (Favorites / Challengers / Dark Horses / Pretenders).
+Include a portfolio allocation strategy.
+
+Output ONLY valid JSON matching the schema. No markdown, no code fences."""
+
+    time.sleep(1)  # Rate limit protection
+    raw_text = client.generate_analysis(TOURNAMENT_SYSTEM_PROMPT, user_prompt)
+
+    if raw_text:
+        print(f"   [Tournament] {league} report generated successfully")
+    else:
+        print(f"   [Tournament] {league} report generation failed")
+
+    return raw_text
+
+
 # Legacy function compatibility
 def call_llm(model, sys_prompt, user_prompt):
     """Legacy function for backward compatibility. Routes through generate_analysis."""

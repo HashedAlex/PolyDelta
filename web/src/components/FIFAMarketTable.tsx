@@ -4,14 +4,6 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { CalculatorModal } from './CalculatorModal'
 
-// Generate URL-friendly slug from team name
-function generateTeamSlug(teamName: string): string {
-  return teamName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
 // Country flag mapping
 const countryFlags: Record<string, string> = {
   'Spain': '🇪🇸',
@@ -174,11 +166,19 @@ export function FIFAMarketTable({ markets, hideLowOdds }: FIFAMarketTableProps) 
               Total Liquidity: <span className="text-[#3fb950] font-medium">{formatVolume(totalVolume)}</span>
             </p>
           </div>
+          <Link
+            href="/tournament-report/world_cup"
+            className="self-stretch px-4 flex items-center bg-[#bc8cff]/10 hover:bg-[#bc8cff]/20 text-[#bc8cff] border border-[#bc8cff]/30 rounded-lg text-sm font-medium transition-colors"
+          >
+            AI Tournament Report
+          </Link>
         </div>
-        <div className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
-          {hideLowOdds && filteredMarkets.length !== markets.length
-            ? `${filteredMarkets.length} / ${markets.length} teams`
-            : `${filteredMarkets.length} teams`}
+        <div className="flex items-center gap-2">
+          <span className="px-2 py-0.5 bg-[#30363d] rounded text-xs text-[#8b949e]">
+            {hideLowOdds && filteredMarkets.length !== markets.length
+              ? `${filteredMarkets.length} / ${markets.length} teams`
+              : `${filteredMarkets.length} teams`}
+          </span>
         </div>
       </div>
 
@@ -196,7 +196,6 @@ export function FIFAMarketTable({ markets, hideLowOdds }: FIFAMarketTableProps) 
                   <th className="text-center py-3 px-3 font-medium">EV</th>
                   <th className="text-center py-3 px-3 font-medium">Liquidity</th>
                   <th className="text-center py-3 px-3 font-medium">Tool</th>
-                  <th className="text-center py-3 px-3 font-medium">Analysis</th>
                   <th className="text-center py-3 px-3 font-medium">Bet</th>
                 </tr>
               </thead>
@@ -275,17 +274,6 @@ export function FIFAMarketTable({ markets, hideLowOdds }: FIFAMarketTableProps) 
                         </button>
                       </td>
 
-                      {/* Analysis Link */}
-                      <td className="py-3 px-3 text-center">
-                        <Link
-                          href={`/match/championship-world_cup-${generateTeamSlug(item.team_name)}?from=worldcup`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#58a6ff] bg-[#58a6ff]/10 hover:bg-[#58a6ff]/20 border border-[#58a6ff]/30 rounded-md transition-colors"
-                        >
-                          <span>📊</span>
-                          <span className="hidden sm:inline">View</span>
-                        </Link>
-                      </td>
-
                       {/* Bet on Polymarket Button */}
                       <td className="py-3 px-3 text-center">
                         {item.polymarket_url ? (
@@ -333,6 +321,7 @@ export function FIFAMarketTable({ markets, hideLowOdds }: FIFAMarketTableProps) 
           type="championship"
         />
       )}
+
     </section>
   )
 }
