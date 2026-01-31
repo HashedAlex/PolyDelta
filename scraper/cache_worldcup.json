@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-31T01:03:24.745337",
+  "timestamp": "2026-01-31T08:18:00.529763",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-01-31T01:02:29Z",
+          "last_update": "2026-01-31T08:16:20Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T01:02:29Z",
+              "last_update": "2026-01-31T08:16:20Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -270,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-01-31T01:00:37Z",
+          "last_update": "2026-01-31T08:14:36Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T01:00:37Z",
+              "last_update": "2026-01-31T08:14:36Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -535,11 +535,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-01-31T00:58:28Z",
+          "last_update": "2026-01-31T08:16:55Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T00:58:28Z",
+              "last_update": "2026-01-31T08:16:55Z",
               "outcomes": [
                 {
                   "name": "South Africa",
@@ -801,7 +801,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-01-31T00:58:28Z",
+              "last_update": "2026-01-31T08:16:55Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -873,7 +873,7 @@
                 },
                 {
                   "name": "Japan",
-                  "price": 130.0
+                  "price": 120.0
                 },
                 {
                   "name": "Senegal",
@@ -901,7 +901,7 @@
                 },
                 {
                   "name": "Scotland",
-                  "price": 270.0
+                  "price": 250.0
                 },
                 {
                   "name": "Canada",
@@ -962,11 +962,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-01-31T00:59:03Z",
+          "last_update": "2026-01-31T08:17:14Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T00:59:03Z",
+              "last_update": "2026-01-31T08:17:14Z",
               "outcomes": [
                 {
                   "name": "South Africa",
@@ -1228,7 +1228,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-01-31T00:59:03Z",
+              "last_update": "2026-01-31T08:17:14Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1300,7 +1300,7 @@
                 },
                 {
                   "name": "Japan",
-                  "price": 130.0
+                  "price": 120.0
                 },
                 {
                   "name": "Senegal",
@@ -1328,7 +1328,7 @@
                 },
                 {
                   "name": "Scotland",
-                  "price": 270.0
+                  "price": 250.0
                 },
                 {
                   "name": "Canada",
@@ -1389,11 +1389,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-01-31T01:01:17Z",
+          "last_update": "2026-01-31T08:16:55Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T01:01:17Z",
+              "last_update": "2026-01-31T08:16:55Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1658,11 +1658,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-01-31T01:02:15Z",
+          "last_update": "2026-01-31T08:15:46Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-01-31T01:02:15Z",
+              "last_update": "2026-01-31T08:15:46Z",
               "outcomes": [
                 {
                   "name": "Spain",
