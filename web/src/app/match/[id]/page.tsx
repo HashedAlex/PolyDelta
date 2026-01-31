@@ -1142,9 +1142,9 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                         <h3 className="text-lg font-bold text-[#e6edf3]">{strategy_card.headline}</h3>
                       </div>
 
-                      {/* Analysis */}
-                      <div>
-                        <p className="text-sm text-[#8b949e] leading-relaxed">{strategy_card.analysis}</p>
+                      {/* Analysis (Strategy Matrix — rendered as Markdown) */}
+                      <div className="text-sm text-[#8b949e] leading-relaxed prose prose-invert prose-sm max-w-none prose-headings:text-[#e6edf3] prose-headings:text-sm prose-headings:font-bold prose-headings:mt-3 prose-headings:mb-1 prose-strong:text-[#e6edf3] prose-p:my-1">
+                        <ReactMarkdown>{strategy_card.analysis}</ReactMarkdown>
                       </div>
 
                       {/* Kelly Advice */}
@@ -1389,7 +1389,7 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                         : 'bg-[#21262d] text-[#e6edf3]'
                     }`}
                   >
-                    {msg.role === 'ai' && <span className="text-xs text-[#8b949e] block mb-1">AI Assistant</span>}
+                    {msg.role === 'ai' && <span className="text-xs text-[#8b949e] block mb-1">DegenGo 🎲</span>}
                     <p className="text-sm">{msg.content}</p>
                   </div>
                 </div>
@@ -1397,7 +1397,7 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
               {chatLoading && (
                 <div className="flex justify-start">
                   <div className="max-w-[80%] px-4 py-2 rounded-lg bg-[#21262d] text-[#8b949e]">
-                    <span className="text-xs block mb-1">AI Assistant</span>
+                    <span className="text-xs block mb-1">DegenGo 🎲</span>
                     <p className="text-sm animate-pulse">Thinking...</p>
                   </div>
                 </div>

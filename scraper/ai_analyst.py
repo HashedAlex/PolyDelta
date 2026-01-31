@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 try:
     import vertexai
-    from vertexai.generative_models import GenerativeModel
+    from vertexai.generative_models import GenerativeModel, Tool, grounding
     HAS_VERTEX_AI = True
 except ImportError:
     HAS_VERTEX_AI = False
@@ -29,7 +29,9 @@ APP_NAME = "PolyDelta Arbitrage"
 
 # ---------------- SYSTEM PROMPT (JSON Output + 4-Pillar Framework) ---------------- #
 SYSTEM_PROMPT = """
-You are a World-Class Sports Betting Analyst. Output ONLY valid JSON — no markdown, no code fences, no commentary.
+You are a Senior Sports Investment Analyst. Output ONLY valid JSON — no markdown, no code fences, no commentary.
+
+Your strategy_card output must read like a professional financial briefing: objective, analytical, and data-driven. Use terms like "risk profile", "exposure", "variance", "capital preservation", "position sizing". No jokes, no slang, no sarcasm in the strategy_card. The news_card pillars can be more expressive, but the strategy_card is strictly professional.
 
 INTERNAL REASONING (use but do NOT output):
 1. Fundamentals: quality gap, home/away, travel/fatigue, H2H
@@ -72,15 +74,38 @@ In at least ONE pillar, explicitly state HOW and WHY the AI probability differs 
 Example: "Market implies 60% for Memphis, but B2B fatigue (-6%) and Ja Morant OUT (-12%) drops true win probability to 42%."
 This is how the user sees the AI's independent value — do NOT skip this step.
 
+STRATEGY CARD FRAMEWORK (Strategy Matrix — Multi-Persona):
+
+You are a Head of Sports Trading Strategies. The analysis field MUST be a Markdown-formatted "Strategy Matrix" with three distinct sections for different risk profiles. Use Markdown headers (###) and bold text. Be professional, structured, and analytical — no generic fluff, get straight to the instruction.
+
+The three personas in the analysis field:
+
+### 🛡️ Conservative (Safety First):
+- Focus: High Win Probability, Capital Preservation.
+- If Win Prob > 70%: suggest "Moneyline" or "Parlay Anchor". If Win Prob < 60%: suggest "Skip/Pass" or "Double Chance".
+- Include PnL: "Risk $100 to win $[X]."
+
+### 🚀 Aggressive (Value Hunter):
+- Focus: Positive EV, ROI, Variance Tolerance.
+- If implied odds < AI probability: suggest "Straight Bet" or "Handicap". Even underdogs if the value is there.
+- Include Kelly fraction sizing (e.g., "0.5u", "0.75u").
+
+### ⏳ Tactical (Trader/Live):
+- Focus: Timing, Hedging, Live Betting opportunities.
+- Suggest one of: "Wait for Line Move" (if public will push odds), "Hedge Opportunity" (if team starts fast but fades), or "Live Entry" (e.g., "Bet if they concede an early goal — odds will drift to 3.50+").
+
+FORMAT THE analysis FIELD EXACTLY LIKE THIS (with literal \n for newlines in the JSON string):
+"### 🛡️ Conservative\n**[Action].** [1-2 sentence reasoning with PnL.]\n\n### 🚀 Aggressive\n**[Action] ([sizing]).** [1-2 sentence reasoning with edge math.]\n\n### ⏳ Tactical\n**[Action].** [1-2 sentence reasoning with specific trigger.]"
+
 OUTPUT SCHEMA (respond with this JSON and nothing else):
 {
   "strategy_card": {
     "score": <integer 0-100, your final win probability>,
     "status": "<status word from user prompt>",
-    "headline": "<4-6 word trading headline>",
-    "analysis": "<1-2 sentence synthesis of fundamentals + news>",
-    "kelly_advice": "<e.g. Quarter Kelly. Edge: +8% (AI 68% vs Market 60%)>",
-    "risk_text": "<1 sentence risk warning with ⚠️>"
+    "headline": "<professional 3-6 word title, e.g. 'Strategy Matrix: Value on Home Win', 'Strategy Matrix: High-Variance Underdog'>",
+    "analysis": "<Markdown Strategy Matrix with all 3 personas as described above. Professional tone, no slang.>",
+    "kelly_advice": "<Aggressive persona sizing summary with edge math, e.g. 'Straight Bet 0.75u. Edge: +8% (AI 68% vs Market 60%). At 1.65 odds, $100 returns $65 profit.'>",
+    "risk_text": "<1 sentence risk assessment with ⚠️, e.g. '⚠️ Moderate variance — schedule fatigue introduces execution uncertainty despite favorable matchup.'>"
   },
   "news_card": {
     "prediction": "<Team Name to Win OR Draw>",
@@ -133,6 +158,14 @@ If [LATEST NEWS] is empty/sparse AND market odds are thin — DO NOT output "no 
 - For pillars: generate tactical analysis from KNOWN team styles (e.g. "Real Madrid's UCL DNA", "Man City's possession dominance", "Liverpool's gegenpressing").
 - YOU MUST OUTPUT VALID JSON regardless of missing inputs. Empty news = rely on internal knowledge. Missing odds = estimate from team strength.
 
+LIVE SEARCH CAPABILITY:
+You have access to Google Search. When analyzing a match, ACTIVELY search for:
+- Latest confirmed injury reports and lineup updates (last 24-48 hours)
+- Recent match results and current form
+- Breaking team news (suspensions, managerial changes, transfer announcements)
+Prioritize fresh search results over the [LATEST NEWS] section when they conflict.
+Cite specifics naturally in pillar content (e.g. "Per today's reports, Player X is ruled out...").
+
 RULES:
 - pillars: exactly 2-3 items. MUST name specific players, stats, or schedule facts. At least ONE pillar MUST explain the AI Edge — how your adjusted probability differs from the market anchor and why (e.g., "Market: 65% → AI: 57% due to B2B fatigue").
 - When [LATEST NEWS] mentions injuries: ALWAYS explain the tactical consequence, not just the absence. Use your knowledge of the team's system to explain what breaks.
@@ -167,7 +200,13 @@ class LLMClient:
         if HAS_VERTEX_AI and self.google_project_id:
             try:
                 vertexai.init(project=self.google_project_id, location="us-central1")
-                self.vertex_model = GenerativeModel(self.VERTEX_MODEL)
+                google_search_tool = Tool.from_google_search_retrieval(
+                    grounding.GoogleSearchRetrieval()
+                )
+                self.vertex_model = GenerativeModel(
+                    self.VERTEX_MODEL,
+                    tools=[google_search_tool],
+                )
                 self.vertex_available = True
                 print(f"   [LLMClient] Vertex AI initialized (project={self.google_project_id})")
             except Exception as e:
@@ -195,9 +234,14 @@ class LLMClient:
         combined_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
         response = self.vertex_model.generate_content(
             combined_prompt,
-            generation_config={"temperature": 0.7, "max_output_tokens": 1000},
+            generation_config={"temperature": 0.7, "max_output_tokens": 2048},
         )
-        return self._clean_response(response.text)
+        candidates = response.candidates
+        if not candidates or not candidates[0].content or not candidates[0].content.parts:
+            return None
+        parts = candidates[0].content.parts
+        full_text = "".join(part.text for part in parts if hasattr(part, "text") and part.text)
+        return self._clean_response(full_text)
 
     def _call_openrouter(self, system_prompt: str, user_prompt: str, model: str = None) -> str:
         """
@@ -216,7 +260,7 @@ class LLMClient:
                 {"role": "user", "content": user_prompt}
             ],
             temperature=0.7,
-            max_tokens=1000,
+            max_tokens=2048,
         )
         content = completion.choices[0].message.content
         return self._clean_response(content)
@@ -233,7 +277,14 @@ class LLMClient:
                 content = parts[-1].strip()
 
         # Remove markdown code fences
-        return content.replace("```markdown", "").replace("```json", "").replace("```", "").strip()
+        content = content.replace("```markdown", "").replace("```json", "").replace("```", "").strip()
+
+        # Extract JSON object if surrounded by non-JSON text (grounding may prepend text)
+        json_match = re.search(r'\{.*\}', content, re.DOTALL)
+        if json_match:
+            content = json_match.group(0)
+
+        return content
 
     def generate_analysis(self, system_prompt: str, user_prompt: str) -> str:
         """

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { CalculatorModal, CalculatorData } from './CalculatorModal'
 import { PremiumLock } from './PremiumLock'
 
@@ -337,8 +338,10 @@ export function AnalysisModal({ isOpen, onClose, team, sportType: _sportType }: 
                       {/* Headline */}
                       <h4 className="text-base font-bold text-[#e6edf3]">{strategy_card.headline}</h4>
 
-                      {/* Analysis */}
-                      <p className="text-sm text-[#8b949e] leading-relaxed">{strategy_card.analysis}</p>
+                      {/* Analysis (Strategy Matrix — rendered as Markdown) */}
+                      <div className="text-sm text-[#8b949e] leading-relaxed prose prose-invert prose-sm max-w-none prose-headings:text-[#e6edf3] prose-headings:text-sm prose-headings:font-bold prose-headings:mt-3 prose-headings:mb-1 prose-strong:text-[#e6edf3] prose-p:my-1">
+                        <ReactMarkdown>{strategy_card.analysis}</ReactMarkdown>
+                      </div>
 
                       {/* Kelly Advice */}
                       <div className={`flex items-start gap-2 rounded-lg px-3 py-2 ${
