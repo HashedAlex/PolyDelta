@@ -32,16 +32,48 @@ RATE_LIMIT_DELAY = 2  # seconds between AI calls
 
 def fetch_pending_matches(cursor):
     """
-    Fetch daily matches starting within the next 24 hours
-    that do NOT already have an AI prediction.
+    Fetch future daily matches that need AI analysis: new OR stale.
+
+    Time windows (for new matches without analysis):
+      - NBA: 3 days | EPL: 7 days | UCL: no limit | Default: 3 days
+
+    Staleness refresh:
+      - <24h to kickoff (all leagues): refresh every job run (if analysis >1h old)
+      - NBA (>24h out): refresh if analysis >24h old
+      - EPL (>24h out): refresh if analysis >48h old
+      - UCL (>24h out): refresh if analysis >72h old
     """
     cursor.execute("""
         SELECT id, sport_type, home_team, away_team, commence_time,
                web2_home_odds, web2_away_odds, web2_draw_odds,
-               poly_home_price, poly_away_price, poly_draw_price
+               poly_home_price, poly_away_price, poly_draw_price,
+               ai_generated_at, ai_prediction
         FROM daily_matches
-        WHERE commence_time BETWEEN NOW() AND NOW() + INTERVAL '24 hours'
-          AND ai_prediction IS NULL
+        WHERE commence_time > NOW()
+          AND (
+              -- NEW: No analysis yet, within time window
+              (ai_prediction IS NULL AND (
+                  (sport_type = 'nba' AND commence_time < NOW() + INTERVAL '3 days') OR
+                  (sport_type = 'epl' AND commence_time < NOW() + INTERVAL '7 days') OR
+                  (sport_type = 'ucl') OR
+                  (sport_type NOT IN ('nba', 'epl', 'ucl') AND commence_time < NOW() + INTERVAL '3 days')
+              ))
+              OR
+              -- URGENT REFRESH: <24h to kickoff, all leagues — refresh if analysis >1h old
+              (commence_time < NOW() + INTERVAL '24 hours'
+               AND ai_prediction IS NOT NULL
+               AND (ai_generated_at IS NULL OR ai_generated_at < NOW() - INTERVAL '1 hour'))
+              OR
+              -- STALE REFRESH: >24h to kickoff — league-specific staleness
+              (commence_time >= NOW() + INTERVAL '24 hours'
+               AND ai_prediction IS NOT NULL
+               AND (
+                  (sport_type = 'nba' AND (ai_generated_at IS NULL OR ai_generated_at < NOW() - INTERVAL '24 hours') AND commence_time < NOW() + INTERVAL '3 days') OR
+                  (sport_type = 'epl' AND (ai_generated_at IS NULL OR ai_generated_at < NOW() - INTERVAL '48 hours') AND commence_time < NOW() + INTERVAL '7 days') OR
+                  (sport_type = 'ucl' AND (ai_generated_at IS NULL OR ai_generated_at < NOW() - INTERVAL '72 hours')) OR
+                  (sport_type NOT IN ('nba', 'epl', 'ucl') AND (ai_generated_at IS NULL OR ai_generated_at < NOW() - INTERVAL '24 hours') AND commence_time < NOW() + INTERVAL '3 days')
+              ))
+          )
         ORDER BY commence_time ASC
     """)
     columns = [desc[0] for desc in cursor.description]
@@ -78,6 +110,7 @@ def process_match(cursor, match):
     home = match["home_team"]
     away = match["away_team"]
     sport_type = match["sport_type"]
+    is_refresh = match.get("ai_prediction") is not None
 
     home_odds = match.get("web2_home_odds") or 0
     away_odds = match.get("web2_away_odds") or 0
@@ -87,7 +120,8 @@ def process_match(cursor, match):
     ev = calculate_ev(home_odds, away_odds, poly_home, poly_away)
     league = league_from_sport_type(sport_type)
 
-    print(f"\n   [{match_id}] {home} vs {away} ({sport_type}) — EV: {ev*100:+.1f}%")
+    tag = "REFRESH" if is_refresh else "NEW"
+    print(f"\n   [{match_id}] [{tag}] {home} vs {away} ({sport_type}) — EV: {ev*100:+.1f}%")
 
     # Build match_data for generate_ai_report
     match_data = {
@@ -99,11 +133,25 @@ def process_match(cursor, match):
         "away_team": away,
     }
 
-    result = generate_ai_report(match_data, is_championship=False, league=league)
+    result = generate_ai_report(match_data, is_championship=False, league=league, force_analysis=True)
 
     if not result:
         print(f"   [{match_id}] Skipped (no report generated)")
         return False
+
+    # Safety net: NBA/basketball has no draws — pick winner from best available odds
+    if sport_type == "nba" and result.get("predicted_winner", "").lower() == "draw":
+        if home_odds > 0 or away_odds > 0:
+            winner = home if home_odds > away_odds else away
+            source = "trad odds"
+        elif poly_home > 0 or poly_away > 0:
+            winner = home if poly_home > poly_away else away
+            source = "poly odds"
+        else:
+            winner = home
+            source = "no odds available, defaulted to home"
+        result["predicted_winner"] = winner
+        print(f"   [{match_id}] Fixed Draw → {winner} (NBA has no draws, picked by {source})")
 
     # Update database with structured fields + full markdown report.
     # Write to both ai_analysis (read by frontend) and ai_analysis_full (backup).
@@ -230,7 +278,7 @@ def main():
         # --- Phase 1: Daily Matches ---
         print("\n--- Phase 1: Daily Matches ---")
         matches = fetch_pending_matches(cursor)
-        print(f"Found {len(matches)} matches needing AI analysis (next 24h)")
+        print(f"Found {len(matches)} matches needing AI analysis (new + stale)")
 
         daily_generated = 0
         daily_skipped = 0

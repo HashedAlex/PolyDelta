@@ -56,8 +56,14 @@ ${contextBlock}
    - **DO NOT** say "I don't have data on that" or "I cannot predict."
    - **INSTEAD**, analyze the contextual clues (e.g., "Both teams have terrible defense" -> imply Over; "Star striker injured" -> imply Under).
    - Formulate a logical observation based on those clues (e.g., "While I don't have an official pick on the total, both teams defend like traffic cones, so expect goals.").
-5. Keep answers concise (2-4 sentences by default, longer if asked for detail).
-6. Respond in the same language the user uses.
+5. **KNOWLEDGE FALLBACK (CRITICAL):**
+   - The [MATCH CONTEXT] might be empty or thin for future games. **NEVER** say "I don't have information about this match" or "No data available."
+   - **INSTEAD:** Use your vast internal training data to analyze the matchup based on the teams' history, typical playstyles, tactical identity, and league standing.
+   - Preface such answers with something like: *"While the daily report isn't out yet, historically/tactically speaking..."*
+   - Give a detailed analysis of the teams' strengths, weaknesses, and tactical matchup from your own knowledge. Stay in character — be snarky about the lack of data but still deliver the goods.
+6. **Live Search (Google Grounding):** You have access to real-time Google Search. When the user asks about RECENT injuries, transfers, team news, lineup updates, or current form — your responses are automatically grounded with the latest information from the web. Leverage this especially when the [MATCH CONTEXT] is thin, outdated, or the match is weeks away. If you use search results, mention it naturally (e.g., "According to the latest reports...").
+7. Keep answers concise (2-4 sentences by default, longer if asked for detail).
+8. Respond in the same language the user uses.
 
 # EXAMPLE INTERACTIONS
 - **User:** "Is this a sure thing?"
@@ -82,8 +88,10 @@ async function callVertexAI(
 
   const model = vertexAI.getGenerativeModel({
     model: GEMINI_MODEL,
-    generationConfig: { temperature: 0.7, maxOutputTokens: 400 },
+    generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
     systemInstruction: { role: 'system', parts: [{ text: systemPrompt }] },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tools: [{ googleSearch: {} } as any],
   })
 
   // Build Vertex AI content history (all messages except the last)
@@ -98,7 +106,9 @@ async function callVertexAI(
   const result = await chat.sendMessage(lastMessage)
   const response = result.response
 
-  return response.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  // Extract text from all parts (grounding may split response across multiple parts)
+  const parts = response.candidates?.[0]?.content?.parts || []
+  return parts.map((p: { text?: string }) => p.text || '').filter(Boolean).join('')
 }
 
 async function callOpenRouter(
@@ -313,5 +323,14 @@ function buildFallbackContext(record: {
   aiMarket: string | null
   aiRisk: string | null
 }) {
-  return `No detailed analysis report available yet. Summary: Predicted winner is ${record.aiPrediction || 'unknown'} with ${record.aiProbability || 'unknown'}% probability. Recommended market: ${record.aiMarket || 'unknown'}. Risk level: ${record.aiRisk || 'unknown'}.`
+  const parts = []
+  if (record.aiPrediction) parts.push(`Predicted winner: ${record.aiPrediction}`)
+  if (record.aiProbability) parts.push(`Win probability: ${record.aiProbability}%`)
+  if (record.aiMarket) parts.push(`Recommended market: ${record.aiMarket}`)
+  if (record.aiRisk) parts.push(`Risk level: ${record.aiRisk}`)
+
+  if (parts.length > 0) {
+    return `Partial analysis available: ${parts.join('. ')}. Full AI report not yet generated — use your internal sports knowledge to supplement.`
+  }
+  return `No AI analysis generated yet for this match. Use your internal sports knowledge about these teams (tactics, form, history, squad depth) to provide analysis. DO NOT say you have no information — you know these teams from your training data.`
 }
