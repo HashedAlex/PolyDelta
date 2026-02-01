@@ -200,9 +200,8 @@ class LLMClient:
         if HAS_VERTEX_AI and self.google_project_id:
             try:
                 vertexai.init(project=self.google_project_id, location="us-central1")
-                google_search_tool = Tool.from_google_search_retrieval(
-                    grounding.GoogleSearchRetrieval()
-                )
+                # Gemini 2.0 uses "google_search" tool (not the legacy "google_search_retrieval")
+                google_search_tool = Tool.from_dict({"google_search": {}})
                 self.vertex_model = GenerativeModel(
                     self.VERTEX_MODEL,
                     tools=[google_search_tool],
@@ -212,15 +211,15 @@ class LLMClient:
             except Exception as e:
                 print(f"   [LLMClient] Vertex AI init failed: {str(e)[:100]}")
 
-        # --- OpenRouter (backup / legacy) ---
-        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+        # --- OpenRouter (disabled — kept for future re-enablement) ---
+        self.openrouter_key = ""  # os.getenv("OPENROUTER_API_KEY", "")
         self.openrouter_client = None
-        if self.openrouter_key:
-            self.openrouter_client = OpenAI(
-                base_url="https://openrouter.ai/api/v1",
-                api_key=self.openrouter_key,
-                timeout=httpx.Timeout(60.0, connect=10.0)
-            )
+        # if self.openrouter_key:
+        #     self.openrouter_client = OpenAI(
+        #         base_url="https://openrouter.ai/api/v1",
+        #         api_key=self.openrouter_key,
+        #         timeout=httpx.Timeout(60.0, connect=10.0)
+        #     )
 
     def is_available(self) -> bool:
         """Check if any LLM provider is configured and available."""

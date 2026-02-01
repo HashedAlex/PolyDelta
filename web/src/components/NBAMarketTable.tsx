@@ -86,7 +86,7 @@ export function NBAMarketTable({ markets, hideLowOdds }: NBAMarketTableProps) {
             href="/tournament-report/nba"
             className="self-stretch px-4 flex items-center bg-[#bc8cff]/10 hover:bg-[#bc8cff]/20 text-[#bc8cff] border border-[#bc8cff]/30 rounded-lg text-sm font-medium transition-colors"
           >
-            AI Tournament Report
+            AI Championship Report
           </Link>
         </div>
         <div className="flex items-center gap-2">

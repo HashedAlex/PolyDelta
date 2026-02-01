@@ -37,15 +37,52 @@ const LEAGUE_CONFIG: Record<string, { name: string; icon: string; sportType: str
   world_cup: { name: 'FIFA World Cup 2026 Winner', icon: '\u{1F3C6}', sportType: 'world_cup', backTab: 'worldcup' },
 }
 
+// --- Team Identity Helpers ---
+const COUNTRY_FLAGS: Record<string, string> = {
+  'Spain': '\u{1F1EA}\u{1F1F8}', 'France': '\u{1F1EB}\u{1F1F7}', 'England': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}', 'Argentina': '\u{1F1E6}\u{1F1F7}',
+  'Brazil': '\u{1F1E7}\u{1F1F7}', 'Germany': '\u{1F1E9}\u{1F1EA}', 'Portugal': '\u{1F1F5}\u{1F1F9}', 'Netherlands': '\u{1F1F3}\u{1F1F1}',
+  'Belgium': '\u{1F1E7}\u{1F1EA}', 'Italy': '\u{1F1EE}\u{1F1F9}', 'Croatia': '\u{1F1ED}\u{1F1F7}', 'Uruguay': '\u{1F1FA}\u{1F1FE}',
+  'Colombia': '\u{1F1E8}\u{1F1F4}', 'Mexico': '\u{1F1F2}\u{1F1FD}', 'USA': '\u{1F1FA}\u{1F1F8}', 'United States': '\u{1F1FA}\u{1F1F8}',
+  'Denmark': '\u{1F1E9}\u{1F1F0}', 'Switzerland': '\u{1F1E8}\u{1F1ED}', 'Japan': '\u{1F1EF}\u{1F1F5}', 'South Korea': '\u{1F1F0}\u{1F1F7}',
+  'Morocco': '\u{1F1F2}\u{1F1E6}', 'Senegal': '\u{1F1F8}\u{1F1F3}', 'Australia': '\u{1F1E6}\u{1F1FA}', 'Poland': '\u{1F1F5}\u{1F1F1}',
+  'Serbia': '\u{1F1F7}\u{1F1F8}', 'Ecuador': '\u{1F1EA}\u{1F1E8}', 'Canada': '\u{1F1E8}\u{1F1E6}', 'Austria': '\u{1F1E6}\u{1F1F9}',
+  'Turkey': '\u{1F1F9}\u{1F1F7}', 'Ukraine': '\u{1F1FA}\u{1F1E6}', 'Sweden': '\u{1F1F8}\u{1F1EA}', 'Norway': '\u{1F1F3}\u{1F1F4}',
+  'Nigeria': '\u{1F1F3}\u{1F1EC}', 'Egypt': '\u{1F1EA}\u{1F1EC}', 'Chile': '\u{1F1E8}\u{1F1F1}', 'Peru': '\u{1F1F5}\u{1F1EA}',
+}
+
+function getTeamBadge(teamName: string, league: string): JSX.Element {
+  if (league === 'world_cup') {
+    const flag = COUNTRY_FLAGS[teamName]
+    if (flag) {
+      return (
+        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#21262d] shadow-md text-lg leading-none shrink-0">
+          {flag}
+        </span>
+      )
+    }
+  }
+  const initials = teamName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const colors = ['#58a6ff', '#3fb950', '#d29922', '#f778ba', '#bc8cff', '#f85149']
+  const colorIndex = teamName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length
+  return (
+    <span
+      className="inline-flex items-center justify-center w-8 h-8 rounded-full shadow-md text-xs font-bold leading-none shrink-0"
+      style={{ backgroundColor: colors[colorIndex] + '25', color: colors[colorIndex], border: `1px solid ${colors[colorIndex]}50` }}
+    >
+      {initials}
+    </span>
+  )
+}
+
 function getVerdictStyle(verdict: string): string {
   switch (verdict) {
     case 'Accumulate':
-      return 'bg-[#3fb950]/20 text-[#3fb950] border-[#3fb950]/40'
+      return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_6px_rgba(16,185,129,0.15)]'
     case 'Sell':
-      return 'bg-[#f85149]/20 text-[#f85149] border-[#f85149]/40'
+      return 'bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-[0_0_6px_rgba(244,63,94,0.15)]'
     case 'Hold':
     default:
-      return 'bg-[#d29922]/20 text-[#d29922] border-[#d29922]/40'
+      return 'bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-[0_0_6px_rgba(245,158,11,0.15)]'
   }
 }
 
@@ -61,6 +98,21 @@ function getTierBorderColor(tierName: string): string {
       return 'border-l-[#6e7681]'
     default:
       return 'border-l-[#30363d]'
+  }
+}
+
+function getTierHeaderBg(tierName: string): string {
+  switch (tierName) {
+    case 'Favorites':
+      return 'bg-[#d29922]/5'
+    case 'Challengers':
+      return 'bg-[#58a6ff]/5'
+    case 'Dark Horses':
+      return 'bg-[#bc8cff]/5'
+    case 'Pretenders':
+      return 'bg-[#6e7681]/5'
+    default:
+      return ''
   }
 }
 
@@ -168,7 +220,7 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
       <main className="min-h-screen bg-[#0d1117] text-[#e6edf3] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#58a6ff] mx-auto mb-4"></div>
-          <p className="text-[#8b949e]">Loading tournament report...</p>
+          <p className="text-[#8b949e]">Loading championship report...</p>
         </div>
       </main>
     )
@@ -193,7 +245,7 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
           <div className="flex items-center gap-3">
             <span className="text-3xl">{config.icon}</span>
             <div>
-              <h1 className="text-2xl font-bold text-[#e6edf3]">Tournament Landscape</h1>
+              <h1 className="text-2xl font-bold text-[#e6edf3]">Championship Landscape</h1>
               <p className="text-sm text-[#8b949e]">
                 {config.name}
                 {generatedAt && (
@@ -212,25 +264,25 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
         {error && (
           <div className="bg-[#161b22] rounded-xl border border-[#f85149] p-6 text-center">
             <p className="text-[#f85149] text-sm mb-2">{error}</p>
-            <p className="text-[#6e7681] text-xs">Tournament reports are generated periodically. Check back later.</p>
+            <p className="text-[#6e7681] text-xs">Championship reports are generated periodically. Check back later.</p>
           </div>
         )}
 
         {report && (
           <>
-            {/* Strategy Card */}
-            <section className="bg-[#161b22] rounded-xl border border-[#30363d] overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#30363d]">
-                <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
+            {/* Strategy Card — Glassmorphism */}
+            <section className="rounded-xl border border-[#30363d] overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(22,27,34,0.95) 0%, rgba(13,17,23,0.98) 50%, rgba(22,27,34,0.95) 100%)', backdropFilter: 'blur(12px)' }}>
+              <div className="px-6 py-4 border-b border-[#30363d]/60" style={{ background: 'linear-gradient(90deg, rgba(88,166,255,0.06) 0%, transparent 100%)' }}>
+                <h2 className="text-lg font-bold text-[#e6edf3] flex items-center gap-2">
                   <span>🎯</span>
                   <span>{report.strategy_card.headline}</span>
                 </h2>
               </div>
               <div className="px-6 py-5">
-                <div className="text-sm text-[#8b949e] leading-relaxed prose prose-invert prose-sm max-w-none prose-headings:text-[#e6edf3] prose-headings:text-sm prose-headings:font-bold prose-headings:mt-3 prose-headings:mb-1 prose-strong:text-[#e6edf3] prose-p:my-1">
+                <div className="text-sm text-[#c9d1d9] leading-7 prose prose-invert prose-sm max-w-none prose-headings:text-[#e6edf3] prose-headings:text-[13px] prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2 prose-headings:tracking-wide prose-strong:text-[#e6edf3] prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
                   <ReactMarkdown>{report.strategy_card.analysis}</ReactMarkdown>
                 </div>
-                <div className="mt-4 text-xs text-[#d29922] bg-[#d29922]/10 px-4 py-2 rounded-lg">
+                <div className="mt-4 text-xs text-[#d29922] bg-[#d29922]/10 px-4 py-2.5 rounded-lg border border-[#d29922]/20">
                   {report.strategy_card.risk_text}
                 </div>
               </div>
@@ -242,9 +294,9 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
                 key={tier.tier_name}
                 className={`bg-[#161b22] rounded-xl border border-[#30363d] border-l-4 ${getTierBorderColor(tier.tier_name)} overflow-hidden`}
               >
-                <div className="px-6 py-3 border-b border-[#30363d]/50">
-                  <h3 className="text-base font-bold text-[#e6edf3] flex items-center gap-2">
-                    <span>{tier.tier_emoji}</span>
+                <div className={`px-6 py-3.5 border-b border-[#30363d]/50 ${getTierHeaderBg(tier.tier_name)}`}>
+                  <h3 className="text-lg font-bold text-[#e6edf3] flex items-center gap-2">
+                    <span className="text-xl">{tier.tier_emoji}</span>
                     <span>{tier.tier_name}</span>
                     <span className="text-xs text-[#6e7681] font-normal ml-auto">
                       {tier.teams.length} team{tier.teams.length !== 1 ? 's' : ''}
@@ -255,7 +307,10 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
                   {tier.teams.map((team) => (
                     <div key={team.team_name} className="px-6 py-4 hover:bg-[#21262d]/50 transition-colors">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-medium text-[#e6edf3]">{team.team_name}</span>
+                        <div className="flex items-center gap-3">
+                          {getTeamBadge(team.team_name, params.sportType)}
+                          <span className="font-medium text-[#e6edf3]">{team.team_name}</span>
+                        </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-mono text-[#58a6ff]">
                             {(team.polymarket_price * 100).toFixed(1)}%
@@ -265,12 +320,12 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
                               ({(team.web2_odds * 100).toFixed(1)}%)
                             </span>
                           )}
-                          <span className={`px-2 py-0.5 rounded text-xs font-bold border ${getVerdictStyle(team.verdict)}`}>
+                          <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold border ${getVerdictStyle(team.verdict)}`}>
                             {team.verdict}
                           </span>
                         </div>
                       </div>
-                      <p className="text-sm text-[#8b949e] leading-relaxed">{team.one_liner}</p>
+                      <p className="text-sm text-[#8b949e] leading-relaxed ml-11">{team.one_liner}</p>
                     </div>
                   ))}
                 </div>
@@ -300,7 +355,7 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
           <div className="px-6 py-4 border-b border-[#30363d]">
             <h2 className="text-lg font-semibold text-[#e6edf3] flex items-center gap-2">
               <span>💬</span>
-              <span>Ask AI About This Tournament</span>
+              <span>Ask AI About This Championship</span>
             </h2>
           </div>
 
@@ -347,7 +402,7 @@ function TournamentReportPage({ params }: { params: { sportType: string } }) {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Ask about tournament odds, team comparisons, betting strategies..."
+                placeholder="Ask about championship odds, team comparisons, betting strategies..."
                 disabled={chatLoading}
                 className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:outline-none disabled:opacity-50"
               />

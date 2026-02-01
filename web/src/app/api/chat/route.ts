@@ -5,7 +5,8 @@ import { VertexAI } from '@google-cloud/vertexai'
 // --- Provider Config ---
 const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID || ''
 const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || ''
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || ''
+// OpenRouter disabled — kept for future re-enablement
+// const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || ''
 const GEMINI_MODEL = 'gemini-2.0-flash-001'
 
 // Parse service account JSON from env var (for Vercel/Railway/GitHub Actions)
@@ -61,12 +62,29 @@ Never just parrot the database. Every answer must have **3 layers**:
 
 This is what separates you from a boring odds feed. Layer 3 is your superpower — USE IT.
 
-# FORMATTING RULES
-- **NO walls of text.** Break everything into short paragraphs (2-3 sentences max).
-- Use **bold** for key terms, names, and numbers.
-- Use bullet points for lists of reasons or factors.
-- Default length: **3-6 sentences.** Go longer only if the user asks for detail.
-- Respond in the same language the user uses.
+# FORMATTING & STYLE RULES (STRICT — FOLLOW EXACTLY)
+
+1. **NO WALLS OF TEXT:** You MUST use line breaks aggressively. NEVER write a paragraph longer than 3 lines. Break up your response into short, punchy blocks.
+
+2. **MANDATORY LISTS:** When comparing teams, listing reasons, or presenting multiple factors, you MUST use Markdown bullet points (\`-\` or \`*\`).
+
+3. **SPACING IS CRITICAL:**
+   - You **MUST** put a blank line **before** and **after** every bullet point or list item.
+   - Correct example:
+
+     - **Arsenal:** Strong home form, pressing machine.
+
+     - **City:** Key injuries, slow starts.
+
+   - WRONG: jamming bullet points together with no blank lines between them.
+
+4. **MARKDOWN SANITY:** Always put spaces around bold markers. Write \`word **Bold** word\`, NEVER \`word**Bold**word\`. This ensures rendering works.
+
+5. **DEFAULT LENGTH:** 3-6 sentences. Go longer ONLY if the user explicitly asks for detail.
+
+6. **LANGUAGE:** Respond in the same language the user uses.
+
+7. **STRUCTURE:** Use the "1+2+3" pattern for every answer: **Direct Answer** → **Data Evidence** → **Insider Insight**. Separate each layer with a line break.
 
 # RESPONSE GUIDELINES
 
@@ -142,41 +160,42 @@ async function callVertexAI(
   return parts.map((p: { text?: string }) => p.text || '').filter(Boolean).join('')
 }
 
-async function callOpenRouter(
-  systemPrompt: string,
-  chatHistory: { role: string; content: string }[]
-): Promise<string> {
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    ...chatHistory.map(m => ({
-      role: m.role === 'ai' ? 'assistant' : m.role,
-      content: m.content,
-    })),
-  ]
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://polydelta.vercel.app',
-      'X-Title': 'PolyDelta Chatbot',
-    },
-    body: JSON.stringify({
-      model: `google/${GEMINI_MODEL}`,
-      messages,
-      temperature: 0.7,
-      max_tokens: 400,
-    }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`OpenRouter HTTP ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data.choices?.[0]?.message?.content || ''
-}
+// --- OpenRouter (disabled — kept for future re-enablement) ---
+// async function callOpenRouter(
+//   systemPrompt: string,
+//   chatHistory: { role: string; content: string }[]
+// ): Promise<string> {
+//   const messages = [
+//     { role: 'system', content: systemPrompt },
+//     ...chatHistory.map(m => ({
+//       role: m.role === 'ai' ? 'assistant' : m.role,
+//       content: m.content,
+//     })),
+//   ]
+//
+//   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+//       'HTTP-Referer': 'https://polydelta.vercel.app',
+//       'X-Title': 'PolyDelta Chatbot',
+//     },
+//     body: JSON.stringify({
+//       model: `google/${GEMINI_MODEL}`,
+//       messages,
+//       temperature: 0.7,
+//       max_tokens: 400,
+//     }),
+//   })
+//
+//   if (!response.ok) {
+//     throw new Error(`OpenRouter HTTP ${response.status}`)
+//   }
+//
+//   const data = await response.json()
+//   return data.choices?.[0]?.message?.content || ''
+// }
 
 // --- Main Handler ---
 
@@ -193,11 +212,10 @@ export async function POST(request: NextRequest) {
     }
 
     const hasVertexAI = !!GOOGLE_PROJECT_ID
-    const hasOpenRouter = !!OPENROUTER_API_KEY
 
-    if (!hasVertexAI && !hasOpenRouter) {
+    if (!hasVertexAI) {
       return NextResponse.json(
-        { success: false, error: 'Chat service not configured' },
+        { success: false, error: 'Chat service not configured (Vertex AI required)' },
         { status: 503 }
       )
     }
@@ -249,6 +267,7 @@ This is a tournament-level analysis covering ALL top contenders, their tier rank
       const teamName = parts.slice(1).join('-')
         .split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
+      // Fetch team odds data
       const market = await prisma.marketOdds.findFirst({
         where: {
           sport_type: sportType === 'world_cup' ? 'world_cup' : sportType,
@@ -263,8 +282,6 @@ This is a tournament-level analysis covering ALL top contenders, their tier rank
           aiProbability: true,
           aiMarket: true,
           aiRisk: true,
-          aiAnalysisFull: true,
-          ai_analysis: true,
         },
       })
 
@@ -275,10 +292,25 @@ This is a tournament-level analysis covering ALL top contenders, their tier rank
         )
       }
 
-      const analysisText =
-        market.aiAnalysisFull ||
-        market.ai_analysis ||
-        buildFallbackContext(market)
+      // Fetch Tournament Report as the primary source of qualitative analysis
+      const CHAMP_SPORT_MAP: Record<string, string> = {
+        epl: 'epl_winner',
+        ucl: 'ucl_winner',
+        nba: 'nba_winner',
+        world_cup: 'world_cup',
+      }
+      const dbSportType = CHAMP_SPORT_MAP[sportType] || sportType
+      const tournamentReport = await prisma.tournamentReport.findUnique({
+        where: { sport_type: dbSportType },
+      })
+
+      const reportSection = tournamentReport
+        ? `--- Tournament Landscape Report (Primary Source) ---
+${tournamentReport.report_json}
+
+--- Instructions ---
+The above Tournament Report covers ALL top contenders with tier rankings, verdicts, and portfolio strategy. Use it as your PRIMARY source of truth for qualitative analysis about ${market.team_name}. Cross-reference with the team odds below.`
+        : `No Tournament Report available yet. Use your internal sports knowledge aggressively and leverage Google Search for the latest info on ${market.team_name}.`
 
       contextBlock = `Type: Championship / Winner Market
 Team: ${market.team_name} (${market.sport_type?.toUpperCase()})
@@ -289,8 +321,7 @@ AI Win Probability: ${market.aiProbability ? market.aiProbability + '%' : 'N/A'}
 AI Recommended Market: ${market.aiMarket || 'N/A'}
 AI Risk Level: ${market.aiRisk || 'N/A'}
 
---- Full AI Analysis Report ---
-${analysisText}`
+${reportSection}`
     } else {
       const match = await prisma.dailyMatch.findFirst({
         where: { match_id: matchId },
@@ -346,24 +377,11 @@ ${analysisText}`
       content: m.content,
     }))
 
-    // --- Step 3: Call LLM (Vertex AI primary, OpenRouter fallback) ---
+    // --- Step 3: Call LLM (Vertex AI only) ---
     let aiReply: string
-    let provider: string
 
-    if (hasVertexAI) {
-      try {
-        aiReply = await callVertexAI(systemPrompt, chatHistory)
-        provider = 'vertex-ai'
-      } catch (err) {
-        console.error('[Chat API] Vertex AI failed, falling back to OpenRouter:', err)
-        if (!hasOpenRouter) throw err
-        aiReply = await callOpenRouter(systemPrompt, chatHistory)
-        provider = 'openrouter (fallback)'
-      }
-    } else {
-      aiReply = await callOpenRouter(systemPrompt, chatHistory)
-      provider = 'openrouter'
-    }
+    aiReply = await callVertexAI(systemPrompt, chatHistory)
+    const provider = 'vertex-ai'
 
     console.log(`[Chat API] Response via ${provider}`)
 
