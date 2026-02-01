@@ -5,9 +5,9 @@
       "home_team": "Galatasaray",
       "away_team": "Juventus",
       "commence_time": "2026-02-17T17:45:00+00:00",
-      "home_odds": 0.2983,
-      "draw_odds": 0.2767,
-      "away_odds": 0.425,
+      "home_odds": 0.298,
+      "draw_odds": 0.2763,
+      "away_odds": 0.4257,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "AS Monaco",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.1852,
-      "draw_odds": 0.2197,
-      "away_odds": 0.5951,
+      "home_odds": 0.185,
+      "draw_odds": 0.2194,
+      "away_odds": 0.5956,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -27,9 +27,9 @@
       "home_team": "Borussia Dortmund",
       "away_team": "Atalanta BC",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.4402,
-      "draw_odds": 0.2866,
-      "away_odds": 0.2733,
+      "home_odds": 0.4515,
+      "draw_odds": 0.2682,
+      "away_odds": 0.2803,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Benfica",
       "away_team": "Real Madrid",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.259,
-      "draw_odds": 0.2572,
-      "away_odds": 0.4838,
+      "home_odds": 0.2537,
+      "draw_odds": 0.2468,
+      "away_odds": 0.4995,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -93,9 +93,9 @@
       "home_team": "Qaraba\u011f FK",
       "away_team": "Newcastle United",
       "commence_time": "2026-02-18T17:45:00+00:00",
-      "home_odds": 0.1311,
-      "draw_odds": 0.2017,
-      "away_odds": 0.6673,
+      "home_odds": 0.1326,
+      "draw_odds": 0.2032,
+      "away_odds": 0.6641,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -133,7 +133,7 @@
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-01T08:20:55.218468",
+  "cached_at": "2026-02-01T16:17:02.655380",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
