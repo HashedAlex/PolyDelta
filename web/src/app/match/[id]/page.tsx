@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 // Link removed - using router.push for navigation
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { CalculatorModal, CalculatorData } from '@/components/CalculatorModal'
 import { PremiumLock } from '@/components/PremiumLock'
 import { OddsHistoryCard } from '@/components/OddsHistoryCard'
@@ -1390,7 +1391,13 @@ function MatchDetailPage({ params }: { params: { id: string } }) {
                     }`}
                   >
                     {msg.role === 'ai' && <span className="text-xs text-[#8b949e] block mb-1">DegenGo 🎲</span>}
-                    <p className="text-sm">{msg.content}</p>
+                    {msg.role === 'ai' ? (
+                      <div className="text-sm prose prose-sm prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:my-2 prose-strong:text-[#e6edf3]">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="text-sm">{msg.content}</p>
+                    )}
                   </div>
                 </div>
               ))}
