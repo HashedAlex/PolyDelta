@@ -16,9 +16,9 @@
       "home_team": "AS Monaco",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.1749,
-      "draw_odds": 0.2194,
-      "away_odds": 0.6057,
+      "home_odds": 0.1733,
+      "draw_odds": 0.2185,
+      "away_odds": 0.6082,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -38,9 +38,9 @@
       "home_team": "Club Brugge",
       "away_team": "Atl\u00e9tico Madrid",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.2426,
-      "draw_odds": 0.246,
-      "away_odds": 0.5114,
+      "home_odds": 0.2403,
+      "draw_odds": 0.2468,
+      "away_odds": 0.5129,
       "bookmaker": "LeoVegas",
       "bookmaker_url": ""
     },
@@ -49,9 +49,9 @@
       "home_team": "Olympiakos Piraeus",
       "away_team": "Bayer Leverkusen",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.3967,
-      "draw_odds": 0.2855,
-      "away_odds": 0.3178,
+      "home_odds": 0.3937,
+      "draw_odds": 0.2861,
+      "away_odds": 0.3202,
       "bookmaker": "LeoVegas",
       "bookmaker_url": ""
     },
@@ -71,9 +71,9 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Inter Milan",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.2218,
-      "draw_odds": 0.2377,
-      "away_odds": 0.5405,
+      "home_odds": 0.2227,
+      "draw_odds": 0.2405,
+      "away_odds": 0.5369,
       "bookmaker": "LeoVegas",
       "bookmaker_url": ""
     },
@@ -115,9 +115,9 @@
       "home_team": "Olympiakos Piraeus",
       "away_team": "Bayer Leverkusen",
       "commence_time": "2026-02-18T20:00:00+00:00",
-      "home_odds": 0.4089,
-      "draw_odds": 0.282,
-      "away_odds": 0.309,
+      "home_odds": 0.4095,
+      "draw_odds": 0.2811,
+      "away_odds": 0.3094,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -133,7 +133,7 @@
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-03T01:10:11.151544",
+  "cached_at": "2026-02-03T08:26:08.790432",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
