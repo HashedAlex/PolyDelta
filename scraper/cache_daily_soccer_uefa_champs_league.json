@@ -16,9 +16,9 @@
       "home_team": "AS Monaco",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.1727,
-      "draw_odds": 0.219,
-      "away_odds": 0.6083,
+      "home_odds": 0.173,
+      "draw_odds": 0.2178,
+      "away_odds": 0.6092,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -71,9 +71,9 @@
       "home_team": "Olympiakos Piraeus",
       "away_team": "Bayer Leverkusen",
       "commence_time": "2026-02-18T20:00:00+00:00",
-      "home_odds": 0.4062,
-      "draw_odds": 0.2909,
-      "away_odds": 0.3029,
+      "home_odds": 0.4068,
+      "draw_odds": 0.2899,
+      "away_odds": 0.3033,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -82,14 +82,14 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Inter Milan",
       "commence_time": "2026-02-18T20:00:00+00:00",
-      "home_odds": 0.2157,
-      "draw_odds": 0.2311,
-      "away_odds": 0.5533,
+      "home_odds": 0.2165,
+      "draw_odds": 0.2283,
+      "away_odds": 0.5552,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-04T16:34:38.484604",
+  "cached_at": "2026-02-05T01:07:18.035896",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
