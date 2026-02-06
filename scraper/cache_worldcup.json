@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-05T16:34:47.507037",
+  "timestamp": "2026-02-06T01:05:41.686563",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-02-05T16:31:08Z",
+          "last_update": "2026-02-06T01:03:54Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:31:08Z",
+              "last_update": "2026-02-06T01:03:54Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -270,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-02-05T16:31:08Z",
+          "last_update": "2026-02-06T01:04:12Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:31:08Z",
+              "last_update": "2026-02-06T01:04:12Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -535,16 +535,12 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-02-05T16:31:49Z",
+          "last_update": "2026-02-06T01:00:33Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:31:49Z",
+              "last_update": "2026-02-06T01:00:33Z",
               "outcomes": [
-                {
-                  "name": "South Africa",
-                  "price": 2.0
-                },
                 {
                   "name": "Spain",
                   "price": 6.0
@@ -558,12 +554,12 @@
                   "price": 9.2
                 },
                 {
-                  "name": "Argentina",
+                  "name": "Brazil",
                   "price": 9.6
                 },
                 {
-                  "name": "Brazil",
-                  "price": 9.8
+                  "name": "Argentina",
+                  "price": 9.6
                 },
                 {
                   "name": "Portugal",
@@ -686,6 +682,10 @@
                   "price": 600.0
                 },
                 {
+                  "name": "South Africa",
+                  "price": 680.0
+                },
+                {
                   "name": "Algeria",
                   "price": 690.0
                 },
@@ -695,7 +695,7 @@
                 },
                 {
                   "name": "Iran",
-                  "price": 840.0
+                  "price": 860.0
                 },
                 {
                   "name": "Tunisia",
@@ -801,7 +801,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-05T16:31:49Z",
+              "last_update": "2026-02-06T01:00:33Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -893,7 +893,7 @@
                 },
                 {
                   "name": "Turkey",
-                  "price": 230.0
+                  "price": 220.0
                 },
                 {
                   "name": "Australia",
@@ -920,6 +920,14 @@
                   "price": 550.0
                 },
                 {
+                  "name": "South Korea",
+                  "price": 560.0
+                },
+                {
+                  "name": "Ivory Coast",
+                  "price": 600.0
+                },
+                {
                   "name": "Republic of Ireland",
                   "price": 780.0
                 },
@@ -928,24 +936,12 @@
                   "price": 820.0
                 },
                 {
-                  "name": "Ivory Coast",
-                  "price": 850.0
-                },
-                {
                   "name": "Ghana",
                   "price": 900.0
                 },
                 {
-                  "name": "South Korea",
-                  "price": 920.0
-                },
-                {
                   "name": "Australia",
                   "price": 990.0
-                },
-                {
-                  "name": "Iran",
-                  "price": 1000.0
                 },
                 {
                   "name": "Algeria",
@@ -962,16 +958,12 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-02-05T16:32:24Z",
+          "last_update": "2026-02-06T01:01:09Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:32:24Z",
+              "last_update": "2026-02-06T01:01:09Z",
               "outcomes": [
-                {
-                  "name": "South Africa",
-                  "price": 2.0
-                },
                 {
                   "name": "Spain",
                   "price": 6.0
@@ -985,12 +977,12 @@
                   "price": 9.2
                 },
                 {
-                  "name": "Argentina",
+                  "name": "Brazil",
                   "price": 9.6
                 },
                 {
-                  "name": "Brazil",
-                  "price": 9.8
+                  "name": "Argentina",
+                  "price": 9.6
                 },
                 {
                   "name": "Portugal",
@@ -1117,12 +1109,16 @@
                   "price": 620.0
                 },
                 {
+                  "name": "South Africa",
+                  "price": 680.0
+                },
+                {
                   "name": "Poland",
                   "price": 750.0
                 },
                 {
                   "name": "Iran",
-                  "price": 840.0
+                  "price": 780.0
                 },
                 {
                   "name": "Tunisia",
@@ -1228,7 +1224,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-05T16:32:24Z",
+              "last_update": "2026-02-06T01:01:09Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1343,6 +1339,14 @@
                   "price": 550.0
                 },
                 {
+                  "name": "South Korea",
+                  "price": 560.0
+                },
+                {
+                  "name": "Ivory Coast",
+                  "price": 600.0
+                },
+                {
                   "name": "Sweden",
                   "price": 650.0
                 },
@@ -1355,24 +1359,12 @@
                   "price": 820.0
                 },
                 {
-                  "name": "Ivory Coast",
-                  "price": 850.0
-                },
-                {
                   "name": "Ghana",
                   "price": 900.0
                 },
                 {
-                  "name": "South Korea",
-                  "price": 920.0
-                },
-                {
                   "name": "Australia",
                   "price": 990.0
-                },
-                {
-                  "name": "Iran",
-                  "price": 1000.0
                 },
                 {
                   "name": "Algeria",
@@ -1389,11 +1381,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-02-05T16:28:22Z",
+          "last_update": "2026-02-06T01:04:31Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:28:22Z",
+              "last_update": "2026-02-06T01:04:31Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1658,11 +1650,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-02-05T16:33:58Z",
+          "last_update": "2026-02-06T01:05:12Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-05T16:33:58Z",
+              "last_update": "2026-02-06T01:05:12Z",
               "outcomes": [
                 {
                   "name": "Spain",
