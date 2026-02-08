@@ -38,9 +38,9 @@
       "home_team": "Benfica",
       "away_team": "Real Madrid",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.2582,
-      "draw_odds": 0.244,
-      "away_odds": 0.4979,
+      "home_odds": 0.258,
+      "draw_odds": 0.2437,
+      "away_odds": 0.4983,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,14 +82,14 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Inter Milan",
       "commence_time": "2026-02-18T20:00:00+00:00",
-      "home_odds": 0.214,
-      "draw_odds": 0.229,
-      "away_odds": 0.557,
+      "home_odds": 0.2132,
+      "draw_odds": 0.2319,
+      "away_odds": 0.5549,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-08T08:20:54.757836",
+  "cached_at": "2026-02-08T16:18:22.754085",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
