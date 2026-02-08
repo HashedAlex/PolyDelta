@@ -27,9 +27,9 @@
       "home_team": "Borussia Dortmund",
       "away_team": "Atalanta BC",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.4483,
-      "draw_odds": 0.2716,
-      "away_odds": 0.2801,
+      "home_odds": 0.4489,
+      "draw_odds": 0.2719,
+      "away_odds": 0.2792,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,14 +82,14 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Inter Milan",
       "commence_time": "2026-02-18T20:00:00+00:00",
-      "home_odds": 0.2142,
-      "draw_odds": 0.2274,
-      "away_odds": 0.5584,
+      "home_odds": 0.214,
+      "draw_odds": 0.229,
+      "away_odds": 0.557,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-08T01:27:30.721195",
+  "cached_at": "2026-02-08T08:20:54.757836",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
