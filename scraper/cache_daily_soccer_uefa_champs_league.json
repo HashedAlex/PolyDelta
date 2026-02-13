@@ -5,9 +5,9 @@
       "home_team": "Galatasaray",
       "away_team": "Juventus",
       "commence_time": "2026-02-17T17:45:00+00:00",
-      "home_odds": 0.2762,
-      "draw_odds": 0.2654,
-      "away_odds": 0.4584,
+      "home_odds": 0.2753,
+      "draw_odds": 0.2658,
+      "away_odds": 0.459,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "AS Monaco",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.1673,
-      "draw_odds": 0.214,
-      "away_odds": 0.6187,
+      "home_odds": 0.167,
+      "draw_odds": 0.2167,
+      "away_odds": 0.6163,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -27,9 +27,9 @@
       "home_team": "Borussia Dortmund",
       "away_team": "Atalanta BC",
       "commence_time": "2026-02-17T20:00:00+00:00",
-      "home_odds": 0.4537,
-      "draw_odds": 0.2674,
-      "away_odds": 0.2789,
+      "home_odds": 0.4517,
+      "draw_odds": 0.2693,
+      "away_odds": 0.279,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -89,7 +89,7 @@
       "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-02-13T01:14:14.334903",
+  "cached_at": "2026-02-13T08:31:24.759106",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
