@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-27T06:48:27.056818",
+  "timestamp": "2026-02-27T06:55:06.211819",
   "data": [
     {
       "id": "0646d720c3fd59168e130d26a5a9d3ca",
@@ -13,11 +13,11 @@
         {
           "key": "pinnacle",
           "title": "Pinnacle",
-          "last_update": "2026-02-27T06:46:24Z",
+          "last_update": "2026-02-27T06:54:38Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:46:24Z",
+              "last_update": "2026-02-27T06:54:38Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -146,11 +146,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-02-27T06:43:58Z",
+          "last_update": "2026-02-27T06:54:12Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:43:58Z",
+              "last_update": "2026-02-27T06:54:12Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -279,11 +279,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-02-27T06:47:44Z",
+          "last_update": "2026-02-27T06:52:52Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:47:44Z",
+              "last_update": "2026-02-27T06:52:52Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -412,11 +412,11 @@
         {
           "key": "betonlineag",
           "title": "BetOnline.ag",
-          "last_update": "2026-02-27T06:45:58Z",
+          "last_update": "2026-02-27T06:51:04Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:45:58Z",
+              "last_update": "2026-02-27T06:51:04Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -521,11 +521,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-02-27T06:47:44Z",
+          "last_update": "2026-02-27T06:52:52Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:47:44Z",
+              "last_update": "2026-02-27T06:52:52Z",
               "outcomes": [
                 {
                   "name": "Washington Wizards",
@@ -545,7 +545,7 @@
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 9.6
+                  "price": 9.8
                 },
                 {
                   "name": "Cleveland Cavaliers",
@@ -557,27 +557,27 @@
                 },
                 {
                   "name": "Detroit Pistons",
-                  "price": 13.5
+                  "price": 14.0
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 15.5
-                },
-                {
-                  "name": "Houston Rockets",
-                  "price": 21.0
+                  "price": 20.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
                   "price": 23.0
                 },
                 {
+                  "name": "Houston Rockets",
+                  "price": 24.0
+                },
+                {
                   "name": "Philadelphia 76ers",
-                  "price": 34.0
+                  "price": 44.0
                 },
                 {
                   "name": "Los Angeles Lakers",
-                  "price": 44.0
+                  "price": 50.0
                 },
                 {
                   "name": "Golden State Warriors",
@@ -651,7 +651,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-27T06:47:44Z",
+              "last_update": "2026-02-27T06:52:52Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -659,7 +659,7 @@
                 },
                 {
                   "name": "Denver Nuggets",
-                  "price": 8.2
+                  "price": 8.4
                 },
                 {
                   "name": "San Antonio Spurs",
@@ -740,11 +740,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-02-27T06:47:44Z",
+          "last_update": "2026-02-27T06:52:52Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:47:44Z",
+              "last_update": "2026-02-27T06:52:52Z",
               "outcomes": [
                 {
                   "name": "Brooklyn Nets",
@@ -772,27 +772,27 @@
                 },
                 {
                   "name": "Detroit Pistons",
-                  "price": 13.5
+                  "price": 14.0
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 15.5
-                },
-                {
-                  "name": "Houston Rockets",
-                  "price": 21.0
+                  "price": 20.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
                   "price": 23.0
                 },
                 {
+                  "name": "Houston Rockets",
+                  "price": 24.0
+                },
+                {
                   "name": "Philadelphia 76ers",
-                  "price": 34.0
+                  "price": 44.0
                 },
                 {
                   "name": "Los Angeles Lakers",
-                  "price": 44.0
+                  "price": 50.0
                 },
                 {
                   "name": "Golden State Warriors",
@@ -870,7 +870,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-27T06:47:44Z",
+              "last_update": "2026-02-27T06:52:52Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -959,11 +959,11 @@
         {
           "key": "everygame",
           "title": "Everygame",
-          "last_update": "2026-02-27T06:43:33Z",
+          "last_update": "2026-02-27T06:53:45Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:43:33Z",
+              "last_update": "2026-02-27T06:53:45Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",

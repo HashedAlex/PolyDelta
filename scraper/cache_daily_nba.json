@@ -5,8 +5,8 @@
       "home_team": "Detroit Pistons",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-02-28T00:10:00+00:00",
-      "home_odds": 0.6807,
-      "away_odds": 0.3193,
+      "home_odds": 0.6817,
+      "away_odds": 0.3183,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -51,7 +51,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-02-27T06:47:32.766559",
+  "cached_at": "2026-02-27T06:54:30.595273",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }

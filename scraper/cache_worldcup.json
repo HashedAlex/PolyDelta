@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-27T06:48:09.936914",
+  "timestamp": "2026-02-27T06:54:48.845790",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-02-27T06:47:58Z",
+          "last_update": "2026-02-27T06:53:05Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:47:58Z",
+              "last_update": "2026-02-27T06:53:05Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -270,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-02-27T06:44:12Z",
+          "last_update": "2026-02-27T06:54:28Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:44:12Z",
+              "last_update": "2026-02-27T06:54:28Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -459,11 +459,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-02-27T06:45:32Z",
+          "last_update": "2026-02-27T06:50:39Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:45:32Z",
+              "last_update": "2026-02-27T06:50:39Z",
               "outcomes": [
                 {
                   "name": "Saudi Arabia",
@@ -725,7 +725,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-27T06:45:32Z",
+              "last_update": "2026-02-27T06:50:39Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -890,11 +890,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-02-27T06:43:59Z",
+          "last_update": "2026-02-27T06:54:18Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:43:59Z",
+              "last_update": "2026-02-27T06:54:18Z",
               "outcomes": [
                 {
                   "name": "Saudi Arabia",
@@ -1156,7 +1156,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-02-27T06:43:59Z",
+              "last_update": "2026-02-27T06:54:18Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1321,11 +1321,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-02-27T06:44:40Z",
+          "last_update": "2026-02-27T06:49:47Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:44:40Z",
+              "last_update": "2026-02-27T06:49:47Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1590,11 +1590,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-02-27T06:47:19Z",
+          "last_update": "2026-02-27T06:54:00Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-02-27T06:47:19Z",
+              "last_update": "2026-02-27T06:54:00Z",
               "outcomes": [
                 {
                   "name": "Spain",
