@@ -5,9 +5,9 @@
       "home_team": "Galatasaray",
       "away_team": "Liverpool",
       "commence_time": "2026-03-10T17:45:00+00:00",
-      "home_odds": 0.2286,
-      "draw_odds": 0.2343,
-      "away_odds": 0.5371,
+      "home_odds": 0.2282,
+      "draw_odds": 0.2357,
+      "away_odds": 0.5361,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -27,9 +27,9 @@
       "home_team": "Atl\u00e9tico Madrid",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.578,
-      "draw_odds": 0.2341,
-      "away_odds": 0.1879,
+      "home_odds": 0.5809,
+      "draw_odds": 0.2316,
+      "away_odds": 0.1875,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -38,9 +38,9 @@
       "home_team": "Newcastle United",
       "away_team": "Barcelona",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.3526,
-      "draw_odds": 0.2475,
-      "away_odds": 0.3999,
+      "home_odds": 0.3425,
+      "draw_odds": 0.2466,
+      "away_odds": 0.4109,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -49,9 +49,9 @@
       "home_team": "Bayer Leverkusen",
       "away_team": "Arsenal",
       "commence_time": "2026-03-11T17:45:00+00:00",
-      "home_odds": 0.1685,
-      "draw_odds": 0.2293,
-      "away_odds": 0.6022,
+      "home_odds": 0.1621,
+      "draw_odds": 0.2296,
+      "away_odds": 0.6083,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Sporting Lisbon",
       "commence_time": "2026-03-11T20:00:00+00:00",
-      "home_odds": 0.3652,
-      "draw_odds": 0.2589,
-      "away_odds": 0.3759,
+      "home_odds": 0.3706,
+      "draw_odds": 0.2569,
+      "away_odds": 0.3725,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -71,9 +71,9 @@
       "home_team": "Paris Saint Germain",
       "away_team": "Chelsea",
       "commence_time": "2026-03-11T20:00:00+00:00",
-      "home_odds": 0.3707,
-      "draw_odds": 0.3243,
-      "away_odds": 0.305,
+      "home_odds": 0.3682,
+      "draw_odds": 0.3256,
+      "away_odds": 0.3063,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -89,7 +89,7 @@
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-03-01T08:19:49.032833",
+  "cached_at": "2026-03-01T16:16:12.791307",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
