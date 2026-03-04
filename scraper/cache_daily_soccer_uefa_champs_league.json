@@ -16,9 +16,9 @@
       "home_team": "Atalanta BC",
       "away_team": "Bayern Munich",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.2119,
-      "draw_odds": 0.2075,
-      "away_odds": 0.5806,
+      "home_odds": 0.2108,
+      "draw_odds": 0.2078,
+      "away_odds": 0.5815,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -38,9 +38,9 @@
       "home_team": "Newcastle United",
       "away_team": "Barcelona",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.3382,
+      "home_odds": 0.3368,
       "draw_odds": 0.2484,
-      "away_odds": 0.4135,
+      "away_odds": 0.4147,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Sporting Lisbon",
       "commence_time": "2026-03-11T20:00:00+00:00",
-      "home_odds": 0.3705,
-      "draw_odds": 0.2562,
-      "away_odds": 0.3733,
+      "home_odds": 0.3711,
+      "draw_odds": 0.256,
+      "away_odds": 0.3729,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -89,7 +89,7 @@
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-03-04T01:06:23.253764",
+  "cached_at": "2026-03-04T08:27:38.168023",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }

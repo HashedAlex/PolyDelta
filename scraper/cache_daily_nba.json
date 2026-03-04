@@ -1,112 +1,12 @@
 {
   "matches": [
     {
-      "match_id": "2213458a287cb0b1ffa4d46d3ed430b3",
-      "home_team": "Charlotte Hornets",
-      "away_team": "Dallas Mavericks",
-      "commence_time": "2026-03-04T00:11:00+00:00",
-      "home_odds": 0.9271,
-      "away_odds": 0.0729,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "b6df29b0fdf2fd3b00b97b1e81870cca",
-      "home_team": "Cleveland Cavaliers",
-      "away_team": "Detroit Pistons",
-      "commence_time": "2026-03-04T00:11:00+00:00",
-      "home_odds": 0.6096,
-      "away_odds": 0.3904,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "7a292e434c91c398eb8db7bf1008b671",
-      "home_team": "Orlando Magic",
-      "away_team": "Washington Wizards",
-      "commence_time": "2026-03-04T00:12:00+00:00",
-      "home_odds": 0.8741,
-      "away_odds": 0.1259,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "637bb875ffdc47533ca3ed42d7bbcaa7",
-      "home_team": "Miami Heat",
-      "away_team": "Brooklyn Nets",
-      "commence_time": "2026-03-04T00:43:00+00:00",
-      "home_odds": 0.8248,
-      "away_odds": 0.1752,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "6e039621e88bb0b022d5b0d3eafd9596",
-      "home_team": "Toronto Raptors",
-      "away_team": "New York Knicks",
-      "commence_time": "2026-03-04T00:43:00+00:00",
-      "home_odds": 0.5123,
-      "away_odds": 0.4877,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "6178a340912ea77ebb5169a9c65f3ec7",
-      "home_team": "Chicago Bulls",
-      "away_team": "Oklahoma City Thunder",
-      "commence_time": "2026-03-04T01:10:00+00:00",
-      "home_odds": 0.2401,
-      "away_odds": 0.7599,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "5b3a7e855054866a44f6443710ea000b",
-      "home_team": "Minnesota Timberwolves",
-      "away_team": "Memphis Grizzlies",
-      "commence_time": "2026-03-04T01:10:00+00:00",
-      "home_odds": 0.857,
-      "away_odds": 0.143,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "fe9fbae6e69b1684995b2fa8f45fb691",
-      "home_team": "Philadelphia 76ers",
-      "away_team": "San Antonio Spurs",
-      "commence_time": "2026-03-04T01:12:00+00:00",
-      "home_odds": 0.2744,
-      "away_odds": 0.7256,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "63d7f24774bdc95465206323a257aa73",
-      "home_team": "Los Angeles Lakers",
-      "away_team": "New Orleans Pelicans",
-      "commence_time": "2026-03-04T03:40:00+00:00",
-      "home_odds": 0.7449,
-      "away_odds": 0.2551,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "1da265a6a1035935a4d2f806af7c3a74",
-      "home_team": "Sacramento Kings",
-      "away_team": "Phoenix Suns",
-      "commence_time": "2026-03-04T04:10:00+00:00",
-      "home_odds": 0.2459,
-      "away_odds": 0.7541,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
       "match_id": "5e27bbc527b9df8725ac9fcf03174b8c",
       "home_team": "New York Knicks",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-03-05T00:10:00+00:00",
-      "home_odds": 0.3957,
-      "away_odds": 0.6043,
+      "home_odds": 0.3789,
+      "away_odds": 0.6211,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -115,8 +15,28 @@
       "home_team": "Boston Celtics",
       "away_team": "Charlotte Hornets",
       "commence_time": "2026-03-05T00:40:00+00:00",
-      "home_odds": 0.6644,
-      "away_odds": 0.3356,
+      "home_odds": 0.6859,
+      "away_odds": 0.3141,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "417802e27d447db450466ad4fd7a4f8d",
+      "home_team": "Philadelphia 76ers",
+      "away_team": "Utah Jazz",
+      "commence_time": "2026-03-05T00:40:00+00:00",
+      "home_odds": 0.7783,
+      "away_odds": 0.2217,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "2a2434eaef59c9cbb34c5410c32f2529",
+      "home_team": "Memphis Grizzlies",
+      "away_team": "Portland Trail Blazers",
+      "commence_time": "2026-03-05T01:10:00+00:00",
+      "home_odds": 0.2936,
+      "away_odds": 0.7064,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -125,13 +45,23 @@
       "home_team": "Milwaukee Bucks",
       "away_team": "Atlanta Hawks",
       "commence_time": "2026-03-05T02:40:00+00:00",
-      "home_odds": 0.4935,
-      "away_odds": 0.5065,
+      "home_odds": 0.5156,
+      "away_odds": 0.4844,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "4a6dcac94e4279ba0acbd1f6376b6df2",
+      "home_team": "Los Angeles Clippers",
+      "away_team": "Indiana Pacers",
+      "commence_time": "2026-03-05T03:40:00+00:00",
+      "home_odds": 0.8324,
+      "away_odds": 0.1676,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-03-04T01:05:49.789767",
+  "cached_at": "2026-03-04T08:26:59.263173",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
