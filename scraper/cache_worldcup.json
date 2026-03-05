@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-05T08:29:09.315166",
+  "timestamp": "2026-03-05T17:53:41.202446",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-03-05T08:26:12Z",
+          "last_update": "2026-03-05T17:49:17Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:26:12Z",
+              "last_update": "2026-03-05T17:49:17Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -270,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-03-05T08:28:04Z",
+          "last_update": "2026-03-05T17:50:55Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:28:04Z",
+              "last_update": "2026-03-05T17:50:55Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -459,11 +459,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-03-05T08:27:33Z",
+          "last_update": "2026-03-05T17:50:39Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:27:33Z",
+              "last_update": "2026-03-05T17:50:39Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -487,7 +487,7 @@
                 },
                 {
                   "name": "Portugal",
-                  "price": 14.0
+                  "price": 13.5
                 },
                 {
                   "name": "Germany",
@@ -559,7 +559,7 @@
                 },
                 {
                   "name": "Australia",
-                  "price": 230.0
+                  "price": 220.0
                 },
                 {
                   "name": "Scotland",
@@ -568,6 +568,10 @@
                 {
                   "name": "Canada",
                   "price": 280.0
+                },
+                {
+                  "name": "Ivory Coast",
+                  "price": 310.0
                 },
                 {
                   "name": "Paraguay",
@@ -586,12 +590,8 @@
                   "price": 350.0
                 },
                 {
-                  "name": "Ivory Coast",
-                  "price": 520.0
-                },
-                {
                   "name": "Australia",
-                  "price": 580.0
+                  "price": 560.0
                 },
                 {
                   "name": "Ghana",
@@ -725,7 +725,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-05T08:27:33Z",
+              "last_update": "2026-03-05T17:50:39Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -890,12 +890,16 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-03-05T08:28:06Z",
+          "last_update": "2026-03-05T17:50:56Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:28:06Z",
+              "last_update": "2026-03-05T17:50:56Z",
               "outcomes": [
+                {
+                  "name": "Ivory Coast",
+                  "price": 1.01
+                },
                 {
                   "name": "Spain",
                   "price": 6.0
@@ -918,7 +922,7 @@
                 },
                 {
                   "name": "Portugal",
-                  "price": 14.0
+                  "price": 13.5
                 },
                 {
                   "name": "Germany",
@@ -990,7 +994,7 @@
                 },
                 {
                   "name": "Australia",
-                  "price": 230.0
+                  "price": 220.0
                 },
                 {
                   "name": "Scotland",
@@ -1015,10 +1019,6 @@
                 {
                   "name": "South Korea",
                   "price": 350.0
-                },
-                {
-                  "name": "Ivory Coast",
-                  "price": 520.0
                 },
                 {
                   "name": "Australia",
@@ -1156,7 +1156,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-05T08:28:06Z",
+              "last_update": "2026-03-05T17:50:56Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1200,7 +1200,7 @@
                 },
                 {
                   "name": "Belgium",
-                  "price": 55.0
+                  "price": 50.0
                 },
                 {
                   "name": "Colombia",
@@ -1264,7 +1264,7 @@
                 },
                 {
                   "name": "Egypt",
-                  "price": 450.0
+                  "price": 440.0
                 },
                 {
                   "name": "South Korea",
@@ -1321,11 +1321,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-03-05T08:27:17Z",
+          "last_update": "2026-03-05T17:51:03Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:27:17Z",
+              "last_update": "2026-03-05T17:51:03Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1590,11 +1590,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-03-05T08:28:36Z",
+          "last_update": "2026-03-05T17:52:35Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-05T08:28:36Z",
+              "last_update": "2026-03-05T17:52:35Z",
               "outcomes": [
                 {
                   "name": "Spain",
