@@ -5,9 +5,9 @@
       "home_team": "Galatasaray",
       "away_team": "Liverpool",
       "commence_time": "2026-03-10T17:45:00+00:00",
-      "home_odds": 0.2294,
-      "draw_odds": 0.2425,
-      "away_odds": 0.5281,
+      "home_odds": 0.2321,
+      "draw_odds": 0.2416,
+      "away_odds": 0.5263,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "Atalanta BC",
       "away_team": "Bayern Munich",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.2099,
-      "draw_odds": 0.207,
-      "away_odds": 0.5832,
+      "home_odds": 0.2094,
+      "draw_odds": 0.2065,
+      "away_odds": 0.5841,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -27,9 +27,9 @@
       "home_team": "Atl\u00e9tico Madrid",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-03-10T20:00:00+00:00",
-      "home_odds": 0.6005,
-      "draw_odds": 0.2243,
-      "away_odds": 0.1752,
+      "home_odds": 0.6044,
+      "draw_odds": 0.2201,
+      "away_odds": 0.1755,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -49,9 +49,9 @@
       "home_team": "Bayer Leverkusen",
       "away_team": "Arsenal",
       "commence_time": "2026-03-11T17:45:00+00:00",
-      "home_odds": 0.1643,
-      "draw_odds": 0.2302,
-      "away_odds": 0.6055,
+      "home_odds": 0.1646,
+      "draw_odds": 0.2288,
+      "away_odds": 0.6066,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Bod\u00f8/Glimt",
       "away_team": "Sporting Lisbon",
       "commence_time": "2026-03-11T20:00:00+00:00",
-      "home_odds": 0.3765,
-      "draw_odds": 0.2558,
-      "away_odds": 0.3677,
+      "home_odds": 0.3725,
+      "draw_odds": 0.2559,
+      "away_odds": 0.3716,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -89,7 +89,7 @@
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-03-06T01:13:05.460513",
+  "cached_at": "2026-03-06T08:26:00.451314",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
