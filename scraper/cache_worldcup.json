@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-08T08:19:29.268512",
+  "timestamp": "2026-03-08T16:16:36.125692",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-03-08T08:15:39Z",
+          "last_update": "2026-03-08T16:14:29Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:15:39Z",
+              "last_update": "2026-03-08T16:14:29Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -270,11 +270,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-03-08T08:15:45Z",
+          "last_update": "2026-03-08T16:14:09Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:15:45Z",
+              "last_update": "2026-03-08T16:14:09Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -459,11 +459,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-03-08T08:16:31Z",
+          "last_update": "2026-03-08T16:15:42Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:16:31Z",
+              "last_update": "2026-03-08T16:15:42Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -725,7 +725,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-08T08:16:31Z",
+              "last_update": "2026-03-08T16:15:42Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -825,7 +825,7 @@
                 },
                 {
                   "name": "Australia",
-                  "price": 300.0
+                  "price": 270.0
                 },
                 {
                   "name": "Canada",
@@ -890,11 +890,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-03-08T08:16:13Z",
+          "last_update": "2026-03-08T16:13:59Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:16:13Z",
+              "last_update": "2026-03-08T16:13:59Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -954,7 +954,7 @@
                 },
                 {
                   "name": "Uruguay",
-                  "price": 90.0
+                  "price": 95.0
                 },
                 {
                   "name": "Mexico",
@@ -1156,7 +1156,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-08T08:16:13Z",
+              "last_update": "2026-03-08T16:13:59Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1256,7 +1256,7 @@
                 },
                 {
                   "name": "Australia",
-                  "price": 300.0
+                  "price": 270.0
                 },
                 {
                   "name": "Canada",
@@ -1321,11 +1321,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-03-08T08:15:17Z",
+          "last_update": "2026-03-08T16:16:02Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:15:17Z",
+              "last_update": "2026-03-08T16:16:02Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1590,11 +1590,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-03-08T08:18:42Z",
+          "last_update": "2026-03-08T16:16:09Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-08T08:18:42Z",
+              "last_update": "2026-03-08T16:16:09Z",
               "outcomes": [
                 {
                   "name": "Spain",
