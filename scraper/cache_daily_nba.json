@@ -5,8 +5,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-03-09T23:10:00+00:00",
-      "home_odds": 0.8121,
-      "away_odds": 0.1879,
+      "home_odds": 0.8392,
+      "away_odds": 0.1608,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -15,8 +15,8 @@
       "home_team": "Brooklyn Nets",
       "away_team": "Memphis Grizzlies",
       "commence_time": "2026-03-09T23:40:00+00:00",
-      "home_odds": 0.4896,
-      "away_odds": 0.5104,
+      "home_odds": 0.4659,
+      "away_odds": 0.5341,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "Denver Nuggets",
       "commence_time": "2026-03-09T23:40:00+00:00",
-      "home_odds": 0.7066,
-      "away_odds": 0.2934,
+      "home_odds": 0.6958,
+      "away_odds": 0.3042,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,8 +35,8 @@
       "home_team": "Utah Jazz",
       "away_team": "Golden State Warriors",
       "commence_time": "2026-03-10T01:10:00+00:00",
-      "home_odds": 0.3513,
-      "away_odds": 0.6487,
+      "home_odds": 0.2956,
+      "away_odds": 0.7044,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,13 +45,23 @@
       "home_team": "Los Angeles Clippers",
       "away_team": "New York Knicks",
       "commence_time": "2026-03-10T02:10:00+00:00",
-      "home_odds": 0.4505,
-      "away_odds": 0.5495,
+      "home_odds": 0.4426,
+      "away_odds": 0.5574,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "e989d01a7b748cf7e0c892b5259ea99d",
+      "home_team": "San Antonio Spurs",
+      "away_team": "Boston Celtics",
+      "commence_time": "2026-03-11T00:10:00+00:00",
+      "home_odds": 0.5823,
+      "away_odds": 0.4177,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-03-09T08:32:22.441325",
+  "cached_at": "2026-03-09T16:45:35.492646",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
