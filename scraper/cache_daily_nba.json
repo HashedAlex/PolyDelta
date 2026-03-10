@@ -5,8 +5,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Memphis Grizzlies",
       "commence_time": "2026-03-10T23:10:00+00:00",
-      "home_odds": 0.6341,
-      "away_odds": 0.3659,
+      "home_odds": 0.584,
+      "away_odds": 0.416,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -15,8 +15,8 @@
       "home_team": "Atlanta Hawks",
       "away_team": "Dallas Mavericks",
       "commence_time": "2026-03-10T23:40:00+00:00",
-      "home_odds": 0.7595,
-      "away_odds": 0.2405,
+      "home_odds": 0.779,
+      "away_odds": 0.221,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "Brooklyn Nets",
       "away_team": "Detroit Pistons",
       "commence_time": "2026-03-10T23:40:00+00:00",
-      "home_odds": 0.1228,
-      "away_odds": 0.8772,
+      "home_odds": 0.1106,
+      "away_odds": 0.8894,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,8 +35,8 @@
       "home_team": "Miami Heat",
       "away_team": "Washington Wizards",
       "commence_time": "2026-03-10T23:40:00+00:00",
-      "home_odds": 0.8713,
-      "away_odds": 0.1287,
+      "home_odds": 0.8828,
+      "away_odds": 0.1172,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,8 +45,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Boston Celtics",
       "commence_time": "2026-03-11T00:10:00+00:00",
-      "home_odds": 0.5759,
-      "away_odds": 0.4241,
+      "home_odds": 0.5747,
+      "away_odds": 0.4253,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -55,8 +55,8 @@
       "home_team": "Houston Rockets",
       "away_team": "Toronto Raptors",
       "commence_time": "2026-03-11T00:10:00+00:00",
-      "home_odds": 0.6279,
-      "away_odds": 0.3721,
+      "home_odds": 0.6403,
+      "away_odds": 0.3597,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -65,8 +65,8 @@
       "home_team": "Milwaukee Bucks",
       "away_team": "Phoenix Suns",
       "commence_time": "2026-03-11T00:10:00+00:00",
-      "home_odds": 0.4559,
-      "away_odds": 0.5441,
+      "home_odds": 0.4931,
+      "away_odds": 0.5069,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -75,8 +75,8 @@
       "home_team": "Portland Trail Blazers",
       "away_team": "Charlotte Hornets",
       "commence_time": "2026-03-11T02:10:00+00:00",
-      "home_odds": 0.4205,
-      "away_odds": 0.5795,
+      "home_odds": 0.4198,
+      "away_odds": 0.5802,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -85,8 +85,8 @@
       "home_team": "Golden State Warriors",
       "away_team": "Chicago Bulls",
       "commence_time": "2026-03-11T02:10:00+00:00",
-      "home_odds": 0.6693,
-      "away_odds": 0.3307,
+      "home_odds": 0.674,
+      "away_odds": 0.326,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -95,8 +95,8 @@
       "home_team": "Sacramento Kings",
       "away_team": "Indiana Pacers",
       "commence_time": "2026-03-11T02:10:00+00:00",
-      "home_odds": 0.6074,
-      "away_odds": 0.3926,
+      "home_odds": 0.5805,
+      "away_odds": 0.4195,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -105,13 +105,13 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-03-11T03:10:00+00:00",
-      "home_odds": 0.4539,
-      "away_odds": 0.5461,
+      "home_odds": 0.4314,
+      "away_odds": 0.5686,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-03-10T08:29:03.264687",
+  "cached_at": "2026-03-10T16:45:05.778002",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
