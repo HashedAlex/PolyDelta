@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-11T16:40:02.411761",
+  "timestamp": "2026-03-12T01:01:36.402252",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-03-11T16:38:16Z",
+          "last_update": "2026-03-12T00:57:50Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:38:16Z",
+              "last_update": "2026-03-12T00:57:50Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -266,11 +266,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-03-11T16:37:52Z",
+          "last_update": "2026-03-12T00:57:40Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:37:52Z",
+              "last_update": "2026-03-12T00:57:40Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -455,11 +455,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-03-11T16:38:19Z",
+          "last_update": "2026-03-12T00:57:17Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:38:19Z",
+              "last_update": "2026-03-12T00:57:17Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -721,7 +721,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-11T16:38:19Z",
+              "last_update": "2026-03-12T00:57:17Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -765,7 +765,7 @@
                 },
                 {
                   "name": "Belgium",
-                  "price": 50.0
+                  "price": 55.0
                 },
                 {
                   "name": "Colombia",
@@ -886,11 +886,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-03-11T16:36:35Z",
+          "last_update": "2026-03-12T01:00:41Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:36:35Z",
+              "last_update": "2026-03-12T01:00:41Z",
               "outcomes": [
                 {
                   "name": "Ivory Coast",
@@ -1152,7 +1152,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-03-11T16:36:35Z",
+              "last_update": "2026-03-12T01:00:41Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1196,7 +1196,7 @@
                 },
                 {
                   "name": "Belgium",
-                  "price": 50.0
+                  "price": 55.0
                 },
                 {
                   "name": "Colombia",
@@ -1317,11 +1317,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-03-11T16:36:49Z",
+          "last_update": "2026-03-12T00:57:48Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:36:49Z",
+              "last_update": "2026-03-12T00:57:48Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1586,11 +1586,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-03-11T16:39:08Z",
+          "last_update": "2026-03-12T01:00:57Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-03-11T16:39:08Z",
+              "last_update": "2026-03-12T01:00:57Z",
               "outcomes": [
                 {
                   "name": "Spain",
