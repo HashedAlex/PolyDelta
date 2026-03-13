@@ -5,9 +5,9 @@
       "home_team": "Burnley",
       "away_team": "Bournemouth",
       "commence_time": "2026-03-14T15:00:00+00:00",
-      "home_odds": 0.2383,
-      "draw_odds": 0.2449,
-      "away_odds": 0.5168,
+      "home_odds": 0.2388,
+      "draw_odds": 0.2434,
+      "away_odds": 0.5178,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "Sunderland",
       "away_team": "Brighton and Hove Albion",
       "commence_time": "2026-03-14T15:00:00+00:00",
-      "home_odds": 0.2829,
-      "draw_odds": 0.2875,
-      "away_odds": 0.4296,
+      "home_odds": 0.2879,
+      "draw_odds": 0.2896,
+      "away_odds": 0.4226,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -27,8 +27,8 @@
       "home_team": "Arsenal",
       "away_team": "Everton",
       "commence_time": "2026-03-14T17:30:00+00:00",
-      "home_odds": 0.6993,
-      "draw_odds": 0.2037,
+      "home_odds": 0.6995,
+      "draw_odds": 0.2036,
       "away_odds": 0.0969,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
@@ -71,9 +71,9 @@
       "home_team": "Crystal Palace",
       "away_team": "Leeds United",
       "commence_time": "2026-03-15T14:00:00+00:00",
-      "home_odds": 0.3754,
-      "draw_odds": 0.2953,
-      "away_odds": 0.3293,
+      "home_odds": 0.3773,
+      "draw_odds": 0.2951,
+      "away_odds": 0.3276,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -82,9 +82,9 @@
       "home_team": "Nottingham Forest",
       "away_team": "Fulham",
       "commence_time": "2026-03-15T14:00:00+00:00",
-      "home_odds": 0.434,
-      "draw_odds": 0.2814,
-      "away_odds": 0.2846,
+      "home_odds": 0.4334,
+      "draw_odds": 0.2815,
+      "away_odds": 0.2852,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -94,8 +94,8 @@
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-03-15T16:30:00+00:00",
       "home_odds": 0.7209,
-      "draw_odds": 0.1627,
-      "away_odds": 0.1164,
+      "draw_odds": 0.1623,
+      "away_odds": 0.1169,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -170,9 +170,9 @@
       "home_team": "Newcastle United",
       "away_team": "Sunderland",
       "commence_time": "2026-03-22T12:00:00+00:00",
-      "home_odds": 0.5775,
-      "draw_odds": 0.2371,
-      "away_odds": 0.1854,
+      "home_odds": 0.577,
+      "draw_odds": 0.2374,
+      "away_odds": 0.1856,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -199,7 +199,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-03-13T01:07:26.826770",
+  "cached_at": "2026-03-13T08:28:22.414757",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
