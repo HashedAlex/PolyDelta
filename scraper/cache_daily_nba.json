@@ -1,77 +1,117 @@
 {
   "matches": [
     {
-      "match_id": "12c0f198cfa33b284457ae31066ace94",
-      "home_team": "Philadelphia 76ers",
-      "away_team": "Brooklyn Nets",
-      "commence_time": "2026-03-14T17:10:00+00:00",
-      "home_odds": 0.7605,
-      "away_odds": 0.2395,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "match_id": "8c95b58e16520c12308e0196b0c19198",
+      "home_team": "Orlando Magic",
+      "away_team": "Phoenix Suns",
+      "commence_time": "2026-03-31T23:11:00+00:00",
+      "home_odds": 0.5214,
+      "away_odds": 0.4786,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     },
     {
-      "match_id": "67fd3c76881fc3018d06f51684b04db5",
-      "home_team": "Atlanta Hawks",
-      "away_team": "Milwaukee Bucks",
-      "commence_time": "2026-03-14T19:10:00+00:00",
-      "home_odds": 0.7208,
-      "away_odds": 0.2792,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "match_id": "ce4beaf577105bae5d26c3205ccce3b4",
+      "home_team": "Milwaukee Bucks",
+      "away_team": "Dallas Mavericks",
+      "commence_time": "2026-04-01T00:10:00+00:00",
+      "home_odds": 0.7771,
+      "away_odds": 0.2229,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     },
     {
-      "match_id": "385c8f2c3153a39f3b1864e324132599",
-      "home_team": "San Antonio Spurs",
-      "away_team": "Charlotte Hornets",
-      "commence_time": "2026-03-14T19:40:00+00:00",
-      "home_odds": 0.6773,
-      "away_odds": 0.3227,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "match_id": "b6b9e83d82f672bcffebdad2ba67d51d",
+      "home_team": "Detroit Pistons",
+      "away_team": "Toronto Raptors",
+      "commence_time": "2026-04-01T00:13:00+00:00",
+      "home_odds": 0.6563,
+      "away_odds": 0.3437,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     },
     {
-      "match_id": "99121dd3b759ee039a7172119402defe",
-      "home_team": "Boston Celtics",
-      "away_team": "Washington Wizards",
-      "commence_time": "2026-03-14T22:10:00+00:00",
-      "home_odds": 0.9187,
-      "away_odds": 0.0813,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "match_id": "0fee871b4f5cc68f4c933d5eb56d25c8",
+      "home_team": "Houston Rockets",
+      "away_team": "New York Knicks",
+      "commence_time": "2026-04-01T00:13:00+00:00",
+      "home_odds": 0.7974,
+      "away_odds": 0.2026,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     },
     {
-      "match_id": "5b7467a257447a40f885525e863992a5",
+      "match_id": "87dab37c8c29cf1586f973f3fe0ca38a",
       "home_team": "Los Angeles Lakers",
-      "away_team": "Denver Nuggets",
-      "commence_time": "2026-03-14T22:40:00+00:00",
-      "home_odds": 0.4354,
-      "away_odds": 0.5646,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "away_team": "Cleveland Cavaliers",
+      "commence_time": "2026-04-01T02:30:00+00:00",
+      "home_odds": 0.5448,
+      "away_odds": 0.4552,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     },
     {
-      "match_id": "b356eed95fac84c751e3a07a9b013bdb",
-      "home_team": "Miami Heat",
-      "away_team": "Orlando Magic",
-      "commence_time": "2026-03-15T00:10:00+00:00",
-      "home_odds": 0.595,
-      "away_odds": 0.405,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
-      "match_id": "fd3cb91e05ed15d6fa70f51f1d305f3b",
+      "match_id": "4ae1016a615b3bc0fcef523ab3c8933b",
       "home_team": "Los Angeles Clippers",
-      "away_team": "Sacramento Kings",
-      "commence_time": "2026-03-15T02:40:00+00:00",
-      "home_odds": 0.857,
-      "away_odds": 0.143,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "away_team": "Portland Trail Blazers",
+      "commence_time": "2026-04-01T03:00:00+00:00",
+      "home_odds": 0.6411,
+      "away_odds": 0.3589,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "ccecac4a3706f43f36fd63ae97cbfc88",
+      "home_team": "Washington Wizards",
+      "away_team": "Philadelphia 76ers",
+      "commence_time": "2026-04-01T23:10:00+00:00",
+      "home_odds": 0.1127,
+      "away_odds": 0.8873,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "5f035331e20684a116344413531bab36",
+      "home_team": "Miami Heat",
+      "away_team": "Boston Celtics",
+      "commence_time": "2026-04-01T23:30:00+00:00",
+      "home_odds": 0.3626,
+      "away_odds": 0.6374,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "1e9f8048801efb165d39e008270e4942",
+      "home_team": "Chicago Bulls",
+      "away_team": "Indiana Pacers",
+      "commence_time": "2026-04-02T00:10:00+00:00",
+      "home_odds": 0.628,
+      "away_odds": 0.372,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "8b86324be55670d1f3c59008ae771dac",
+      "home_team": "Utah Jazz",
+      "away_team": "Denver Nuggets",
+      "commence_time": "2026-04-02T01:10:00+00:00",
+      "home_odds": 0.0838,
+      "away_odds": 0.9162,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "54540a1bafcd2e0cff9b5cd8a09e0bfa",
+      "home_team": "Golden State Warriors",
+      "away_team": "San Antonio Spurs",
+      "commence_time": "2026-04-02T02:00:00+00:00",
+      "home_odds": 0.1418,
+      "away_odds": 0.8582,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-03-14T08:22:44.070717",
+  "cached_at": "2026-04-01T01:24:51.625836",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
