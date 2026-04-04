@@ -5,8 +5,8 @@
       "home_team": "Denver Nuggets",
       "away_team": "San Antonio Spurs",
       "commence_time": "2026-04-04T19:10:00+00:00",
-      "home_odds": 0.4517,
-      "away_odds": 0.5483,
+      "home_odds": 0.4615,
+      "away_odds": 0.5385,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -15,8 +15,8 @@
       "home_team": "Miami Heat",
       "away_team": "Washington Wizards",
       "commence_time": "2026-04-04T19:10:00+00:00",
-      "home_odds": 0.9198,
-      "away_odds": 0.0802,
+      "home_odds": 0.9248,
+      "away_odds": 0.0752,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Detroit Pistons",
       "commence_time": "2026-04-04T23:10:00+00:00",
-      "home_odds": 0.4379,
-      "away_odds": 0.5621,
+      "home_odds": 0.4195,
+      "away_odds": 0.5805,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,8 +35,8 @@
       "home_team": "Boston Celtics",
       "away_team": "Toronto Raptors",
       "commence_time": "2026-04-05T19:40:00+00:00",
-      "home_odds": 0.7706,
-      "away_odds": 0.2294,
+      "home_odds": 0.7714,
+      "away_odds": 0.2286,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,8 +45,8 @@
       "home_team": "Chicago Bulls",
       "away_team": "Phoenix Suns",
       "commence_time": "2026-04-05T19:40:00+00:00",
-      "home_odds": 0.2047,
-      "away_odds": 0.7953,
+      "home_odds": 0.1969,
+      "away_odds": 0.8031,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -55,8 +55,8 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "Charlotte Hornets",
       "commence_time": "2026-04-05T23:10:00+00:00",
-      "home_odds": 0.5375,
-      "away_odds": 0.4625,
+      "home_odds": 0.5239,
+      "away_odds": 0.4761,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -65,8 +65,8 @@
       "home_team": "New Orleans Pelicans",
       "away_team": "Orlando Magic",
       "commence_time": "2026-04-05T23:10:00+00:00",
-      "home_odds": 0.4264,
-      "away_odds": 0.5736,
+      "home_odds": 0.4132,
+      "away_odds": 0.5868,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -75,8 +75,8 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "Utah Jazz",
       "commence_time": "2026-04-05T23:10:00+00:00",
-      "home_odds": 0.9315,
-      "away_odds": 0.0685,
+      "home_odds": 0.9389,
+      "away_odds": 0.0611,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -85,8 +85,8 @@
       "home_team": "Dallas Mavericks",
       "away_team": "Los Angeles Lakers",
       "commence_time": "2026-04-05T23:40:00+00:00",
-      "home_odds": 0.2998,
-      "away_odds": 0.7002,
+      "home_odds": 0.3047,
+      "away_odds": 0.6953,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -95,8 +95,8 @@
       "home_team": "Sacramento Kings",
       "away_team": "Los Angeles Clippers",
       "commence_time": "2026-04-06T01:10:00+00:00",
-      "home_odds": 0.1631,
-      "away_odds": 0.8369,
+      "home_odds": 0.1706,
+      "away_odds": 0.8294,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -105,13 +105,13 @@
       "home_team": "Golden State Warriors",
       "away_team": "Houston Rockets",
       "commence_time": "2026-04-06T02:10:00+00:00",
-      "home_odds": 0.4035,
-      "away_odds": 0.5965,
+      "home_odds": 0.4018,
+      "away_odds": 0.5982,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-04-04T08:29:08.631898",
+  "cached_at": "2026-04-04T16:22:53.798837",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
