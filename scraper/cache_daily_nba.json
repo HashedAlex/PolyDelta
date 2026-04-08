@@ -5,8 +5,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Atlanta Hawks",
       "commence_time": "2026-04-08T23:10:00+00:00",
-      "home_odds": 0.5243,
-      "away_odds": 0.4757,
+      "home_odds": 0.523,
+      "away_odds": 0.477,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -15,8 +15,8 @@
       "home_team": "Detroit Pistons",
       "away_team": "Milwaukee Bucks",
       "commence_time": "2026-04-08T23:10:00+00:00",
-      "home_odds": 0.9143,
-      "away_odds": 0.0857,
+      "home_odds": 0.9278,
+      "away_odds": 0.0722,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "Orlando Magic",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-04-08T23:10:00+00:00",
-      "home_odds": 0.6617,
-      "away_odds": 0.3383,
+      "home_odds": 0.7023,
+      "away_odds": 0.2977,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -35,8 +35,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Portland Trail Blazers",
       "commence_time": "2026-04-09T00:10:00+00:00",
-      "home_odds": 0.6001,
-      "away_odds": 0.3999,
+      "home_odds": 0.5938,
+      "away_odds": 0.4062,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,8 +45,8 @@
       "home_team": "Denver Nuggets",
       "away_team": "Memphis Grizzlies",
       "commence_time": "2026-04-09T01:10:00+00:00",
-      "home_odds": 0.9451,
-      "away_odds": 0.0549,
+      "home_odds": 0.9437,
+      "away_odds": 0.0563,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -55,8 +55,8 @@
       "home_team": "Phoenix Suns",
       "away_team": "Dallas Mavericks",
       "commence_time": "2026-04-09T02:10:00+00:00",
-      "home_odds": 0.8144,
-      "away_odds": 0.1856,
+      "home_odds": 0.8159,
+      "away_odds": 0.1841,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -65,13 +65,13 @@
       "home_team": "Los Angeles Clippers",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-04-09T02:10:00+00:00",
-      "home_odds": 0.2946,
-      "away_odds": 0.7054,
+      "home_odds": 0.2993,
+      "away_odds": 0.7007,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-04-08T08:50:58.696645",
+  "cached_at": "2026-04-08T16:50:50.353677",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
