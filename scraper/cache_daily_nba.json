@@ -15,8 +15,8 @@
       "home_team": "Phoenix Suns",
       "away_team": "Portland Trail Blazers",
       "commence_time": "2026-04-15T02:10:00+00:00",
-      "home_odds": 0.5876,
-      "away_odds": 0.4124,
+      "home_odds": 0.5894,
+      "away_odds": 0.4106,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Orlando Magic",
       "commence_time": "2026-04-15T23:30:00+00:00",
-      "home_odds": 0.5238,
-      "away_odds": 0.4762,
+      "home_odds": 0.5247,
+      "away_odds": 0.4753,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,8 +45,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Toronto Raptors",
       "commence_time": "2026-04-18T17:00:00+00:00",
-      "home_odds": 0.7337,
-      "away_odds": 0.2663,
+      "home_odds": 0.7315,
+      "away_odds": 0.2685,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -55,8 +55,8 @@
       "home_team": "Denver Nuggets",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-04-18T19:40:00+00:00",
-      "home_odds": 0.68,
-      "away_odds": 0.32,
+      "home_odds": 0.678,
+      "away_odds": 0.322,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -65,8 +65,8 @@
       "home_team": "New York Knicks",
       "away_team": "Atlanta Hawks",
       "commence_time": "2026-04-18T22:00:00+00:00",
-      "home_odds": 0.6426,
-      "away_odds": 0.3574,
+      "home_odds": 0.6394,
+      "away_odds": 0.3606,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -75,13 +75,13 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Houston Rockets",
       "commence_time": "2026-04-19T00:40:00+00:00",
-      "home_odds": 0.3391,
-      "away_odds": 0.6609,
+      "home_odds": 0.3425,
+      "away_odds": 0.6575,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-04-14T01:24:35.850146",
+  "cached_at": "2026-04-14T09:08:04.103354",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
