@@ -1,51 +1,29 @@
 {
   "matches": [
     {
-      "match_id": "e39a51d05b5444bf1c98ffa0ed6811d3",
-      "home_team": "Atl\u00e9tico Madrid",
-      "away_team": "Barcelona",
-      "commence_time": "2026-04-14T19:00:00+00:00",
-      "home_odds": 0.2566,
-      "draw_odds": 0.2203,
-      "away_odds": 0.5231,
-      "bookmaker": "William Hill",
-      "bookmaker_url": "https://sports.williamhill.com"
-    },
-    {
-      "match_id": "6f7c43b668146a5e9ba09151c1ba460b",
-      "home_team": "Liverpool",
-      "away_team": "Paris Saint Germain",
-      "commence_time": "2026-04-14T19:00:00+00:00",
-      "home_odds": 0.3981,
-      "draw_odds": 0.2281,
-      "away_odds": 0.3737,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
-    },
-    {
-      "match_id": "02ff9b02f1eab3394f9e38d70e257e12",
+      "match_id": "f3df07dd72b759828e43d61cb813a166",
       "home_team": "Arsenal",
-      "away_team": "Sporting Lisbon",
-      "commence_time": "2026-04-15T19:00:00+00:00",
-      "home_odds": 0.6504,
-      "draw_odds": 0.212,
-      "away_odds": 0.1376,
+      "away_team": "Atl\u00e9tico Madrid",
+      "commence_time": "2026-05-05T19:00:00+00:00",
+      "home_odds": 0.5744,
+      "draw_odds": 0.2457,
+      "away_odds": 0.1798,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
     {
-      "match_id": "76200682955d7f62f3b051a14f5f67fa",
+      "match_id": "541c5e45c0f5393079508826d283ea6e",
       "home_team": "Bayern Munich",
-      "away_team": "Real Madrid",
-      "commence_time": "2026-04-15T19:00:00+00:00",
-      "home_odds": 0.6159,
-      "draw_odds": 0.1828,
-      "away_odds": 0.2013,
+      "away_team": "Paris Saint Germain",
+      "commence_time": "2026-05-06T19:00:00+00:00",
+      "home_odds": 0.5638,
+      "draw_odds": 0.1973,
+      "away_odds": 0.2389,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-04-13T16:53:01.328345",
+  "cached_at": "2026-05-01T01:55:37.946997",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
