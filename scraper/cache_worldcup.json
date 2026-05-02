@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-02T01:44:42.383321",
+  "timestamp": "2026-05-02T08:56:22.989064",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-05-02T01:43:18Z",
+          "last_update": "2026-05-02T08:54:58Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:43:18Z",
+              "last_update": "2026-05-02T08:54:58Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -214,11 +214,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-05-02T01:44:14Z",
+          "last_update": "2026-05-02T08:51:39Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:44:14Z",
+              "last_update": "2026-05-02T08:51:39Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -419,11 +419,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-05-02T01:43:03Z",
+          "last_update": "2026-05-02T08:53:28Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:43:03Z",
+              "last_update": "2026-05-02T08:53:28Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -502,10 +502,6 @@
                   "price": 100.0
                 },
                 {
-                  "name": "Iran",
-                  "price": 100.0
-                },
-                {
                   "name": "Croatia",
                   "price": 110.0
                 },
@@ -527,7 +523,7 @@
                 },
                 {
                   "name": "Scotland",
-                  "price": 240.0
+                  "price": 250.0
                 },
                 {
                   "name": "Canada",
@@ -564,6 +560,10 @@
                 {
                   "name": "Ghana",
                   "price": 560.0
+                },
+                {
+                  "name": "Iran",
+                  "price": 600.0
                 },
                 {
                   "name": "Australia",
@@ -645,7 +645,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-05-02T01:43:03Z",
+              "last_update": "2026-05-02T08:53:28Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -802,11 +802,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-05-02T01:44:17Z",
+          "last_update": "2026-05-02T08:51:38Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:44:17Z",
+              "last_update": "2026-05-02T08:51:38Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -885,10 +885,6 @@
                   "price": 100.0
                 },
                 {
-                  "name": "Iran",
-                  "price": 100.0
-                },
-                {
                   "name": "Croatia",
                   "price": 110.0
                 },
@@ -947,6 +943,10 @@
                 {
                   "name": "Ghana",
                   "price": 550.0
+                },
+                {
+                  "name": "Iran",
+                  "price": 600.0
                 },
                 {
                   "name": "Australia",
@@ -1028,7 +1028,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-05-02T01:44:17Z",
+              "last_update": "2026-05-02T08:51:38Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1185,11 +1185,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-05-02T01:38:45Z",
+          "last_update": "2026-05-02T08:52:56Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:38:45Z",
+              "last_update": "2026-05-02T08:52:56Z",
               "outcomes": [
                 {
                   "name": "Spain",
@@ -1390,11 +1390,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-05-02T01:44:32Z",
+          "last_update": "2026-05-02T08:55:55Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-02T01:44:32Z",
+              "last_update": "2026-05-02T08:55:55Z",
               "outcomes": [
                 {
                   "name": "Spain",
