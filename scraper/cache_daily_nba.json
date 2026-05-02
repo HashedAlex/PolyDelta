@@ -4,19 +4,19 @@
       "match_id": "88e10294c54deffd6e9e6efcba249d2c",
       "home_team": "Orlando Magic",
       "away_team": "Detroit Pistons",
-      "commence_time": "2026-05-01T23:10:00+00:00",
-      "home_odds": 0.3929,
-      "away_odds": 0.6071,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
+      "commence_time": "2026-05-01T23:09:16+00:00",
+      "home_odds": 0.2129,
+      "away_odds": 0.7871,
+      "bookmaker": "Bovada",
+      "bookmaker_url": "https://www.bovada.lv"
     },
     {
       "match_id": "d1938a9c13602a661e894f996f2680e8",
       "home_team": "Toronto Raptors",
       "away_team": "Cleveland Cavaliers",
-      "commence_time": "2026-05-01T23:40:00+00:00",
-      "home_odds": 0.3743,
-      "away_odds": 0.6257,
+      "commence_time": "2026-05-01T23:41:07+00:00",
+      "home_odds": 0.8352,
+      "away_odds": 0.1648,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -24,9 +24,9 @@
       "match_id": "c361a0b8c035a055bd9497b52674e3fb",
       "home_team": "Houston Rockets",
       "away_team": "Los Angeles Lakers",
-      "commence_time": "2026-05-02T01:40:00+00:00",
-      "home_odds": 0.5978,
-      "away_odds": 0.4022,
+      "commence_time": "2026-05-02T01:49:00+00:00",
+      "home_odds": 0.6285,
+      "away_odds": 0.3715,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -35,8 +35,18 @@
       "home_team": "Boston Celtics",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-05-02T23:40:00+00:00",
-      "home_odds": 0.7167,
-      "away_odds": 0.2833,
+      "home_odds": 0.7158,
+      "away_odds": 0.2842,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "be60e6f50fc77fc3a3cf6925472bad91",
+      "home_team": "Detroit Pistons",
+      "away_team": "Orlando Magic",
+      "commence_time": "2026-05-03T17:00:00+00:00",
+      "home_odds": 0.7449,
+      "away_odds": 0.2551,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -45,13 +55,13 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-05-05T01:30:00+00:00",
-      "home_odds": 0.8668,
-      "away_odds": 0.1332,
+      "home_odds": 0.8684,
+      "away_odds": 0.1316,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-05-01T16:46:22.407778",
+  "cached_at": "2026-05-02T01:44:38.301860",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
