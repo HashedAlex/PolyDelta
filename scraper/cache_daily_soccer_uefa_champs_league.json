@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Atl\u00e9tico Madrid",
       "commence_time": "2026-05-05T19:00:00+00:00",
-      "home_odds": 0.5669,
-      "draw_odds": 0.2487,
-      "away_odds": 0.1843,
+      "home_odds": 0.5759,
+      "draw_odds": 0.2444,
+      "away_odds": 0.1796,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     },
@@ -16,14 +16,14 @@
       "home_team": "Bayern Munich",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-05-06T19:00:00+00:00",
-      "home_odds": 0.564,
-      "draw_odds": 0.1954,
+      "home_odds": 0.5685,
+      "draw_odds": 0.191,
       "away_odds": 0.2405,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-05-02T16:35:20.431575",
+  "cached_at": "2026-05-03T01:48:03.365164",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
