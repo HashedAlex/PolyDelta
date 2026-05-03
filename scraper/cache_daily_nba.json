@@ -1,22 +1,12 @@
 {
   "matches": [
     {
-      "match_id": "a37e80a2e3cf3aaa3ae84a9124987058",
-      "home_team": "Boston Celtics",
-      "away_team": "Philadelphia 76ers",
-      "commence_time": "2026-05-02T23:36:16+00:00",
-      "home_odds": 0.4504,
-      "away_odds": 0.5496,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
-    },
-    {
       "match_id": "be60e6f50fc77fc3a3cf6925472bad91",
       "home_team": "Detroit Pistons",
       "away_team": "Orlando Magic",
       "commence_time": "2026-05-03T19:40:00+00:00",
-      "home_odds": 0.7391,
-      "away_odds": 0.2609,
+      "home_odds": 0.736,
+      "away_odds": 0.264,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -25,8 +15,18 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Toronto Raptors",
       "commence_time": "2026-05-03T23:40:00+00:00",
-      "home_odds": 0.7346,
-      "away_odds": 0.2654,
+      "home_odds": 0.7222,
+      "away_odds": 0.2778,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "b11391b35b7a0cf79deeef3bb3eb9009",
+      "home_team": "New York Knicks",
+      "away_team": "Philadelphia 76ers",
+      "commence_time": "2026-05-05T00:10:00+00:00",
+      "home_odds": 0.6985,
+      "away_odds": 0.3015,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -35,8 +35,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-05-05T01:40:00+00:00",
-      "home_odds": 0.8637,
-      "away_odds": 0.1363,
+      "home_odds": 0.861,
+      "away_odds": 0.139,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -51,7 +51,7 @@
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-05-03T01:48:01.135694",
+  "cached_at": "2026-05-03T09:12:10.455051",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }

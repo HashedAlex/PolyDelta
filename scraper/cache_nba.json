@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-03T01:48:14.070675",
+  "timestamp": "2026-05-03T09:12:27.428555",
   "data": [
     {
       "id": "0646d720c3fd59168e130d26a5a9d3ca",
@@ -11,36 +11,89 @@
       "away_team": null,
       "bookmakers": [
         {
-          "key": "draftkings",
-          "title": "DraftKings",
-          "last_update": "2026-05-03T01:48:08Z",
+          "key": "pinnacle",
+          "title": "Pinnacle",
+          "last_update": "2026-05-03T09:10:40Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-03T01:48:08Z",
+              "last_update": "2026-05-03T09:10:40Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
-                  "price": 1.71
+                  "price": 1.69
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 4.8
+                  "price": 4.62
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 12.0
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 15.0
+                  "price": 11.02
                 },
                 {
                   "name": "Cleveland Cavaliers",
-                  "price": 19.0
+                  "price": 17.04
                 },
                 {
                   "name": "Detroit Pistons",
+                  "price": 19.05
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 24.01
+                },
+                {
+                  "name": "Denver Nuggets",
+                  "price": 28.56
+                },
+                {
+                  "name": "Philadelphia 76ers",
+                  "price": 30.73
+                },
+                {
+                  "name": "Orlando Magic",
+                  "price": 126.31
+                },
+                {
+                  "name": "Minnesota Timberwolves",
+                  "price": 141.35
+                },
+                {
+                  "name": "Toronto Raptors",
+                  "price": 281.68
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "draftkings",
+          "title": "DraftKings",
+          "last_update": "2026-05-03T09:10:22Z",
+          "markets": [
+            {
+              "key": "outrights",
+              "last_update": "2026-05-03T09:10:22Z",
+              "outcomes": [
+                {
+                  "name": "Oklahoma City Thunder",
+                  "price": 1.69
+                },
+                {
+                  "name": "San Antonio Spurs",
+                  "price": 4.3
+                },
+                {
+                  "name": "New York Knicks",
+                  "price": 11.0
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 21.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
                   "price": 21.0
                 },
                 {
@@ -49,11 +102,11 @@
                 },
                 {
                   "name": "Philadelphia 76ers",
-                  "price": 66.0
+                  "price": 46.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
-                  "price": 181.0
+                  "price": 171.0
                 },
                 {
                   "name": "Orlando Magic",
@@ -70,34 +123,30 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-05-03T01:47:17Z",
+          "last_update": "2026-05-03T09:11:52Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-03T01:47:17Z",
+              "last_update": "2026-05-03T09:11:52Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
-                  "price": 1.71
+                  "price": 1.65
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 4.8
+                  "price": 4.6
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 13.0
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 14.0
-                },
-                {
-                  "name": "Cleveland Cavaliers",
-                  "price": 20.0
+                  "price": 9.5
                 },
                 {
                   "name": "Detroit Pistons",
+                  "price": 20.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
                   "price": 21.0
                 },
                 {
@@ -106,11 +155,11 @@
                 },
                 {
                   "name": "Philadelphia 76ers",
-                  "price": 61.0
+                  "price": 41.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
-                  "price": 201.0
+                  "price": 126.0
                 },
                 {
                   "name": "Orlando Magic",
@@ -118,7 +167,113 @@
                 },
                 {
                   "name": "Toronto Raptors",
-                  "price": 1001.0
+                  "price": 601.0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "betrivers",
+          "title": "BetRivers",
+          "last_update": "2026-05-03T09:10:58Z",
+          "markets": [
+            {
+              "key": "outrights",
+              "last_update": "2026-05-03T09:10:58Z",
+              "outcomes": [
+                {
+                  "name": "Oklahoma City Thunder",
+                  "price": 1.66
+                },
+                {
+                  "name": "San Antonio Spurs",
+                  "price": 4.5
+                },
+                {
+                  "name": "New York Knicks",
+                  "price": 10.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
+                  "price": 21.0
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 21.0
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 31.0
+                },
+                {
+                  "name": "Philadelphia 76ers",
+                  "price": 41.0
+                },
+                {
+                  "name": "Minnesota Timberwolves",
+                  "price": 151.0
+                },
+                {
+                  "name": "Orlando Magic",
+                  "price": 251.0
+                },
+                {
+                  "name": "Toronto Raptors",
+                  "price": 501.0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "betonlineag",
+          "title": "BetOnline.ag",
+          "last_update": "2026-05-03T09:11:35Z",
+          "markets": [
+            {
+              "key": "outrights",
+              "last_update": "2026-05-03T09:11:35Z",
+              "outcomes": [
+                {
+                  "name": "Oklahoma City Thunder",
+                  "price": 1.69
+                },
+                {
+                  "name": "San Antonio Spurs",
+                  "price": 4.0
+                },
+                {
+                  "name": "New York Knicks",
+                  "price": 11.0
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 19.0
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 21.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
+                  "price": 23.0
+                },
+                {
+                  "name": "Philadelphia 76ers",
+                  "price": 29.0
+                },
+                {
+                  "name": "Minnesota Timberwolves",
+                  "price": 81.0
+                },
+                {
+                  "name": "Orlando Magic",
+                  "price": 251.0
+                },
+                {
+                  "name": "Toronto Raptors",
+                  "price": 351.0
                 }
               ]
             }
@@ -127,89 +282,81 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-05-03T01:47:33Z",
+          "last_update": "2026-05-03T09:11:33Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-03T01:47:33Z",
+              "last_update": "2026-05-03T09:11:33Z",
               "outcomes": [
                 {
-                  "name": "Orlando Magic",
-                  "price": 1.01
+                  "name": "Oklahoma City Thunder",
+                  "price": 1.77
                 },
                 {
-                  "name": "Oklahoma City Thunder",
-                  "price": 1.8
+                  "name": "Toronto Raptors",
+                  "price": 4.0
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 4.6
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 10.0
+                  "price": 4.8
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 12.0
-                },
-                {
-                  "name": "Cleveland Cavaliers",
-                  "price": 15.0
-                },
-                {
-                  "name": "Los Angeles Lakers",
-                  "price": 16.5
+                  "price": 12.5
                 },
                 {
                   "name": "Detroit Pistons",
-                  "price": 17.5
+                  "price": 14.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
+                  "price": 19.0
                 },
                 {
                   "name": "Philadelphia 76ers",
-                  "price": 24.0
+                  "price": 30.0
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 40.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
                   "price": 80.0
                 },
                 {
-                  "name": "Toronto Raptors",
-                  "price": 120.0
+                  "name": "Orlando Magic",
+                  "price": 140.0
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-05-03T01:47:33Z",
+              "last_update": "2026-05-03T09:11:33Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
-                  "price": 1.82
+                  "price": 1.8
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 5.2
+                  "price": 5.1
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 30.0
+                  "price": 16.5
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 36.0
                 },
                 {
                   "name": "Cleveland Cavaliers",
                   "price": 40.0
                 },
                 {
-                  "name": "Detroit Pistons",
-                  "price": 55.0
-                },
-                {
                   "name": "Philadelphia 76ers",
-                  "price": 65.0
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 70.0
+                  "price": 85.0
                 },
                 {
                   "name": "Los Angeles Lakers",
@@ -220,12 +367,12 @@
                   "price": 550.0
                 },
                 {
-                  "name": "Minnesota Timberwolves",
-                  "price": 900.0
+                  "name": "Orlando Magic",
+                  "price": 760.0
                 },
                 {
-                  "name": "Orlando Magic",
-                  "price": 1000.0
+                  "name": "Minnesota Timberwolves",
+                  "price": 900.0
                 }
               ]
             }
@@ -234,105 +381,150 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-05-03T01:44:53Z",
+          "last_update": "2026-05-03T09:12:25Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-03T01:44:53Z",
+              "last_update": "2026-05-03T09:12:25Z",
               "outcomes": [
                 {
-                  "name": "Orlando Magic",
-                  "price": 1.01
-                },
-                {
                   "name": "Oklahoma City Thunder",
-                  "price": 1.8
-                },
-                {
-                  "name": "San Antonio Spurs",
-                  "price": 4.6
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 10.0
-                },
-                {
-                  "name": "New York Knicks",
-                  "price": 12.0
-                },
-                {
-                  "name": "Cleveland Cavaliers",
-                  "price": 15.0
-                },
-                {
-                  "name": "Los Angeles Lakers",
-                  "price": 16.5
-                },
-                {
-                  "name": "Detroit Pistons",
-                  "price": 17.5
-                },
-                {
-                  "name": "Philadelphia 76ers",
-                  "price": 27.0
-                },
-                {
-                  "name": "Minnesota Timberwolves",
-                  "price": 90.0
+                  "price": 1.77
                 },
                 {
                   "name": "Toronto Raptors",
-                  "price": 180.0
+                  "price": 4.0
+                },
+                {
+                  "name": "San Antonio Spurs",
+                  "price": 4.8
+                },
+                {
+                  "name": "New York Knicks",
+                  "price": 12.5
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 15.5
+                },
+                {
+                  "name": "Cleveland Cavaliers",
+                  "price": 19.0
+                },
+                {
+                  "name": "Philadelphia 76ers",
+                  "price": 30.0
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 40.0
+                },
+                {
+                  "name": "Minnesota Timberwolves",
+                  "price": 80.0
+                },
+                {
+                  "name": "Orlando Magic",
+                  "price": 140.0
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-05-03T01:44:53Z",
+              "last_update": "2026-05-03T09:12:25Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
-                  "price": 1.82
+                  "price": 1.79
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 5.2
+                  "price": 5.1
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 30.0
+                  "price": 16.5
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 36.0
                 },
                 {
                   "name": "Cleveland Cavaliers",
                   "price": 40.0
                 },
                 {
-                  "name": "Detroit Pistons",
-                  "price": 55.0
-                },
-                {
                   "name": "Philadelphia 76ers",
-                  "price": 60.0
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 70.0
+                  "price": 85.0
                 },
                 {
                   "name": "Los Angeles Lakers",
-                  "price": 150.0
+                  "price": 100.0
+                },
+                {
+                  "name": "Minnesota Timberwolves",
+                  "price": 390.0
                 },
                 {
                   "name": "Toronto Raptors",
                   "price": 550.0
                 },
                 {
+                  "name": "Orlando Magic",
+                  "price": 760.0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "everygame",
+          "title": "Everygame",
+          "last_update": "2026-05-03T09:12:25Z",
+          "markets": [
+            {
+              "key": "outrights",
+              "last_update": "2026-05-03T09:12:25Z",
+              "outcomes": [
+                {
+                  "name": "Oklahoma City Thunder",
+                  "price": 1.66
+                },
+                {
+                  "name": "San Antonio Spurs",
+                  "price": 4.5
+                },
+                {
+                  "name": "New York Knicks",
+                  "price": 11.0
+                },
+                {
+                  "name": "Detroit Pistons",
+                  "price": 17.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
+                  "price": 19.0
+                },
+                {
+                  "name": "Los Angeles Lakers",
+                  "price": 29.0
+                },
+                {
+                  "name": "Philadelphia 76ers",
+                  "price": 41.0
+                },
+                {
                   "name": "Minnesota Timberwolves",
-                  "price": 900.0
+                  "price": 176.0
                 },
                 {
                   "name": "Orlando Magic",
-                  "price": 1000.0
+                  "price": 251.0
+                },
+                {
+                  "name": "Toronto Raptors",
+                  "price": 501.0
                 }
               ]
             }
@@ -341,11 +533,11 @@
         {
           "key": "betmgm",
           "title": "BetMGM",
-          "last_update": "2026-05-03T01:47:33Z",
+          "last_update": "2026-05-03T09:12:25Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-05-03T01:47:33Z",
+              "last_update": "2026-05-03T09:12:25Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -353,31 +545,27 @@
                 },
                 {
                   "name": "San Antonio Spurs",
-                  "price": 4.25
+                  "price": 4.0
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 11.0
-                },
-                {
-                  "name": "Boston Celtics",
-                  "price": 14.0
-                },
-                {
-                  "name": "Cleveland Cavaliers",
-                  "price": 21.0
+                  "price": 10.0
                 },
                 {
                   "name": "Detroit Pistons",
+                  "price": 21.0
+                },
+                {
+                  "name": "Cleveland Cavaliers",
                   "price": 23.0
                 },
                 {
-                  "name": "Los Angeles Lakers",
-                  "price": 41.0
+                  "name": "Philadelphia 76ers",
+                  "price": 36.0
                 },
                 {
-                  "name": "Philadelphia 76ers",
-                  "price": 67.0
+                  "name": "Los Angeles Lakers",
+                  "price": 36.0
                 },
                 {
                   "name": "Minnesota Timberwolves",
