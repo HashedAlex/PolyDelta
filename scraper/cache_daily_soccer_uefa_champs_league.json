@@ -16,14 +16,14 @@
       "home_team": "Bayern Munich",
       "away_team": "Paris Saint Germain",
       "commence_time": "2026-05-06T19:00:00+00:00",
-      "home_odds": 0.5645,
-      "draw_odds": 0.1865,
-      "away_odds": 0.2489,
+      "home_odds": 0.57,
+      "draw_odds": 0.1848,
+      "away_odds": 0.2452,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-05-03T16:36:07.347455",
+  "cached_at": "2026-05-04T01:48:35.353158",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }

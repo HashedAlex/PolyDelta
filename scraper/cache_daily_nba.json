@@ -1,32 +1,22 @@
 {
   "matches": [
     {
-      "match_id": "be60e6f50fc77fc3a3cf6925472bad91",
-      "home_team": "Detroit Pistons",
-      "away_team": "Orlando Magic",
-      "commence_time": "2026-05-03T19:40:00+00:00",
-      "home_odds": 0.7346,
-      "away_odds": 0.2654,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
-    },
-    {
       "match_id": "a463f640631f8b0580966b909965de14",
       "home_team": "Cleveland Cavaliers",
       "away_team": "Toronto Raptors",
-      "commence_time": "2026-05-03T23:40:00+00:00",
-      "home_odds": 0.7193,
-      "away_odds": 0.2807,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
+      "commence_time": "2026-05-03T23:42:55+00:00",
+      "home_odds": 0.9684,
+      "away_odds": 0.0316,
+      "bookmaker": "BetMGM",
+      "bookmaker_url": "https://sports.betmgm.com"
     },
     {
       "match_id": "b11391b35b7a0cf79deeef3bb3eb9009",
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-05-05T00:10:00+00:00",
-      "home_odds": 0.7168,
-      "away_odds": 0.2832,
+      "home_odds": 0.7143,
+      "away_odds": 0.2857,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -35,8 +25,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-05-05T01:40:00+00:00",
-      "home_odds": 0.861,
-      "away_odds": 0.139,
+      "home_odds": 0.8472,
+      "away_odds": 0.1528,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -45,13 +35,13 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "Los Angeles Lakers",
       "commence_time": "2026-05-06T01:40:00+00:00",
-      "home_odds": 0.8886,
-      "away_odds": 0.1114,
+      "home_odds": 0.8839,
+      "away_odds": 0.1161,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-05-03T16:36:05.846311",
+  "cached_at": "2026-05-04T01:48:33.620421",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
