@@ -1,32 +1,12 @@
 {
   "matches": [
     {
-      "match_id": "b11391b35b7a0cf79deeef3bb3eb9009",
-      "home_team": "New York Knicks",
-      "away_team": "Philadelphia 76ers",
-      "commence_time": "2026-05-05T00:13:39+00:00",
-      "home_odds": 0.9712,
-      "away_odds": 0.0288,
-      "bookmaker": "BetMGM",
-      "bookmaker_url": "https://sports.betmgm.com"
-    },
-    {
-      "match_id": "219920e3a715ceb3dc69f3638f7571d5",
-      "home_team": "San Antonio Spurs",
-      "away_team": "Minnesota Timberwolves",
-      "commence_time": "2026-05-05T01:43:12+00:00",
-      "home_odds": 0.7865,
-      "away_odds": 0.2135,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
-    },
-    {
       "match_id": "0d7933fbc3dd3e384f9b709cff4e882c",
       "home_team": "Detroit Pistons",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-05-05T23:10:00+00:00",
-      "home_odds": 0.5793,
-      "away_odds": 0.4207,
+      "home_odds": 0.5743,
+      "away_odds": 0.4257,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,13 +15,33 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "Los Angeles Lakers",
       "commence_time": "2026-05-06T00:40:00+00:00",
-      "home_odds": 0.881,
-      "away_odds": 0.119,
+      "home_odds": 0.8741,
+      "away_odds": 0.1259,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "d146e10295545e18ac8915a1f5860317",
+      "home_team": "New York Knicks",
+      "away_team": "Philadelphia 76ers",
+      "commence_time": "2026-05-06T23:10:00+00:00",
+      "home_odds": 0.7034,
+      "away_odds": 0.2966,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "246001ab42d44857430f7fe63f423461",
+      "home_team": "San Antonio Spurs",
+      "away_team": "Minnesota Timberwolves",
+      "commence_time": "2026-05-07T01:40:00+00:00",
+      "home_odds": 0.7526,
+      "away_odds": 0.2474,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-05-05T01:48:56.135117",
+  "cached_at": "2026-05-05T09:51:19.021863",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
