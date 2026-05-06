@@ -5,18 +5,18 @@
       "home_team": "Detroit Pistons",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-05-05T23:10:00+00:00",
-      "home_odds": 0.5723,
-      "away_odds": 0.4277,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
+      "home_odds": 0.9712,
+      "away_odds": 0.0288,
+      "bookmaker": "BetMGM",
+      "bookmaker_url": "https://sports.betmgm.com"
     },
     {
       "match_id": "689b4554b0b10e67f46872eb2e74b98d",
       "home_team": "Oklahoma City Thunder",
       "away_team": "Los Angeles Lakers",
-      "commence_time": "2026-05-06T00:40:00+00:00",
-      "home_odds": 0.8666,
-      "away_odds": 0.1334,
+      "commence_time": "2026-05-06T00:43:02+00:00",
+      "home_odds": 0.911,
+      "away_odds": 0.089,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-05-06T23:10:00+00:00",
-      "home_odds": 0.7054,
-      "away_odds": 0.2946,
+      "home_odds": 0.7039,
+      "away_odds": 0.2961,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,13 +35,23 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-05-07T01:40:00+00:00",
-      "home_odds": 0.7546,
-      "away_odds": 0.2454,
+      "home_odds": 0.7699,
+      "away_odds": 0.2301,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
+    },
+    {
+      "match_id": "862af0717b53a01b5e93a188a655d663",
+      "home_team": "Detroit Pistons",
+      "away_team": "Cleveland Cavaliers",
+      "commence_time": "2026-05-08T02:10:00+00:00",
+      "home_odds": 0.5914,
+      "away_odds": 0.4086,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-05T17:12:36.470239",
+  "cached_at": "2026-05-06T01:48:10.019290",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
