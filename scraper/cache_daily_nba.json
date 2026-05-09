@@ -1,22 +1,12 @@
 {
   "matches": [
     {
-      "match_id": "30d614c5d781b768faf9cf885e890851",
-      "home_team": "Philadelphia 76ers",
-      "away_team": "New York Knicks",
-      "commence_time": "2026-05-08T23:10:00+00:00",
-      "home_odds": 0.5251,
-      "away_odds": 0.4749,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
       "match_id": "1b5c084f510006e8f30cd6cac40e231d",
       "home_team": "Minnesota Timberwolves",
       "away_team": "San Antonio Spurs",
-      "commence_time": "2026-05-09T01:40:00+00:00",
-      "home_odds": 0.3545,
-      "away_odds": 0.6455,
+      "commence_time": "2026-05-09T01:48:00+00:00",
+      "home_odds": 0.2921,
+      "away_odds": 0.7079,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +15,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Detroit Pistons",
       "commence_time": "2026-05-09T19:10:00+00:00",
-      "home_odds": 0.6121,
-      "away_odds": 0.3879,
+      "home_odds": 0.6153,
+      "away_odds": 0.3847,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,13 +25,23 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-05-10T00:40:00+00:00",
-      "home_odds": 0.2425,
-      "away_odds": 0.7575,
+      "home_odds": 0.2418,
+      "away_odds": 0.7582,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "878243c543236baba132ad43ae333aae",
+      "home_team": "Philadelphia 76ers",
+      "away_team": "New York Knicks",
+      "commence_time": "2026-05-10T19:40:00+00:00",
+      "home_odds": 0.4844,
+      "away_odds": 0.5156,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-08T17:00:47.237287",
+  "cached_at": "2026-05-09T01:51:26.965573",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
