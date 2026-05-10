@@ -1,22 +1,12 @@
 {
   "matches": [
     {
-      "match_id": "2734c350b90f332dbece882dd10b204e",
-      "home_team": "Cleveland Cavaliers",
-      "away_team": "Detroit Pistons",
-      "commence_time": "2026-05-09T19:10:00+00:00",
-      "home_odds": 0.6174,
-      "away_odds": 0.3826,
-      "bookmaker": "FanDuel",
-      "bookmaker_url": "https://sportsbook.fanduel.com"
-    },
-    {
       "match_id": "40c8a29efb894c4dd6bf6acc5025c9cb",
       "home_team": "Los Angeles Lakers",
       "away_team": "Oklahoma City Thunder",
-      "commence_time": "2026-05-10T00:40:00+00:00",
-      "home_odds": 0.2413,
-      "away_odds": 0.7587,
+      "commence_time": "2026-05-10T00:41:00+00:00",
+      "home_odds": 0.3156,
+      "away_odds": 0.6844,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +15,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "New York Knicks",
       "commence_time": "2026-05-10T19:40:00+00:00",
-      "home_odds": 0.4809,
-      "away_odds": 0.5191,
+      "home_odds": 0.4856,
+      "away_odds": 0.5144,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -35,13 +25,23 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "San Antonio Spurs",
       "commence_time": "2026-05-10T23:40:00+00:00",
-      "home_odds": 0.3732,
-      "away_odds": 0.6268,
+      "home_odds": 0.3721,
+      "away_odds": 0.6279,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
+    },
+    {
+      "match_id": "b537062ee0483d20ae932052628b663d",
+      "home_team": "Cleveland Cavaliers",
+      "away_team": "Detroit Pistons",
+      "commence_time": "2026-05-12T00:00:00+00:00",
+      "home_odds": 0.597,
+      "away_odds": 0.403,
+      "bookmaker": "DraftKings",
+      "bookmaker_url": "https://sportsbook.draftkings.com"
     }
   ],
-  "cached_at": "2026-05-09T16:39:51.350841",
+  "cached_at": "2026-05-10T01:51:18.783094",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
