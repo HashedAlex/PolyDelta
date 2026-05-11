@@ -5,14 +5,14 @@
       "home_team": "Paris Saint Germain",
       "away_team": "Arsenal",
       "commence_time": "2026-05-30T16:00:00+00:00",
-      "home_odds": 0.4235,
-      "draw_odds": 0.2839,
-      "away_odds": 0.2925,
+      "home_odds": 0.4241,
+      "draw_odds": 0.2822,
+      "away_odds": 0.2937,
       "bookmaker": "William Hill",
       "bookmaker_url": "https://sports.williamhill.com"
     }
   ],
-  "cached_at": "2026-05-11T10:51:45.708288",
+  "cached_at": "2026-05-11T17:48:09.134294",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
