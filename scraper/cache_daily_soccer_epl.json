@@ -5,113 +5,113 @@
       "home_team": "Tottenham Hotspur",
       "away_team": "Leeds United",
       "commence_time": "2026-05-11T19:00:00+00:00",
-      "home_odds": 0.5275,
-      "draw_odds": 0.2437,
-      "away_odds": 0.2288,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.5307,
+      "draw_odds": 0.2442,
+      "away_odds": 0.2251,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "25f172034a65aca643fc22203f5e4cb2",
       "home_team": "Manchester City",
       "away_team": "Crystal Palace",
       "commence_time": "2026-05-13T19:00:00+00:00",
-      "home_odds": 0.796,
-      "draw_odds": 0.1313,
-      "away_odds": 0.0727,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.7974,
+      "draw_odds": 0.1351,
+      "away_odds": 0.0675,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "1c5214151ed7571cdad54fd8cdad6113",
       "home_team": "Aston Villa",
       "away_team": "Liverpool",
       "commence_time": "2026-05-15T19:00:00+00:00",
-      "home_odds": 0.3203,
-      "draw_odds": 0.2536,
-      "away_odds": 0.4261,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.3186,
+      "draw_odds": 0.2518,
+      "away_odds": 0.4296,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
     },
     {
       "match_id": "7142bb335268525fa5116c2f62763fa0",
       "home_team": "Manchester United",
       "away_team": "Nottingham Forest",
       "commence_time": "2026-05-17T11:30:00+00:00",
-      "home_odds": 0.5845,
-      "draw_odds": 0.2232,
-      "away_odds": 0.1923,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.584,
+      "draw_odds": 0.2254,
+      "away_odds": 0.1906,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "616cd9236437862ceceb47b6aec4a004",
       "home_team": "Brentford",
       "away_team": "Crystal Palace",
       "commence_time": "2026-05-17T14:00:00+00:00",
-      "home_odds": 0.5484,
-      "draw_odds": 0.2233,
-      "away_odds": 0.2283,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.5378,
+      "draw_odds": 0.2351,
+      "away_odds": 0.2271,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "80dfd4c3675149dca21da2943420629a",
       "home_team": "Leeds United",
       "away_team": "Brighton and Hove Albion",
       "commence_time": "2026-05-17T14:00:00+00:00",
-      "home_odds": 0.3075,
-      "draw_odds": 0.2646,
-      "away_odds": 0.4278,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.307,
+      "draw_odds": 0.2666,
+      "away_odds": 0.4264,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "bd38142035040006cfb0ca9d6e3ab2be",
       "home_team": "Everton",
       "away_team": "Sunderland",
       "commence_time": "2026-05-17T14:00:00+00:00",
-      "home_odds": 0.5363,
-      "draw_odds": 0.2545,
-      "away_odds": 0.2092,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.5376,
+      "draw_odds": 0.2548,
+      "away_odds": 0.2075,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "e0c6894a7376e3bacabd8e4c522a733e",
       "home_team": "Wolverhampton Wanderers",
       "away_team": "Fulham",
       "commence_time": "2026-05-17T14:00:00+00:00",
-      "home_odds": 0.2675,
-      "draw_odds": 0.2419,
-      "away_odds": 0.4906,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.2634,
+      "draw_odds": 0.2456,
+      "away_odds": 0.491,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "f331171c7e14ee86e88f338343aa7f97",
       "home_team": "Newcastle United",
       "away_team": "West Ham United",
       "commence_time": "2026-05-17T16:30:00+00:00",
-      "home_odds": 0.4759,
-      "draw_odds": 0.2456,
-      "away_odds": 0.2785,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.4735,
+      "draw_odds": 0.2424,
+      "away_odds": 0.2841,
+      "bookmaker": "William Hill",
+      "bookmaker_url": "https://sports.williamhill.com"
     },
     {
       "match_id": "818582ac502774aad4bb82309b9b85fa",
       "home_team": "Arsenal",
       "away_team": "Burnley",
       "commence_time": "2026-05-18T19:00:00+00:00",
-      "home_odds": 0.8777,
-      "draw_odds": 0.0818,
-      "away_odds": 0.0405,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
+      "home_odds": 0.8726,
+      "draw_odds": 0.0844,
+      "away_odds": 0.0431,
+      "bookmaker": "Betfair",
+      "bookmaker_url": "https://www.betfair.com"
     }
   ],
-  "cached_at": "2026-05-11T01:59:42.003882",
+  "cached_at": "2026-05-11T10:51:44.903767",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
