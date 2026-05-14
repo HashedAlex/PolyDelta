@@ -1,27 +1,27 @@
 {
   "matches": [
     {
-      "match_id": "c3531530e77a4ada542bdbff23de5409",
-      "home_team": "Detroit Pistons",
-      "away_team": "Cleveland Cavaliers",
-      "commence_time": "2026-05-14T00:14:16+00:00",
-      "home_odds": 0.63,
-      "away_odds": 0.37,
-      "bookmaker": "DraftKings",
-      "bookmaker_url": "https://sportsbook.draftkings.com"
+      "match_id": "745d265e0d83dac45060b44665d8cbe5",
+      "home_team": "Cleveland Cavaliers",
+      "away_team": "Detroit Pistons",
+      "commence_time": "2026-05-15T23:10:00+00:00",
+      "home_odds": 0.6139,
+      "away_odds": 0.3861,
+      "bookmaker": "FanDuel",
+      "bookmaker_url": "https://sportsbook.fanduel.com"
     },
     {
       "match_id": "1bd4432ce20bc61756180bf2d1c59c91",
       "home_team": "Minnesota Timberwolves",
       "away_team": "San Antonio Spurs",
       "commence_time": "2026-05-16T01:40:00+00:00",
-      "home_odds": 0.3764,
-      "away_odds": 0.6236,
+      "home_odds": 0.3738,
+      "away_odds": 0.6262,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-14T02:03:18.562397",
+  "cached_at": "2026-05-14T10:04:33.008677",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
