@@ -5,8 +5,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-05-29T00:40:00+00:00",
-      "home_odds": 0.5908,
-      "away_odds": 0.4092,
+      "home_odds": 0.5879,
+      "away_odds": 0.4121,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -15,8 +15,8 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "New York Knicks",
       "commence_time": "2026-06-04T00:40:00+00:00",
-      "home_odds": 0.6828,
-      "away_odds": 0.3172,
+      "home_odds": 0.6788,
+      "away_odds": 0.3212,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,13 +25,13 @@
       "home_team": "San Antonio Spurs",
       "away_team": "New York Knicks",
       "commence_time": "2026-06-04T00:40:00+00:00",
-      "home_odds": 0.6,
-      "away_odds": 0.4,
+      "home_odds": 0.5965,
+      "away_odds": 0.4035,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-28T01:55:37.917897",
+  "cached_at": "2026-05-28T11:28:00.889861",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
