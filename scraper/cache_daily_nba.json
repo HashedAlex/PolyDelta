@@ -15,8 +15,8 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "New York Knicks",
       "commence_time": "2026-06-04T00:40:00+00:00",
-      "home_odds": 0.676,
-      "away_odds": 0.324,
+      "home_odds": 0.6682,
+      "away_odds": 0.3318,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -31,7 +31,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-29T11:18:22.337772",
+  "cached_at": "2026-05-29T18:25:33.524036",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
