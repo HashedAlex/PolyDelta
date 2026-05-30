@@ -5,8 +5,8 @@
       "home_team": "Oklahoma City Thunder",
       "away_team": "San Antonio Spurs",
       "commence_time": "2026-05-31T00:10:00+00:00",
-      "home_odds": 0.5914,
-      "away_odds": 0.4086,
+      "home_odds": 0.5766,
+      "away_odds": 0.4234,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -31,7 +31,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-05-29T18:25:33.524036",
+  "cached_at": "2026-05-30T01:57:58.648694",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
