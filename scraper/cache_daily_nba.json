@@ -1,17 +1,17 @@
 {
   "matches": [
     {
-      "match_id": "1aae688472781f1a1aaf3efdb38e884b",
+      "match_id": "2852e944f8ef0bc3eba79f883b9101ba",
       "home_team": "San Antonio Spurs",
       "away_team": "New York Knicks",
-      "commence_time": "2026-06-04T00:44:00+00:00",
-      "home_odds": 0.5879,
-      "away_odds": 0.4121,
+      "commence_time": "2026-06-06T00:40:00+00:00",
+      "home_odds": 0.671,
+      "away_odds": 0.329,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-06-04T02:35:58.237437",
+  "cached_at": "2026-06-04T10:53:03.326766",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
