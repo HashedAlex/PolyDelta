@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-03T19:40:37.755629",
+  "timestamp": "2026-06-04T02:36:08.877157",
   "data": [
     {
       "id": "0646d720c3fd59168e130d26a5a9d3ca",
@@ -13,19 +13,19 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-06-03T19:25:16Z",
+          "last_update": "2026-06-04T02:35:56Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:25:16Z",
+              "last_update": "2026-06-04T02:35:56Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
-                  "price": 1.54
+                  "price": 1.56
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 2.55
+                  "price": 2.5
                 }
               ]
             }
@@ -34,11 +34,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-06-03T19:38:57Z",
+          "last_update": "2026-06-04T02:34:40Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:38:57Z",
+              "last_update": "2026-06-04T02:34:40Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
@@ -55,11 +55,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-06-03T19:40:14Z",
+          "last_update": "2026-06-04T00:37:53Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:40:14Z",
+              "last_update": "2026-06-04T00:37:53Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
@@ -76,33 +76,33 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-06-03T19:39:54Z",
+          "last_update": "2026-06-04T02:35:56Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:39:54Z",
+              "last_update": "2026-06-04T02:35:56Z",
               "outcomes": [
                 {
-                  "name": "San Antonio Spurs",
-                  "price": 1.56
+                  "name": "New York Knicks",
+                  "price": 1.01
                 },
                 {
-                  "name": "New York Knicks",
-                  "price": 2.76
+                  "name": "San Antonio Spurs",
+                  "price": 1.25
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-06-03T19:39:54Z",
+              "last_update": "2026-06-04T02:35:56Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
-                  "price": 1.57
+                  "price": 2.34
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 2.84
+                  "price": 7.0
                 }
               ]
             }
@@ -111,33 +111,33 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-06-03T19:40:32Z",
+          "last_update": "2026-06-04T02:35:57Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:40:32Z",
+              "last_update": "2026-06-04T02:35:57Z",
               "outcomes": [
                 {
-                  "name": "San Antonio Spurs",
-                  "price": 1.56
+                  "name": "New York Knicks",
+                  "price": 1.01
                 },
                 {
-                  "name": "New York Knicks",
-                  "price": 2.76
+                  "name": "San Antonio Spurs",
+                  "price": 1.25
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-06-03T19:40:32Z",
+              "last_update": "2026-06-04T02:35:57Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
-                  "price": 1.57
+                  "price": 2.34
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 2.84
+                  "price": 7.0
                 }
               ]
             }
@@ -146,19 +146,19 @@
         {
           "key": "betmgm",
           "title": "BetMGM",
-          "last_update": "2026-06-03T19:05:37Z",
+          "last_update": "2026-06-04T02:35:01Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-06-03T19:05:37Z",
+              "last_update": "2026-06-04T02:35:01Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
-                  "price": 1.53
+                  "price": 1.54
                 },
                 {
                   "name": "New York Knicks",
-                  "price": 2.55
+                  "price": 2.5
                 }
               ]
             }
