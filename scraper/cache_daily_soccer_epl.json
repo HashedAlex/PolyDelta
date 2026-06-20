@@ -16,9 +16,9 @@
       "home_team": "Hull City",
       "away_team": "Manchester United",
       "commence_time": "2026-08-22T11:30:00+00:00",
-      "home_odds": 0.1335,
-      "draw_odds": 0.2897,
-      "away_odds": 0.5768,
+      "home_odds": 0.1486,
+      "draw_odds": 0.2092,
+      "away_odds": 0.6422,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -93,9 +93,9 @@
       "home_team": "Newcastle United",
       "away_team": "Liverpool",
       "commence_time": "2026-08-23T15:30:00+00:00",
-      "home_odds": 0.3144,
-      "draw_odds": 0.3262,
-      "away_odds": 0.3594,
+      "home_odds": 0.2718,
+      "draw_odds": 0.3734,
+      "away_odds": 0.3548,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -104,14 +104,14 @@
       "home_team": "Fulham",
       "away_team": "Chelsea",
       "commence_time": "2026-08-24T19:00:00+00:00",
-      "home_odds": 0.2958,
-      "draw_odds": 0.3336,
-      "away_odds": 0.3706,
+      "home_odds": 0.2876,
+      "draw_odds": 0.2755,
+      "away_odds": 0.4369,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-06-20T02:11:55.754935",
+  "cached_at": "2026-06-20T10:24:48.922931",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
