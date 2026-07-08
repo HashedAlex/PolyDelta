@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-08T10:05:31.095155",
+  "timestamp": "2026-07-08T17:17:21.348156",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,11 +13,11 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-07-08T10:01:50Z",
+          "last_update": "2026-07-08T17:15:51Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-08T10:01:50Z",
+              "last_update": "2026-07-08T17:15:51Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -58,11 +58,11 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-07-08T10:04:55Z",
+          "last_update": "2026-07-08T17:12:43Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-08T10:04:55Z",
+              "last_update": "2026-07-08T17:12:43Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -86,7 +86,7 @@
                 },
                 {
                   "name": "Morocco",
-                  "price": 34.0
+                  "price": 36.0
                 },
                 {
                   "name": "Belgium",
@@ -100,7 +100,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-07-08T10:04:55Z",
+              "last_update": "2026-07-08T17:12:43Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -124,7 +124,7 @@
                 },
                 {
                   "name": "Morocco",
-                  "price": 36.0
+                  "price": 38.0
                 },
                 {
                   "name": "Belgium",
@@ -141,11 +141,11 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-07-08T10:00:34Z",
+          "last_update": "2026-07-08T17:13:09Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-08T10:00:34Z",
+              "last_update": "2026-07-08T17:13:09Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -169,7 +169,7 @@
                 },
                 {
                   "name": "Morocco",
-                  "price": 34.0
+                  "price": 36.0
                 },
                 {
                   "name": "Belgium",
@@ -183,7 +183,7 @@
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-07-08T10:00:34Z",
+              "last_update": "2026-07-08T17:13:09Z",
               "outcomes": [
                 {
                   "name": "France",
@@ -207,7 +207,7 @@
                 },
                 {
                   "name": "Morocco",
-                  "price": 36.0
+                  "price": 38.0
                 },
                 {
                   "name": "Belgium",
@@ -224,11 +224,11 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-07-08T10:05:09Z",
+          "last_update": "2026-07-08T17:17:07Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-08T10:05:09Z",
+              "last_update": "2026-07-08T17:17:07Z",
               "outcomes": [
                 {
                   "name": "France",

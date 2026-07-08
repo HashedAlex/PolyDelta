@@ -60,9 +60,9 @@
       "home_team": "Brentford",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-08-22T16:30:00+00:00",
-      "home_odds": 0.3705,
-      "draw_odds": 0.2636,
-      "away_odds": 0.3658,
+      "home_odds": 0.3722,
+      "draw_odds": 0.263,
+      "away_odds": 0.3648,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-07-08T10:05:29.683957",
+  "cached_at": "2026-07-08T17:17:20.393690",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
