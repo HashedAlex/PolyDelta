@@ -6,8 +6,8 @@
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
       "home_odds": 0.8159,
-      "draw_odds": 0.123,
-      "away_odds": 0.0611,
+      "draw_odds": 0.1239,
+      "away_odds": 0.0602,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,9 +82,9 @@
       "home_team": "Manchester City",
       "away_team": "Bournemouth",
       "commence_time": "2026-08-23T13:00:00+00:00",
-      "home_odds": 0.661,
-      "draw_odds": 0.1877,
-      "away_odds": 0.1513,
+      "home_odds": 0.6595,
+      "draw_odds": 0.1876,
+      "away_odds": 0.1529,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-07-10T01:48:41.432750",
+  "cached_at": "2026-07-10T10:42:51.723008",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
