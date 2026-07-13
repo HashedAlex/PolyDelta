@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-13T10:48:22.960138",
+  "timestamp": "2026-07-13T17:47:27.366664",
   "data": [
     {
       "id": "bfb75c30bceadf7a0e5277f59ec11eac",
@@ -13,11 +13,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-07-13T10:47:01Z",
+          "last_update": "2026-07-13T17:43:31Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-13T10:47:01Z",
+              "last_update": "2026-07-13T17:43:31Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
@@ -146,11 +146,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-07-13T10:44:33Z",
+          "last_update": "2026-07-13T17:45:41Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-13T10:44:33Z",
+              "last_update": "2026-07-13T17:45:41Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -174,7 +174,7 @@
                 },
                 {
                   "name": "Cleveland Cavaliers",
-                  "price": 23.0
+                  "price": 26.0
                 },
                 {
                   "name": "Denver Nuggets",
@@ -279,11 +279,11 @@
         {
           "key": "betonlineag",
           "title": "BetOnline.ag",
-          "last_update": "2026-07-13T10:47:15Z",
+          "last_update": "2026-07-13T17:43:32Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-13T10:47:15Z",
+              "last_update": "2026-07-13T17:43:32Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
@@ -412,11 +412,11 @@
         {
           "key": "pinnacle",
           "title": "Pinnacle",
-          "last_update": "2026-07-13T10:47:51Z",
+          "last_update": "2026-07-13T17:47:12Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-13T10:47:51Z",
+              "last_update": "2026-07-13T17:47:12Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
