@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-14T17:01:02.075535",
+  "timestamp": "2026-07-15T01:16:53.762546",
   "data": [
     {
       "id": "94d798388a4dab6d081114ad5e83db38",
@@ -13,27 +13,23 @@
         {
           "key": "draftkings",
           "title": "DraftKings",
-          "last_update": "2026-07-14T16:56:07Z",
+          "last_update": "2026-07-15T01:13:01Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-14T16:56:07Z",
+              "last_update": "2026-07-15T01:13:01Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.3
-                },
-                {
                   "name": "Spain",
-                  "price": 4.2
+                  "price": 1.64
                 },
                 {
                   "name": "England",
-                  "price": 4.4
+                  "price": 4.0
                 },
                 {
                   "name": "Argentina",
-                  "price": 5.5
+                  "price": 5.0
                 }
               ]
             }
@@ -42,49 +38,41 @@
         {
           "key": "betfair_ex_eu",
           "title": "Betfair",
-          "last_update": "2026-07-14T16:56:47Z",
+          "last_update": "2026-07-15T01:13:22Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-14T16:56:47Z",
+              "last_update": "2026-07-15T01:13:22Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.62
-                },
-                {
                   "name": "Spain",
-                  "price": 4.3
+                  "price": 1.74
                 },
                 {
                   "name": "England",
-                  "price": 4.6
+                  "price": 4.2
                 },
                 {
                   "name": "Argentina",
-                  "price": 5.8
+                  "price": 5.2
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-07-14T16:56:47Z",
+              "last_update": "2026-07-15T01:13:22Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.64
-                },
-                {
                   "name": "Spain",
-                  "price": 4.4
+                  "price": 1.75
                 },
                 {
                   "name": "England",
-                  "price": 4.7
+                  "price": 4.3
                 },
                 {
                   "name": "Argentina",
-                  "price": 5.9
+                  "price": 5.3
                 }
               ]
             }
@@ -93,49 +81,41 @@
         {
           "key": "betfair_ex_uk",
           "title": "Betfair",
-          "last_update": "2026-07-14T16:56:07Z",
+          "last_update": "2026-07-15T01:13:03Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-14T16:56:07Z",
+              "last_update": "2026-07-15T01:13:03Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.62
-                },
-                {
                   "name": "Spain",
-                  "price": 4.3
+                  "price": 1.74
                 },
                 {
                   "name": "England",
-                  "price": 4.6
+                  "price": 4.2
                 },
                 {
                   "name": "Argentina",
-                  "price": 5.8
+                  "price": 5.2
                 }
               ]
             },
             {
               "key": "outrights_lay",
-              "last_update": "2026-07-14T16:56:07Z",
+              "last_update": "2026-07-15T01:13:03Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.64
-                },
-                {
                   "name": "Spain",
-                  "price": 4.4
+                  "price": 1.75
                 },
                 {
                   "name": "England",
-                  "price": 4.7
+                  "price": 4.3
                 },
                 {
                   "name": "Argentina",
-                  "price": 5.9
+                  "price": 5.3
                 }
               ]
             }
@@ -144,23 +124,19 @@
         {
           "key": "williamhill",
           "title": "William Hill",
-          "last_update": "2026-07-14T17:00:22Z",
+          "last_update": "2026-07-15T01:16:07Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-07-14T17:00:22Z",
+              "last_update": "2026-07-15T01:16:07Z",
               "outcomes": [
                 {
-                  "name": "France",
-                  "price": 2.38
-                },
-                {
                   "name": "Spain",
-                  "price": 4.0
+                  "price": 1.7
                 },
                 {
                   "name": "England",
-                  "price": 4.0
+                  "price": 3.6
                 },
                 {
                   "name": "Argentina",
