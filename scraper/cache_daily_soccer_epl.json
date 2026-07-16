@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.8169,
-      "draw_odds": 0.122,
-      "away_odds": 0.0611,
+      "home_odds": 0.8176,
+      "draw_odds": 0.1212,
+      "away_odds": 0.0612,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -93,9 +93,9 @@
       "home_team": "Newcastle United",
       "away_team": "Liverpool",
       "commence_time": "2026-08-23T15:30:00+00:00",
-      "home_odds": 0.324,
-      "draw_odds": 0.2472,
-      "away_odds": 0.4288,
+      "home_odds": 0.3244,
+      "draw_odds": 0.2475,
+      "away_odds": 0.4281,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-07-16T09:54:29.846240",
+  "cached_at": "2026-07-16T17:01:20.297807",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
