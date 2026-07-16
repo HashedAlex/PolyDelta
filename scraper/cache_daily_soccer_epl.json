@@ -5,8 +5,8 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.8167,
-      "draw_odds": 0.123,
+      "home_odds": 0.8175,
+      "draw_odds": 0.1221,
       "away_odds": 0.0604,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
@@ -16,9 +16,9 @@
       "home_team": "Hull City",
       "away_team": "Manchester United",
       "commence_time": "2026-08-22T11:30:00+00:00",
-      "home_odds": 0.1374,
-      "draw_odds": 0.2119,
-      "away_odds": 0.6507,
+      "home_odds": 0.1392,
+      "draw_odds": 0.2115,
+      "away_odds": 0.6493,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -27,9 +27,9 @@
       "home_team": "Everton",
       "away_team": "Crystal Palace",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.4473,
-      "draw_odds": 0.2758,
-      "away_odds": 0.2769,
+      "home_odds": 0.448,
+      "draw_odds": 0.2755,
+      "away_odds": 0.2765,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Brentford",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-08-22T16:30:00+00:00",
-      "home_odds": 0.4189,
-      "draw_odds": 0.2562,
-      "away_odds": 0.3249,
+      "home_odds": 0.4107,
+      "draw_odds": 0.2565,
+      "away_odds": 0.3328,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-07-15T17:03:19.567044",
+  "cached_at": "2026-07-16T01:26:22.913406",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
