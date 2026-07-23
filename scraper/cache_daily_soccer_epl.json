@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.812,
-      "draw_odds": 0.1238,
-      "away_odds": 0.0643,
+      "home_odds": 0.8128,
+      "draw_odds": 0.1239,
+      "away_odds": 0.0633,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-07-23T01:45:23.822071",
+  "cached_at": "2026-07-23T10:09:56.184742",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
