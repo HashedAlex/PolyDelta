@@ -38,9 +38,9 @@
       "home_team": "Ipswich Town",
       "away_team": "Sunderland",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.3419,
-      "draw_odds": 0.2887,
-      "away_odds": 0.3693,
+      "home_odds": 0.3439,
+      "draw_odds": 0.2891,
+      "away_odds": 0.367,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,9 +82,9 @@
       "home_team": "Manchester City",
       "away_team": "Bournemouth",
       "commence_time": "2026-08-23T13:00:00+00:00",
-      "home_odds": 0.651,
-      "draw_odds": 0.1914,
-      "away_odds": 0.1576,
+      "home_odds": 0.6515,
+      "draw_odds": 0.1911,
+      "away_odds": 0.1574,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-08-03T17:40:30.584818",
+  "cached_at": "2026-08-04T01:21:47.630949",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
