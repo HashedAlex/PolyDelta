@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.8188,
-      "draw_odds": 0.1222,
-      "away_odds": 0.059,
+      "home_odds": 0.8196,
+      "draw_odds": 0.122,
+      "away_odds": 0.0584,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "Hull City",
       "away_team": "Manchester United",
       "commence_time": "2026-08-22T11:30:00+00:00",
-      "home_odds": 0.1282,
-      "draw_odds": 0.2149,
-      "away_odds": 0.6569,
+      "home_odds": 0.1277,
+      "draw_odds": 0.214,
+      "away_odds": 0.6583,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -49,9 +49,9 @@
       "home_team": "Nottingham Forest",
       "away_team": "Leeds United",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.4212,
-      "draw_odds": 0.2808,
-      "away_odds": 0.298,
+      "home_odds": 0.4192,
+      "draw_odds": 0.2795,
+      "away_odds": 0.3013,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Brentford",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-08-22T16:30:00+00:00",
-      "home_odds": 0.3955,
-      "draw_odds": 0.2634,
-      "away_odds": 0.3411,
+      "home_odds": 0.3943,
+      "draw_odds": 0.2639,
+      "away_odds": 0.3418,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -93,9 +93,9 @@
       "home_team": "Newcastle United",
       "away_team": "Liverpool",
       "commence_time": "2026-08-23T15:30:00+00:00",
-      "home_odds": 0.2898,
-      "draw_odds": 0.2485,
-      "away_odds": 0.4617,
+      "home_odds": 0.2893,
+      "draw_odds": 0.2482,
+      "away_odds": 0.4625,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-08-08T00:46:29.468852",
+  "cached_at": "2026-08-08T08:26:06.901131",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
