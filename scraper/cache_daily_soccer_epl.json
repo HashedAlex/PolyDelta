@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.8199,
-      "draw_odds": 0.1213,
-      "away_odds": 0.0589,
+      "home_odds": 0.8193,
+      "draw_odds": 0.1219,
+      "away_odds": 0.0588,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "Hull City",
       "away_team": "Manchester United",
       "commence_time": "2026-08-22T11:30:00+00:00",
-      "home_odds": 0.1277,
-      "draw_odds": 0.214,
-      "away_odds": 0.6583,
+      "home_odds": 0.1279,
+      "draw_odds": 0.2143,
+      "away_odds": 0.6578,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -38,9 +38,9 @@
       "home_team": "Ipswich Town",
       "away_team": "Sunderland",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.3439,
-      "draw_odds": 0.2891,
-      "away_odds": 0.367,
+      "home_odds": 0.3442,
+      "draw_odds": 0.2893,
+      "away_odds": 0.3664,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -49,9 +49,9 @@
       "home_team": "Nottingham Forest",
       "away_team": "Leeds United",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.4212,
-      "draw_odds": 0.2808,
-      "away_odds": 0.298,
+      "home_odds": 0.4207,
+      "draw_odds": 0.2817,
+      "away_odds": 0.2976,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Brentford",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-08-22T16:30:00+00:00",
-      "home_odds": 0.3946,
-      "draw_odds": 0.2641,
-      "away_odds": 0.3413,
+      "home_odds": 0.3937,
+      "draw_odds": 0.2642,
+      "away_odds": 0.3421,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -71,9 +71,9 @@
       "home_team": "Brighton and Hove Albion",
       "away_team": "Aston Villa",
       "commence_time": "2026-08-23T13:00:00+00:00",
-      "home_odds": 0.4128,
-      "draw_odds": 0.2631,
-      "away_odds": 0.3241,
+      "home_odds": 0.4177,
+      "draw_odds": 0.2633,
+      "away_odds": 0.319,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-08-09T16:20:35.311364",
+  "cached_at": "2026-08-10T00:52:35.660607",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
