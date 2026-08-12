@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-12T00:58:38.732197",
+  "timestamp": "2026-08-12T08:58:59.654304",
   "data": [
     {
       "id": "bfb75c30bceadf7a0e5277f59ec11eac",
@@ -13,11 +13,11 @@
         {
           "key": "fanduel",
           "title": "FanDuel",
-          "last_update": "2026-08-12T00:57:48Z",
+          "last_update": "2026-08-12T08:55:10Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-08-12T00:57:48Z",
+              "last_update": "2026-08-12T08:55:10Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -146,11 +146,11 @@
         {
           "key": "betrivers",
           "title": "BetRivers",
-          "last_update": "2026-08-12T00:54:05Z",
+          "last_update": "2026-08-12T08:57:48Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-08-12T00:54:05Z",
+              "last_update": "2026-08-12T08:57:48Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -279,11 +279,11 @@
         {
           "key": "betonlineag",
           "title": "BetOnline.ag",
-          "last_update": "2026-08-12T00:58:35Z",
+          "last_update": "2026-08-12T08:55:50Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-08-12T00:58:35Z",
+              "last_update": "2026-08-12T08:55:50Z",
               "outcomes": [
                 {
                   "name": "San Antonio Spurs",
@@ -412,11 +412,11 @@
         {
           "key": "pinnacle",
           "title": "Pinnacle",
-          "last_update": "2026-08-12T00:57:49Z",
+          "last_update": "2026-08-12T08:57:08Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-08-12T00:57:49Z",
+              "last_update": "2026-08-12T08:57:08Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
@@ -545,11 +545,11 @@
         {
           "key": "betmgm",
           "title": "BetMGM",
-          "last_update": "2026-08-12T00:56:41Z",
+          "last_update": "2026-08-12T08:54:32Z",
           "markets": [
             {
               "key": "outrights",
-              "last_update": "2026-08-12T00:56:41Z",
+              "last_update": "2026-08-12T08:54:32Z",
               "outcomes": [
                 {
                   "name": "Oklahoma City Thunder",
