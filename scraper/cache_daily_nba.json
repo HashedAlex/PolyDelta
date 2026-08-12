@@ -15,8 +15,8 @@
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-10-20T23:00:00+00:00",
-      "home_odds": 0.6098,
-      "away_odds": 0.3902,
+      "home_odds": 0.618,
+      "away_odds": 0.382,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-10-21T01:30:00+00:00",
-      "home_odds": 0.5358,
-      "away_odds": 0.4642,
+      "home_odds": 0.5324,
+      "away_odds": 0.4676,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -95,8 +95,8 @@
       "home_team": "New York Knicks",
       "away_team": "San Antonio Spurs",
       "commence_time": "2026-12-25T17:00:00+00:00",
-      "home_odds": 0.4975,
-      "away_odds": 0.5025,
+      "home_odds": 0.504,
+      "away_odds": 0.496,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -105,8 +105,8 @@
       "home_team": "Boston Celtics",
       "away_team": "Miami Heat",
       "commence_time": "2026-12-25T19:30:00+00:00",
-      "home_odds": 0.6293,
-      "away_odds": 0.3707,
+      "home_odds": 0.6227,
+      "away_odds": 0.3773,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -115,8 +115,8 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-12-25T22:00:00+00:00",
-      "home_odds": 0.5157,
-      "away_odds": 0.4843,
+      "home_odds": 0.507,
+      "away_odds": 0.493,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -125,8 +125,8 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-12-26T01:00:00+00:00",
-      "home_odds": 0.4167,
-      "away_odds": 0.5833,
+      "home_odds": 0.4074,
+      "away_odds": 0.5926,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -135,13 +135,13 @@
       "home_team": "Golden State Warriors",
       "away_team": "Denver Nuggets",
       "commence_time": "2026-12-26T03:30:00+00:00",
-      "home_odds": 0.4664,
-      "away_odds": 0.5336,
+      "home_odds": 0.4451,
+      "away_odds": 0.5549,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-11T16:44:36.711769",
+  "cached_at": "2026-08-12T00:58:36.701692",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
