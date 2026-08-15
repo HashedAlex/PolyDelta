@@ -405,13 +405,13 @@
       "home_team": "Golden State Warriors",
       "away_team": "Denver Nuggets",
       "commence_time": "2026-12-26T03:30:00+00:00",
-      "home_odds": 0.4463,
-      "away_odds": 0.5537,
+      "home_odds": 0.4565,
+      "away_odds": 0.5435,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-15T00:35:01.553863",
+  "cached_at": "2026-08-15T08:14:08.865081",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
