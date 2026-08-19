@@ -85,8 +85,8 @@
       "home_team": "Memphis Grizzlies",
       "away_team": "Utah Jazz",
       "commence_time": "2026-10-22T00:10:00+00:00",
-      "home_odds": 0.4352,
-      "away_odds": 0.5648,
+      "home_odds": 0.4315,
+      "away_odds": 0.5685,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-19T08:22:20.451386",
+  "cached_at": "2026-08-19T16:17:49.512218",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
