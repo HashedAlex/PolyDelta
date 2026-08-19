@@ -15,8 +15,8 @@
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-10-20T23:00:00+00:00",
-      "home_odds": 0.616,
-      "away_odds": 0.384,
+      "home_odds": 0.618,
+      "away_odds": 0.382,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -45,8 +45,8 @@
       "home_team": "Washington Wizards",
       "away_team": "Milwaukee Bucks",
       "commence_time": "2026-10-21T23:10:00+00:00",
-      "home_odds": 0.6669,
-      "away_odds": 0.3331,
+      "home_odds": 0.6643,
+      "away_odds": 0.3357,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -85,8 +85,8 @@
       "home_team": "Memphis Grizzlies",
       "away_team": "Utah Jazz",
       "commence_time": "2026-10-22T00:10:00+00:00",
-      "home_odds": 0.4315,
-      "away_odds": 0.5685,
+      "home_odds": 0.4352,
+      "away_odds": 0.5648,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -105,8 +105,8 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Golden State Warriors",
       "commence_time": "2026-10-22T02:10:00+00:00",
-      "home_odds": 0.6165,
-      "away_odds": 0.3835,
+      "home_odds": 0.6143,
+      "away_odds": 0.3857,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -125,8 +125,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-10-22T23:10:00+00:00",
-      "home_odds": 0.6065,
-      "away_odds": 0.3935,
+      "home_odds": 0.6095,
+      "away_odds": 0.3905,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -155,8 +155,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Houston Rockets",
       "commence_time": "2026-10-24T01:40:00+00:00",
-      "home_odds": 0.6444,
-      "away_odds": 0.3556,
+      "home_odds": 0.6573,
+      "away_odds": 0.3427,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -245,8 +245,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-11-07T00:40:00+00:00",
-      "home_odds": 0.526,
-      "away_odds": 0.474,
+      "home_odds": 0.5222,
+      "away_odds": 0.4778,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -265,8 +265,8 @@
       "home_team": "Indiana Pacers",
       "away_team": "New York Knicks",
       "commence_time": "2026-11-14T00:10:00+00:00",
-      "home_odds": 0.4675,
-      "away_odds": 0.5325,
+      "home_odds": 0.4574,
+      "away_odds": 0.5426,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -285,8 +285,8 @@
       "home_team": "Denver Nuggets",
       "away_team": "Houston Rockets",
       "commence_time": "2026-11-21T03:10:00+00:00",
-      "home_odds": 0.5714,
-      "away_odds": 0.4286,
+      "home_odds": 0.5823,
+      "away_odds": 0.4177,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -295,8 +295,8 @@
       "home_team": "Washington Wizards",
       "away_team": "Boston Celtics",
       "commence_time": "2026-11-25T01:10:00+00:00",
-      "home_odds": 0.3639,
-      "away_odds": 0.6361,
+      "home_odds": 0.3689,
+      "away_odds": 0.6311,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -345,8 +345,8 @@
       "home_team": "New York Knicks",
       "away_team": "Miami Heat",
       "commence_time": "2026-11-28T00:10:00+00:00",
-      "home_odds": 0.6361,
-      "away_odds": 0.3639,
+      "home_odds": 0.6311,
+      "away_odds": 0.3689,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -355,8 +355,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Los Angeles Lakers",
       "commence_time": "2026-11-28T02:40:00+00:00",
-      "home_odds": 0.705,
-      "away_odds": 0.295,
+      "home_odds": 0.7097,
+      "away_odds": 0.2903,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-18T16:17:54.089317",
+  "cached_at": "2026-08-19T00:34:56.685509",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
