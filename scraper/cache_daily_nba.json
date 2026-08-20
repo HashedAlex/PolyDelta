@@ -15,8 +15,8 @@
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-10-20T23:00:00+00:00",
-      "home_odds": 0.618,
-      "away_odds": 0.382,
+      "home_odds": 0.6196,
+      "away_odds": 0.3804,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-20T08:23:14.484320",
+  "cached_at": "2026-08-20T16:20:29.378627",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
