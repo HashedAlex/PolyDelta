@@ -115,8 +115,8 @@
       "home_team": "Portland Trail Blazers",
       "away_team": "Phoenix Suns",
       "commence_time": "2026-10-22T02:10:00+00:00",
-      "home_odds": 0.6095,
-      "away_odds": 0.3905,
+      "home_odds": 0.6065,
+      "away_odds": 0.3935,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-20T00:34:19.718739",
+  "cached_at": "2026-08-20T08:23:14.484320",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }

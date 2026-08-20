@@ -5,9 +5,9 @@
       "home_team": "Arsenal",
       "away_team": "Coventry City",
       "commence_time": "2026-08-21T19:00:00+00:00",
-      "home_odds": 0.8133,
-      "draw_odds": 0.1259,
-      "away_odds": 0.0608,
+      "home_odds": 0.8137,
+      "draw_odds": 0.1257,
+      "away_odds": 0.0606,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -16,9 +16,9 @@
       "home_team": "Hull City",
       "away_team": "Manchester United",
       "commence_time": "2026-08-22T11:30:00+00:00",
-      "home_odds": 0.1131,
-      "draw_odds": 0.1973,
-      "away_odds": 0.6896,
+      "home_odds": 0.1133,
+      "draw_odds": 0.1976,
+      "away_odds": 0.6891,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -28,8 +28,8 @@
       "away_team": "Crystal Palace",
       "commence_time": "2026-08-22T14:00:00+00:00",
       "home_odds": 0.4354,
-      "draw_odds": 0.281,
-      "away_odds": 0.2836,
+      "draw_odds": 0.2814,
+      "away_odds": 0.2833,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -49,9 +49,9 @@
       "home_team": "Nottingham Forest",
       "away_team": "Leeds United",
       "commence_time": "2026-08-22T14:00:00+00:00",
-      "home_odds": 0.4162,
-      "draw_odds": 0.282,
-      "away_odds": 0.3018,
+      "home_odds": 0.4157,
+      "draw_odds": 0.283,
+      "away_odds": 0.3014,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +60,9 @@
       "home_team": "Brentford",
       "away_team": "Tottenham Hotspur",
       "commence_time": "2026-08-22T16:30:00+00:00",
-      "home_odds": 0.3899,
-      "draw_odds": 0.2658,
-      "away_odds": 0.3443,
+      "home_odds": 0.3904,
+      "draw_odds": 0.2663,
+      "away_odds": 0.3433,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,9 +82,9 @@
       "home_team": "Manchester City",
       "away_team": "Bournemouth",
       "commence_time": "2026-08-23T13:00:00+00:00",
-      "home_odds": 0.6434,
-      "draw_odds": 0.1953,
-      "away_odds": 0.1613,
+      "home_odds": 0.6433,
+      "draw_odds": 0.1954,
+      "away_odds": 0.1614,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -94,8 +94,8 @@
       "away_team": "Liverpool",
       "commence_time": "2026-08-23T15:30:00+00:00",
       "home_odds": 0.2586,
-      "draw_odds": 0.2455,
-      "away_odds": 0.4959,
+      "draw_odds": 0.2448,
+      "away_odds": 0.4966,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -111,7 +111,7 @@
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-08-20T00:34:20.157465",
+  "cached_at": "2026-08-20T08:23:14.846454",
   "sport_key": "soccer_epl",
   "sport_name": "English Premier League"
 }
