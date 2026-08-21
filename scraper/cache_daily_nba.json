@@ -245,8 +245,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-11-07T00:40:00+00:00",
-      "home_odds": 0.5222,
-      "away_odds": 0.4778,
+      "home_odds": 0.526,
+      "away_odds": 0.474,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-21T00:37:23.909658",
+  "cached_at": "2026-08-21T08:25:25.804755",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
