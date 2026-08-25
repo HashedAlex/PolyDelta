@@ -205,8 +205,8 @@
       "home_team": "Dallas Mavericks",
       "away_team": "Houston Rockets",
       "commence_time": "2026-10-31T00:10:00+00:00",
-      "home_odds": 0.3905,
-      "away_odds": 0.6095,
+      "home_odds": 0.3965,
+      "away_odds": 0.6035,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -375,8 +375,8 @@
       "home_team": "Boston Celtics",
       "away_team": "Miami Heat",
       "commence_time": "2026-12-25T19:30:00+00:00",
-      "home_odds": 0.6261,
-      "away_odds": 0.3739,
+      "home_odds": 0.6244,
+      "away_odds": 0.3756,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-24T16:22:23.901571",
+  "cached_at": "2026-08-25T00:35:39.458447",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
