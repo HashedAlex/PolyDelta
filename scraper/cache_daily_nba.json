@@ -25,8 +25,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-10-21T01:30:00+00:00",
-      "home_odds": 0.529,
-      "away_odds": 0.471,
+      "home_odds": 0.5307,
+      "away_odds": 0.4693,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -85,8 +85,8 @@
       "home_team": "Memphis Grizzlies",
       "away_team": "Utah Jazz",
       "commence_time": "2026-10-22T00:10:00+00:00",
-      "home_odds": 0.4315,
-      "away_odds": 0.5685,
+      "home_odds": 0.4352,
+      "away_odds": 0.5648,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -125,8 +125,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-10-22T23:10:00+00:00",
-      "home_odds": 0.6065,
-      "away_odds": 0.3935,
+      "home_odds": 0.6095,
+      "away_odds": 0.3905,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -395,8 +395,8 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-12-26T01:00:00+00:00",
-      "home_odds": 0.4074,
-      "away_odds": 0.5926,
+      "home_odds": 0.405,
+      "away_odds": 0.595,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-08-27T05:34:16.122756",
+  "cached_at": "2026-09-01T02:27:58.101058",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }

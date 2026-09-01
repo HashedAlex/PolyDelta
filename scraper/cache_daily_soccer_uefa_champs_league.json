@@ -1,18 +1,205 @@
 {
   "matches": [
     {
-      "match_id": "a54f22aca3be31d95f13eac0aeac62cf",
-      "home_team": "Paris Saint Germain",
+      "match_id": "9c28ce0ac169f83e873ae8caa7f9a597",
+      "home_team": "AEK Athens",
+      "away_team": "LASK",
+      "commence_time": "2026-09-08T16:45:00+00:00",
+      "home_odds": 0.5426,
+      "draw_odds": 0.2423,
+      "away_odds": 0.2151,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "8f1221dd6bc88a3ebbfe573332840741",
+      "home_team": "Club Brugge",
+      "away_team": "Aston Villa",
+      "commence_time": "2026-09-08T16:45:00+00:00",
+      "home_odds": 0.3513,
+      "draw_odds": 0.256,
+      "away_odds": 0.3927,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "33aa4b8a301a13b229e96901d831fd38",
+      "home_team": "Borussia Dortmund",
+      "away_team": "Villarreal",
+      "commence_time": "2026-09-08T19:00:00+00:00",
+      "home_odds": 0.5262,
+      "draw_odds": 0.2384,
+      "away_odds": 0.2354,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "259414448d0b88e42b454f4e7deca152",
+      "home_team": "Real Madrid",
+      "away_team": "Inter Milan",
+      "commence_time": "2026-09-08T19:00:00+00:00",
+      "home_odds": 0.5935,
+      "draw_odds": 0.2194,
+      "away_odds": 0.1871,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "e47709952f60b21cbd0a358299071e5c",
+      "home_team": "Lille",
+      "away_team": "Real Betis",
+      "commence_time": "2026-09-08T19:00:00+00:00",
+      "home_odds": 0.3711,
+      "draw_odds": 0.3098,
+      "away_odds": 0.3191,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "bfeab0a3d8931c7cdff0056c041ff97c",
+      "home_team": "Porto",
+      "away_team": "Manchester City",
+      "commence_time": "2026-09-08T19:00:00+00:00",
+      "home_odds": 0.224,
+      "draw_odds": 0.244,
+      "away_odds": 0.532,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "c9bbedd626635eddff4934e689472fb8",
+      "home_team": "Barcelona",
+      "away_team": "Feyenoord",
+      "commence_time": "2026-09-09T16:45:00+00:00",
+      "home_odds": 0.8563,
+      "draw_odds": 0.091,
+      "away_odds": 0.0527,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "7f35abdd401ebdfd0e74a9fad9051ef0",
+      "home_team": "VfB Stuttgart",
+      "away_team": "Viking FK",
+      "commence_time": "2026-09-09T16:45:00+00:00",
+      "home_odds": 0.7591,
+      "draw_odds": 0.1465,
+      "away_odds": 0.0945,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "a43752f35ceb66893134410ad476bca9",
+      "home_team": "Napoli",
       "away_team": "Arsenal",
-      "commence_time": "2026-05-30T16:01:00+00:00",
-      "home_odds": 0.1789,
-      "draw_odds": 0.2635,
-      "away_odds": 0.5576,
+      "commence_time": "2026-09-09T19:00:00+00:00",
+      "home_odds": 0.2278,
+      "draw_odds": 0.2624,
+      "away_odds": 0.5098,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "0f3bf8fff62bb732883c00265d28f766",
+      "home_team": "Liverpool",
+      "away_team": "Atl\u00e9tico Madrid",
+      "commence_time": "2026-09-09T19:00:00+00:00",
+      "home_odds": 0.5462,
+      "draw_odds": 0.2427,
+      "away_odds": 0.211,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "0be8f24bfc0697e8d789fafc699ece49",
+      "home_team": "Sporting Lisbon",
+      "away_team": "Galatasaray",
+      "commence_time": "2026-09-09T19:00:00+00:00",
+      "home_odds": 0.49,
+      "draw_odds": 0.2591,
+      "away_odds": 0.2509,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "05779f7ef396f94b5d36ce6923ab6870",
+      "home_team": "Paris Saint Germain",
+      "away_team": "\u0160K Slovan Bratislava",
+      "commence_time": "2026-09-09T19:00:00+00:00",
+      "home_odds": 0.9274,
+      "draw_odds": 0.0466,
+      "away_odds": 0.026,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "548baa1054bef3f3c9f830d99280eefe",
+      "home_team": "Fenerbahce",
+      "away_team": "AS Roma",
+      "commence_time": "2026-09-10T16:45:00+00:00",
+      "home_odds": 0.3715,
+      "draw_odds": 0.2807,
+      "away_odds": 0.3478,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "c0600767e29158f4b32b3203d6b230d2",
+      "home_team": "PSV Eindhoven",
+      "away_team": "Shakhtar Donetsk",
+      "commence_time": "2026-09-10T16:45:00+00:00",
+      "home_odds": 0.67,
+      "draw_odds": 0.1921,
+      "away_odds": 0.138,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "ce224016de80ab3f7101a6c7cde3a5c7",
+      "home_team": "Bayern Munich",
+      "away_team": "Bod\u00f8/Glimt",
+      "commence_time": "2026-09-10T19:00:00+00:00",
+      "home_odds": 0.8247,
+      "draw_odds": 0.1059,
+      "away_odds": 0.0694,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "c50014f4b3e58a12a2c79dcde72548e6",
+      "home_team": "Como",
+      "away_team": "RB Leipzig",
+      "commence_time": "2026-09-10T19:00:00+00:00",
+      "home_odds": 0.4484,
+      "draw_odds": 0.2654,
+      "away_odds": 0.2862,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
+    },
+    {
+      "match_id": "347bee87359150e58c8883fc2cf6495a",
+      "home_team": "Manchester United",
+      "away_team": "Sabah FK",
+      "commence_time": "2026-09-10T19:00:00+00:00",
+      "home_odds": 0.8664,
+      "draw_odds": 0.0899,
+      "away_odds": 0.0436,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
+    },
+    {
+      "match_id": "6fab77b7f43d32938669027a713d7454",
+      "home_team": "Slavia Praha",
+      "away_team": "RC Lens",
+      "commence_time": "2026-09-10T19:00:00+00:00",
+      "home_odds": 0.3512,
+      "draw_odds": 0.2749,
+      "away_odds": 0.3739,
+      "bookmaker": "Pinnacle",
+      "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-05-30T16:51:16.907997",
+  "cached_at": "2026-09-01T02:27:59.111794",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
