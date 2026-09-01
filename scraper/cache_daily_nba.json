@@ -125,8 +125,8 @@
       "home_team": "Philadelphia 76ers",
       "away_team": "Cleveland Cavaliers",
       "commence_time": "2026-10-22T23:10:00+00:00",
-      "home_odds": 0.6095,
-      "away_odds": 0.3905,
+      "home_odds": 0.6065,
+      "away_odds": 0.3935,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -245,8 +245,8 @@
       "home_team": "Cleveland Cavaliers",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-11-07T00:40:00+00:00",
-      "home_odds": 0.526,
-      "away_odds": 0.474,
+      "home_odds": 0.5222,
+      "away_odds": 0.4778,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-09-01T12:51:23.289013",
+  "cached_at": "2026-09-01T18:57:31.334620",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
