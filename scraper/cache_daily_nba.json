@@ -395,8 +395,8 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-12-26T01:00:00+00:00",
-      "home_odds": 0.405,
-      "away_odds": 0.595,
+      "home_odds": 0.4074,
+      "away_odds": 0.5926,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-09-04T12:20:13.346654",
+  "cached_at": "2026-09-04T18:40:07.490173",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
