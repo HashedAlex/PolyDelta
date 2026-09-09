@@ -15,8 +15,8 @@
       "home_team": "New York Knicks",
       "away_team": "Philadelphia 76ers",
       "commence_time": "2026-10-20T23:00:00+00:00",
-      "home_odds": 0.6352,
-      "away_odds": 0.3648,
+      "home_odds": 0.6309,
+      "away_odds": 0.3691,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -25,8 +25,8 @@
       "home_team": "San Antonio Spurs",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-10-21T01:30:00+00:00",
-      "home_odds": 0.5307,
-      "away_odds": 0.4693,
+      "home_odds": 0.5264,
+      "away_odds": 0.4736,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -65,8 +65,8 @@
       "home_team": "Miami Heat",
       "away_team": "Minnesota Timberwolves",
       "commence_time": "2026-10-21T23:40:00+00:00",
-      "home_odds": 0.5203,
-      "away_odds": 0.4797,
+      "home_odds": 0.5255,
+      "away_odds": 0.4745,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -105,8 +105,8 @@
       "home_team": "Los Angeles Lakers",
       "away_team": "Golden State Warriors",
       "commence_time": "2026-10-22T02:10:00+00:00",
-      "home_odds": 0.6165,
-      "away_odds": 0.3835,
+      "home_odds": 0.6159,
+      "away_odds": 0.3841,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -395,8 +395,8 @@
       "home_team": "Minnesota Timberwolves",
       "away_team": "Oklahoma City Thunder",
       "commence_time": "2026-12-26T01:00:00+00:00",
-      "home_odds": 0.4074,
-      "away_odds": 0.5926,
+      "home_odds": 0.4086,
+      "away_odds": 0.5914,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-09-09T12:32:53.982847",
+  "cached_at": "2026-09-09T18:54:49.397151",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
