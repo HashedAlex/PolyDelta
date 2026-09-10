@@ -1,57 +1,13 @@
 {
   "matches": [
     {
-      "match_id": "a43752f35ceb66893134410ad476bca9",
-      "home_team": "Napoli",
-      "away_team": "Arsenal",
-      "commence_time": "2026-09-09T19:00:00+00:00",
-      "home_odds": 0.1795,
-      "draw_odds": 0.2534,
-      "away_odds": 0.5671,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
-    },
-    {
-      "match_id": "0f3bf8fff62bb732883c00265d28f766",
-      "home_team": "Liverpool",
-      "away_team": "Atl\u00e9tico Madrid",
-      "commence_time": "2026-09-09T19:00:00+00:00",
-      "home_odds": 0.546,
-      "draw_odds": 0.2445,
-      "away_odds": 0.2096,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
-    },
-    {
-      "match_id": "0be8f24bfc0697e8d789fafc699ece49",
-      "home_team": "Sporting Lisbon",
-      "away_team": "Galatasaray",
-      "commence_time": "2026-09-09T19:00:00+00:00",
-      "home_odds": 0.5884,
-      "draw_odds": 0.2233,
-      "away_odds": 0.1883,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
-    },
-    {
-      "match_id": "05779f7ef396f94b5d36ce6923ab6870",
-      "home_team": "Paris Saint Germain",
-      "away_team": "\u0160K Slovan Bratislava",
-      "commence_time": "2026-09-09T19:00:00+00:00",
-      "home_odds": 0.9296,
-      "draw_odds": 0.0488,
-      "away_odds": 0.0217,
-      "bookmaker": "Pinnacle",
-      "bookmaker_url": "https://www.pinnacle.com"
-    },
-    {
       "match_id": "548baa1054bef3f3c9f830d99280eefe",
       "home_team": "Fenerbahce",
       "away_team": "AS Roma",
       "commence_time": "2026-09-10T16:45:00+00:00",
-      "home_odds": 0.2837,
-      "draw_odds": 0.2757,
-      "away_odds": 0.4406,
+      "home_odds": 0.2815,
+      "draw_odds": 0.2702,
+      "away_odds": 0.4483,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -60,9 +16,9 @@
       "home_team": "PSV Eindhoven",
       "away_team": "Shakhtar Donetsk",
       "commence_time": "2026-09-10T16:45:00+00:00",
-      "home_odds": 0.6689,
-      "draw_odds": 0.1854,
-      "away_odds": 0.1456,
+      "home_odds": 0.6571,
+      "draw_odds": 0.1919,
+      "away_odds": 0.151,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -71,9 +27,9 @@
       "home_team": "Bayern Munich",
       "away_team": "Bod\u00f8/Glimt",
       "commence_time": "2026-09-10T19:00:00+00:00",
-      "home_odds": 0.8715,
-      "draw_odds": 0.0773,
-      "away_odds": 0.0512,
+      "home_odds": 0.8791,
+      "draw_odds": 0.0757,
+      "away_odds": 0.0452,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -82,9 +38,9 @@
       "home_team": "Como",
       "away_team": "RB Leipzig",
       "commence_time": "2026-09-10T19:00:00+00:00",
-      "home_odds": 0.5165,
-      "draw_odds": 0.243,
-      "away_odds": 0.2405,
+      "home_odds": 0.5246,
+      "draw_odds": 0.2414,
+      "away_odds": 0.234,
       "bookmaker": "Betfair",
       "bookmaker_url": "https://www.betfair.com"
     },
@@ -93,9 +49,9 @@
       "home_team": "Manchester United",
       "away_team": "Sabah FK",
       "commence_time": "2026-09-10T19:00:00+00:00",
-      "home_odds": 0.8563,
-      "draw_odds": 0.1061,
-      "away_odds": 0.0376,
+      "home_odds": 0.8586,
+      "draw_odds": 0.107,
+      "away_odds": 0.0344,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     },
@@ -104,14 +60,14 @@
       "home_team": "Slavia Praha",
       "away_team": "RC Lens",
       "commence_time": "2026-09-10T19:00:00+00:00",
-      "home_odds": 0.3693,
-      "draw_odds": 0.2777,
-      "away_odds": 0.353,
+      "home_odds": 0.3651,
+      "draw_odds": 0.2765,
+      "away_odds": 0.3584,
       "bookmaker": "Pinnacle",
       "bookmaker_url": "https://www.pinnacle.com"
     }
   ],
-  "cached_at": "2026-09-09T18:54:50.641593",
+  "cached_at": "2026-09-10T01:55:23.898641",
   "sport_key": "soccer_uefa_champs_league",
   "sport_name": "UEFA Champions League"
 }
