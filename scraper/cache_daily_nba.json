@@ -345,8 +345,8 @@
       "home_team": "New York Knicks",
       "away_team": "Miami Heat",
       "commence_time": "2026-11-28T00:10:00+00:00",
-      "home_odds": 0.6361,
-      "away_odds": 0.3639,
+      "home_odds": 0.6311,
+      "away_odds": 0.3689,
       "bookmaker": "DraftKings",
       "bookmaker_url": "https://sportsbook.draftkings.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-09-15T19:20:35.751132",
+  "cached_at": "2026-09-16T02:10:00.918749",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
