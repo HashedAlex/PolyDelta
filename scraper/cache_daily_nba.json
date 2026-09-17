@@ -5,8 +5,8 @@
       "home_team": "Detroit Pistons",
       "away_team": "Boston Celtics",
       "commence_time": "2026-10-20T19:00:00+00:00",
-      "home_odds": 0.5299,
-      "away_odds": 0.4701,
+      "home_odds": 0.5281,
+      "away_odds": 0.4719,
       "bookmaker": "FanDuel",
       "bookmaker_url": "https://sportsbook.fanduel.com"
     },
@@ -411,7 +411,7 @@
       "bookmaker_url": "https://sportsbook.fanduel.com"
     }
   ],
-  "cached_at": "2026-09-16T19:11:02.307812",
+  "cached_at": "2026-09-17T02:13:55.015136",
   "sport_key": "basketball_nba",
   "sport_name": "NBA"
 }
